@@ -105,7 +105,7 @@ static struct XWBNode* XWBMemFind (
     unsigned int* oSIze,
     const char** oFile,
     unsigned int* oLine);
-static void XWBMemDump (void);
+
 static void XWBMemInsert (
     void* iPtr,
     const unsigned int iSize,
@@ -205,20 +205,7 @@ static void XWBMemNew (void)
 
     atexit (XWBReportFinal);
 }
-/*******************************************************************************
-* Dump List - used for debugging only
-*******************************************************************************/
-static void XWBMemDump ()
-{
-    int count;
-    struct XWBNode* iter = xwbMem.mHead;
-    
-    for (count = 0; iter != 0; count++, iter = iter->mNext)
-    {
-        fprintf (xwbMem.mReport, "%d node %p prev %p next %p\n", count, iter, iter->mPrev, iter->mNext);
-    }
-    fprintf (xwbMem.mReport, "\n");
-}
+
 /*******************************************************************************
 * Insert into the tracking list
 *******************************************************************************/

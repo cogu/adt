@@ -134,7 +134,7 @@ void adt_str_push(adt_str_t *this,const int c){
 	assert(this->u32Cur < this->u32Len);
 }
 
-int adt_str_chop(adt_str_t *this){
+int adt_str_pop(adt_str_t *this){
 	int retval = 0;
 	if(this){
 		if(this->u32Cur>0){

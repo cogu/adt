@@ -7,7 +7,7 @@
 #include "adt_str.h"
 #include "CMemLeak.h"
 
-void Test_adt_str_constructor(CuTest* tc)
+void test_adt_str_constructor(CuTest* tc)
 {
 	adt_str_t *str = adt_str_new();
 	CuAssertPtrNotNull(tc, str);
@@ -15,7 +15,7 @@ void Test_adt_str_constructor(CuTest* tc)
 	adt_str_delete(str);
 }
 
-void Test_adt_str_push(CuTest* tc){
+void test_adt_str_push(CuTest* tc){
 	adt_str_t *str = adt_str_new();
 	CuAssertPtrNotNull(tc, str);
 	int i;
@@ -32,7 +32,27 @@ void Test_adt_str_push(CuTest* tc){
 	adt_str_delete(str);
 }
 
-void Test_adt_str_cdup(CuTest* tc){
+void test_adt_str_pop(CuTest* tc){
+	adt_str_t *str = adt_str_new();
+	CuAssertPtrNotNull(tc, str);
+	int i;
+	int len = 26;
+	adt_str_set_cstr(str,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	for(i = 'Z'; i >= 'A'; i--){
+		char c;
+		len--;
+		c = (char) adt_str_pop(str);
+		CuAssertTrue(tc,len>=0);
+		CuAssertIntEquals(tc,len,strlen(adt_str_cstr(str)));
+		CuAssertIntEquals(tc,len,adt_str_len(str));
+		CuAssertIntEquals(tc,i,c);
+	}
+	CuAssertTrue(tc,len==0);
+	CuAssertStrEquals(tc,"",adt_str_cstr(str));
+	adt_str_delete(str);
+}
+
+void test_adt_str_cdup(CuTest* tc){
 	adt_str_t *str = adt_str_dup_cstr("Hello World");
 	CuAssertPtrNotNull(tc, str);
 	CuAssertIntEquals(tc,11,adt_str_len(str));
@@ -40,7 +60,7 @@ void Test_adt_str_cdup(CuTest* tc){
 	adt_str_delete(str);
 }
 
-void Test_adt_str_cappend(CuTest* tc){
+void test_adt_str_cappend(CuTest* tc){
 	adt_str_t *str = adt_str_dup_cstr("Hello");
 	CuAssertPtrNotNull(tc, str);
 	CuAssertIntEquals(tc,5,adt_str_len(str));
@@ -73,11 +93,13 @@ CuSuite* testsuite_adt_str(void)
 {
 	CuSuite* suite = CuSuiteNew();
 
-	SUITE_ADD_TEST(suite, Test_adt_str_constructor);
-	SUITE_ADD_TEST(suite, Test_adt_str_push);
-	SUITE_ADD_TEST(suite, Test_adt_str_cdup);
-	SUITE_ADD_TEST(suite, Test_adt_str_cappend);
+	SUITE_ADD_TEST(suite, test_adt_str_constructor);
+	SUITE_ADD_TEST(suite, test_adt_str_push);
+	SUITE_ADD_TEST(suite, test_adt_str_pop);
+	SUITE_ADD_TEST(suite, test_adt_str_cdup);
+	SUITE_ADD_TEST(suite, test_adt_str_cappend);
 	SUITE_ADD_TEST(suite, test_adt_str_copy_range);
+
 
 	return suite;
 }

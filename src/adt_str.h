@@ -62,7 +62,7 @@ void adt_str_set(adt_str_t *lhs, adt_str_t *rhs);
 void adt_str_append(adt_str_t *lhs,adt_str_t *rhs);
 void adt_str_reserve(adt_str_t *this,uint32_t u32Len);
 void adt_str_push(adt_str_t *this,const int c);
-int adt_str_chop(adt_str_t *this);
+int adt_str_pop(adt_str_t *this);
 
 /* C string compatible functions */
 adt_str_t *adt_str_dup_cstr(const char* cstr); //constructor
