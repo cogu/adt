@@ -7,9 +7,7 @@
 #include "adt_stack.h"
 #include "CMemLeak.h"
 
-void void_free(void* p){
-	free(p); //need a function pointer for calling free in case CMemLeak detection is active
-}
+void void_free(void* p);
 
 void test_adt_stack_new(CuTest* tc)
 {

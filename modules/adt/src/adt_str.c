@@ -86,7 +86,7 @@ adt_str_t *adt_str_make(const char *pBegin, const char *pEnd){
 	return this;
 }
 
-int32_t adt_str_len(adt_str_t *this){
+int32_t adt_str_length(adt_str_t *this){
 	if(this){
 		return this->u32Cur;
 	}
@@ -143,6 +143,29 @@ int adt_str_pop(adt_str_t *this){
 		}
 	}
 	return retval;
+}
+
+int adt_str_get_char(adt_str_t *this,int index){
+	if(this){
+		uint32_t u32Index;
+		if(index<0){
+			u32Index=(uint32_t) (-index); //use u32Index as temporary value
+			if(u32Index<=this->u32Cur){
+				u32Index=this->u32Cur-u32Index;
+			}
+			else{
+				return -1; //out of bounds error
+			}
+		}
+		else{
+			u32Index = (uint32_t) index;
+			if(u32Index>=this->u32Cur){
+				return -1; //out of bounds error
+			}
+		}
+		return (int) this->pStr[u32Index];
+	}
+	return -1;
 }
 
 

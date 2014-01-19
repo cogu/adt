@@ -3,6 +3,7 @@
 #include "CMemLeak.h"
 
 CuSuite* testsuite_adt_str(void);
+CuSuite* testsuite_adt_array(void);
 CuSuite* testsuite_adt_hash(void);
 CuSuite* testsuite_adt_stack(void);
 
@@ -12,6 +13,7 @@ void RunAllTests(void)
 	CuSuite* suite = CuSuiteNew();
 
 	CuSuiteAddSuite(suite, testsuite_adt_str());
+	CuSuiteAddSuite(suite, testsuite_adt_array());
 	CuSuiteAddSuite(suite, testsuite_adt_hash());
 	CuSuiteAddSuite(suite, testsuite_adt_stack());
 

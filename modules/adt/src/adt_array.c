@@ -120,7 +120,7 @@ void*	adt_array_pop(adt_array_t *this){
 	pElem = this->pFirst[--this->u32CurLen];
 	if(this->u32CurLen == 0){
 		//reallign pFirst with pAlloc when buffer becomes empty
-		this->pFirst = this->pAlloc;
+		this->pFirst = this->ppAlloc;
 	}
 	return pElem;
 }
@@ -134,14 +134,14 @@ void*	adt_array_shift(adt_array_t *this){
 	this->u32CurLen--; //reduce array length by 1
 	if(this->u32CurLen == 0){
 		//reallign pFirst with pAlloc when buffer becomes empty
-		this->pFirst = this->pAlloc;
+		this->pFirst = this->ppAlloc;
 	}
 	return pElem;
 }
 void	adt_array_unshift(adt_array_t *this, void *pElem){
 	assert( (this != 0) && (pElem != 0));
 	assert(this->u32CurLen < INT32_MAX);
-	if(this->pFirst > this->pAlloc){
+	if(this->pFirst > this->ppAlloc){
 		//room for one more element at the beginning
 		*(--this->pFirst)=pElem;
 		this->u32CurLen++;
@@ -177,7 +177,7 @@ void	adt_array_extend(adt_array_t *this, int32_t s32Len){
 	//check if allocated length is greater than requested length
 	if( (this->u32AllocLen>=u32Len) ){
 		//shift array data to start of allocated array
-		memmove(this->pAlloc,this->pFirst,this->u32CurLen * sizeof(void*));
+		memmove(this->ppAlloc,this->pFirst,this->u32CurLen * sizeof(void*));
 		this->u32CurLen = u32Len;
 	}
 	else {
@@ -188,12 +188,12 @@ void	adt_array_extend(adt_array_t *this, int32_t s32Len){
 		}
 		ppAlloc = (void**) malloc(sizeof(void*)*u32Len);
 		assert(ppAlloc != 0);
-		if(this->pAlloc){
+		if(this->ppAlloc){
 			memset(ppAlloc,0,this->u32CurLen * sizeof(void*));
 			memcpy(ppAlloc,this->pFirst,this->u32CurLen * sizeof(void*));
-			free(this->pAlloc);
+			free(this->ppAlloc);
 		}
-		this->pAlloc = this->pFirst = ppAlloc;
+		this->ppAlloc = this->pFirst = ppAlloc;
 		this->u32AllocLen = this->u32CurLen = u32Len;
 	}
 }
@@ -217,7 +217,7 @@ void adt_array_clear(adt_array_t *this){
 	}
 }
 
-uint32_t adt_array_len(adt_array_t *this){
+uint32_t adt_array_length(adt_array_t *this){
 	if(this){
 		return this->u32CurLen;
 	}
@@ -249,7 +249,7 @@ int32_t	adt_array_exists(adt_array_t *this, int32_t s32Index){
 }
 
 void adt_array_create(adt_array_t *this,void (*pDestructor)(void*)){
-	this->pAlloc = (void**) 0;
+	this->ppAlloc = (void**) 0;
 	this->pFirst = (void**) 0;
 	this->u32AllocLen = 0;
 	this->u32CurLen = 0;
@@ -266,10 +266,10 @@ void adt_array_destroy(adt_array_t *this){
 			this->pDestructor(*(ppElem++));
 		}
 	}
-	if(this->pAlloc != 0){
-		free(this->pAlloc);
+	if(this->ppAlloc != 0){
+		free(this->ppAlloc);
 	}
-	this->pAlloc = (void**) 0;
+	this->ppAlloc = (void**) 0;
 	this->u32AllocLen = 0;
 	this->pFirst = (void**) 0;
 	this->u32CurLen = 0;

@@ -15,7 +15,7 @@
 
 /***************** Public Function Declarations *******************/
 typedef struct adt_array_tag{
-	void **pAlloc;		//array of (void*)
+	void **ppAlloc;		//array of (void*)
 	void **pFirst;		//pointer to first array element
 	uint32_t u32AllocLen;	//number of elements allocated
 	uint32_t u32CurLen;	//number of elements currently in the array
@@ -45,7 +45,7 @@ void	adt_array_unshift(adt_array_t *this, void *pElem);
 void	adt_array_extend(adt_array_t *this, int32_t s32Len);
 void	adt_array_fill(adt_array_t *this, int32_t s32Len);
 void	adt_array_clear(adt_array_t *this);
-uint32_t adt_array_len(adt_array_t *this);
+uint32_t adt_array_length(adt_array_t *this);
 void 	adt_array_set_fill_elem(adt_array_t *this,void* pFillElem);
 void* 	adt_array_get_fill_elem(adt_array_t *this);
 
