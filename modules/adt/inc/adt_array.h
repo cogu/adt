@@ -27,28 +27,28 @@ typedef struct adt_array_tag{
 //Constructor/Destructor
 adt_array_t*	adt_array_new(void (*pDestructor)(void*));
 adt_array_t*	adt_array_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*));
-void	adt_array_delete(adt_array_t *this);
-void 	adt_array_create(adt_array_t *this, void (*pDestructor)(void*));
-void 	adt_array_destroy(adt_array_t *this);
+void	adt_array_delete(adt_array_t *inst);
+void 	adt_array_create(adt_array_t *inst, void (*pDestructor)(void*));
+void 	adt_array_destroy(adt_array_t *inst);
 
 
 //Accessors
-void**	adt_array_set(adt_array_t *this, int32_t s32Index, void *pElem);
-void**	adt_array_get(adt_array_t *this, int32_t s32Index);
-void	adt_array_push(adt_array_t *this, void *pElem);
-void*	adt_array_pop(adt_array_t *this);
-void*	adt_array_shift(adt_array_t *this);
-void	adt_array_unshift(adt_array_t *this, void *pElem);
+void**	adt_array_set(adt_array_t *inst, int32_t s32Index, void *pElem);
+void**	adt_array_get(adt_array_t *inst, int32_t s32Index);
+void	adt_array_push(adt_array_t *inst, void *pElem);
+void*	adt_array_pop(adt_array_t *inst);
+void*	adt_array_shift(adt_array_t *inst);
+void	adt_array_unshift(adt_array_t *inst, void *pElem);
 
 
 //Utility functions
-void	adt_array_extend(adt_array_t *this, int32_t s32Len);
-void	adt_array_fill(adt_array_t *this, int32_t s32Len);
-void	adt_array_clear(adt_array_t *this);
-uint32_t adt_array_length(adt_array_t *this);
-void 	adt_array_set_fill_elem(adt_array_t *this,void* pFillElem);
-void* 	adt_array_get_fill_elem(adt_array_t *this);
+void	adt_array_extend(adt_array_t *inst, int32_t s32Len);
+void	adt_array_fill(adt_array_t *inst, int32_t s32Len);
+void	adt_array_clear(adt_array_t *inst);
+uint32_t adt_array_length(adt_array_t *inst);
+void 	adt_array_set_fill_elem(adt_array_t *inst,void* pFillElem);
+void* 	adt_array_get_fill_elem(adt_array_t *inst);
 
-int32_t	adt_array_exists(adt_array_t *this, int32_t s32Index);
+int32_t	adt_array_exists(adt_array_t *inst, int32_t s32Index);
 
 #endif //ADT_ARRAY_H__
