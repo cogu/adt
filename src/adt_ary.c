@@ -7,11 +7,14 @@
 * Copyright (c) 2013 Conny Gustafsson
 *
 ******************************************************************************/
-#include "adt_array.h"
+#include "adt_ary.h"
 #include <malloc.h>
 #include <assert.h>
 #include <string.h>
+#ifdef _DEBUG
 #include "CMemLeak.h"
+#endif
+
 
 #define DATA_BLOCK_MAX 65536 	//maximum amount of bytes that can be copied in memmmove is implementation specific,
 								//use inst define to control how many bytes shall be copied
@@ -24,29 +27,29 @@
 
 
 /****************** Public Function Definitions *******************/
-adt_array_t*	adt_array_new(void (*pDestructor)(void*)){
-	adt_array_t *inst;
-	if((inst = malloc(sizeof(adt_array_t)))==(adt_array_t*)0){
-		return (adt_array_t*)0;
+adt_ary_t*	adt_ary_new(void (*pDestructor)(void*)){
+	adt_ary_t *inst;
+	if((inst = malloc(sizeof(adt_ary_t)))==(adt_ary_t*)0){
+		return (adt_ary_t*)0;
 	}
-	adt_array_create(inst,pDestructor);
+	adt_ary_create(inst,pDestructor);
 	return inst;
 }
-adt_array_t*	adt_array_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*)){
-	adt_array_t *inst;
+adt_ary_t*	adt_ary_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*)){
+	adt_ary_t *inst;
 	int32_t s32i;
 	void **ppDest,**ppSrc;
 
 	if(s32Len>= INT32_MAX){
 		//array length too long
-		return (adt_array_t*) 0;
+		return (adt_ary_t*) 0;
 	}
 
-	inst = adt_array_new(pDestructor);
-	if(inst==(adt_array_t*)0){
-		return (adt_array_t*)0;
+	inst = adt_ary_new(pDestructor);
+	if(inst==(adt_ary_t*)0){
+		return (adt_ary_t*)0;
 	}
-	adt_array_extend(inst,s32Len);
+	adt_ary_extend(inst,s32Len);
 	ppDest=inst->pFirst;
 	ppSrc=ppElem;
 	for(s32i=0;s32i<s32Len;s32i++){
@@ -54,15 +57,15 @@ adt_array_t*	adt_array_make(void** ppElem, int32_t s32Len,void (*pDestructor)(vo
 	}
 	return inst;
 }
-void adt_array_delete(adt_array_t *inst){
+void adt_ary_delete(adt_ary_t *inst){
 	if(inst != 0){
-		adt_array_destroy(inst);
+		adt_ary_destroy(inst);
 		free(inst);
 	}
 }
 
 //Accessors
-void**	adt_array_set(adt_array_t *inst, int32_t s32Index, void *pElem){
+void**	adt_ary_set(adt_ary_t *inst, int32_t s32Index, void *pElem){
 	uint32_t u32Index;
 	if(inst==0){
 		return (void**)0;
@@ -79,11 +82,11 @@ void**	adt_array_set(adt_array_t *inst, int32_t s32Index, void *pElem){
 	else{
 		u32Index = (uint32_t) s32Index;
 	}
-	adt_array_fill(inst,((int32_t) u32Index)+1);
+	adt_ary_fill(inst,((int32_t) u32Index)+1);
 	inst->pFirst[u32Index]=pElem;
 	return &inst->pFirst[u32Index];
 }
-void**	adt_array_get(adt_array_t *inst, int32_t s32Index){
+void**	adt_ary_get(adt_ary_t *inst, int32_t s32Index){
 	uint32_t u32Index;
 	if(inst==0){
 		return (void**)0;
@@ -100,18 +103,18 @@ void**	adt_array_get(adt_array_t *inst, int32_t s32Index){
 	else{
 		u32Index = (int32_t) s32Index;
 	}
-	adt_array_fill(inst,(int32_t) (u32Index+1));
+	adt_ary_fill(inst,(int32_t) (u32Index+1));
 	return &inst->pFirst[u32Index];
 }
-void	adt_array_push(adt_array_t *inst, void *pElem){
+void	adt_ary_push(adt_ary_t *inst, void *pElem){
 	int32_t u32Index;
 	assert( (inst != 0) && (pElem != 0));
 	u32Index = inst->u32CurLen;
 	assert(inst->u32CurLen < INT32_MAX);
-	adt_array_extend(inst,u32Index+1);
+	adt_ary_extend(inst,u32Index+1);
 	inst->pFirst[u32Index]=pElem;
 }
-void*	adt_array_pop(adt_array_t *inst){
+void*	adt_ary_pop(adt_ary_t *inst){
 	void *pElem;
 	assert( (inst!=0) );
 	if(inst->u32CurLen==0){
@@ -124,7 +127,7 @@ void*	adt_array_pop(adt_array_t *inst){
 	}
 	return pElem;
 }
-void*	adt_array_shift(adt_array_t *inst){
+void*	adt_ary_shift(adt_ary_t *inst){
 	void *pElem;
 	assert( (inst!=0) );
 	if(inst->u32CurLen==0){
@@ -138,7 +141,7 @@ void*	adt_array_shift(adt_array_t *inst){
 	}
 	return pElem;
 }
-void	adt_array_unshift(adt_array_t *inst, void *pElem){
+void	adt_ary_unshift(adt_ary_t *inst, void *pElem){
 	assert( (inst != 0) && (pElem != 0));
 	assert(inst->u32CurLen < INT32_MAX);
 	if(inst->pFirst > inst->ppAlloc){
@@ -151,7 +154,7 @@ void	adt_array_unshift(adt_array_t *inst, void *pElem){
 		int32_t u32Remain,u32ElemSize;
 		uint8_t *pBegin,*pEnd;
 		u32ElemSize = sizeof(void**);
-		adt_array_extend(inst,inst->u32CurLen+1);
+		adt_ary_extend(inst,inst->u32CurLen+1);
 		pBegin = (uint8_t*) inst->pFirst+u32ElemSize;
 		pEnd = ((uint8_t*) &inst->pFirst[inst->u32CurLen])-1;
 		u32Remain = pEnd-pBegin+1;
@@ -167,7 +170,7 @@ void	adt_array_unshift(adt_array_t *inst, void *pElem){
 
 
 //Utility functions
-void	adt_array_extend(adt_array_t *inst, int32_t s32Len){
+void	adt_ary_extend(adt_ary_t *inst, int32_t s32Len){
 	void **ppAlloc;
 	uint32_t u32Len = (uint32_t) s32Len;
 	assert(inst);
@@ -198,13 +201,13 @@ void	adt_array_extend(adt_array_t *inst, int32_t s32Len){
 		inst->u32AllocLen = inst->u32CurLen = u32Len;
 	}
 }
-void adt_array_fill(adt_array_t *inst, int32_t s32Len){
+void adt_ary_fill(adt_ary_t *inst, int32_t s32Len){
 	int32_t u32Index;
 	uint32_t u32Len = (uint32_t) s32Len;
 	uint32_t u32CurLen = inst->u32CurLen;
 	assert( inst != 0);
 	if(inst->u32CurLen >= u32Len) return; //increase not necessary
-	adt_array_extend(inst,u32Len);
+	adt_ary_extend(inst,u32Len);
 	//set undef to all newly created array elements
 	for(u32Index=u32CurLen; u32Index<u32Len; u32Index++){
 		inst->pFirst[u32Index]=inst->pFillElem;
@@ -212,13 +215,13 @@ void adt_array_fill(adt_array_t *inst, int32_t s32Len){
 	assert(inst->u32CurLen>=u32Len);
 	assert(u32Index==inst->u32CurLen);
 }
-void adt_array_clear(adt_array_t *inst){
+void adt_ary_clear(adt_ary_t *inst){
 	if(inst){
-		adt_array_destroy(inst);
+		adt_ary_destroy(inst);
 	}
 }
 
-uint32_t adt_array_length(adt_array_t *inst){
+uint32_t adt_ary_length(adt_ary_t *inst){
 	if(inst){
 		return inst->u32CurLen;
 	}
@@ -226,7 +229,7 @@ uint32_t adt_array_length(adt_array_t *inst){
 }
 
 //Returns nonzero if the element exists
-int32_t	adt_array_exists(adt_array_t *inst, int32_t s32Index){
+int32_t	adt_ary_exists(adt_ary_t *inst, int32_t s32Index){
 	int32_t u32Index;
 	if(inst==0){
 		return 0;
@@ -249,7 +252,7 @@ int32_t	adt_array_exists(adt_array_t *inst, int32_t s32Index){
 	return 0;
 }
 
-void adt_array_create(adt_array_t *inst,void (*pDestructor)(void*)){
+void adt_ary_create(adt_ary_t *inst,void (*pDestructor)(void*)){
 	inst->ppAlloc = (void**) 0;
 	inst->pFirst = (void**) 0;
 	inst->u32AllocLen = 0;
@@ -258,7 +261,7 @@ void adt_array_create(adt_array_t *inst,void (*pDestructor)(void*)){
 	inst->pFillElem = (void*)0;
 }
 
-void adt_array_destroy(adt_array_t *inst){
+void adt_ary_destroy(adt_ary_t *inst){
 	int32_t s32i;
 
 	void **ppElem=inst->pFirst;
@@ -276,18 +279,76 @@ void adt_array_destroy(adt_array_t *inst){
 	inst->u32CurLen = 0;
 }
 
-void 	adt_array_set_fill_elem(adt_array_t *inst,void* pFillElem){
+void 	adt_ary_set_fill_elem(adt_ary_t *inst,void* pFillElem){
 	if(inst){
 		inst->pFillElem = pFillElem;
 	}
 }
-void* 	adt_array_get_fill_elem(adt_array_t *inst){
+void* 	adt_ary_get_fill_elem(adt_ary_t *inst){
 	if(inst){
 		return inst->pFillElem;
 	}
 	return (void*)0;
 }
 
+void adt_ary_splice(adt_ary_t *inst,int32_t s32Index, int32_t s32Len){
+   uint32_t u32Index;
+   uint32_t u32Source;
+   uint32_t u32Destination;
+   uint32_t u32Removed = 0;
+   uint32_t i;
+   if( (inst==0) || (s32Len <= 0) ){
+      return; //invalid input argument
+   }
+   if(s32Index<0){
+      u32Index = (int32_t) (-s32Index);
+      if(u32Index > (inst->u32CurLen) ){
+         return; //negative index out of bounds
+      }
+      //negative index inside array bounds
+      u32Index=inst->u32CurLen-u32Index;
+   }
+   else{
+      u32Index = (int32_t) s32Index;
+   }
+   if(u32Index >= inst->u32CurLen){
+      return;
+   }
+   u32Destination = u32Index;
+   u32Source = u32Index + ((uint32_t) s32Len);
+   for(i=0;i<s32Len;i++){
+      if(u32Source < inst->u32CurLen){
+         //move item
+         assert(u32Destination != u32Source);
+         assert(u32Destination < inst->u32CurLen);
+         assert(u32Source < inst->u32CurLen);
+         if( inst->pDestructor != 0 ){
+            u32Removed++;
+            inst->pDestructor(inst->pFirst[u32Destination]);
+         }
+         inst->pFirst[u32Destination] = inst->pFirst[u32Source];
+         inst->pFirst[u32Source] = inst->pFillElem;
+      }
+      else if(u32Destination < inst->u32CurLen){
+         //remove item
+         if( inst->pDestructor != 0 ){
+            inst->pDestructor(inst->pFirst[u32Destination]);
+         }
+         u32Removed++;
+         inst->pFirst[u32Destination] = inst->pFillElem;
+      }
+      u32Source++;
+      u32Destination++;
+   }
+   //move remaining items
+   while(u32Source < inst->u32CurLen){
+      inst->pFirst[u32Destination] = inst->pFirst[u32Source];
+      inst->pFirst[u32Source] = inst->pFillElem;
+      u32Source++;
+      u32Destination++;
+   }
+   inst->u32CurLen-=u32Removed;
+}
 
 /***************** Private Function Definitions *******************/
 

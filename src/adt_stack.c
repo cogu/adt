@@ -11,7 +11,10 @@
 #include <assert.h>
 #include <string.h>
 #include "adt_stack.h"
+#ifdef _DEBUG
 #include "CMemLeak.h"
+#endif
+
 
 
 #define ADT_STACK_DEFAULT_MIN_LEN 8

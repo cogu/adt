@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "adt_stack.h"
-#include "adt_array.h"
+#include "adt_ary.h"
 
 #define ADT_HASH_VERSION 0.1.0
 
@@ -129,6 +129,6 @@ void*	adt_hash_iter_next(adt_hash_t *this,const char **ppKey,uint32_t *pKeyLen);
 //Utility functions
 uint32_t 	adt_hash_size(adt_hash_t *this);
 bool		adt_hash_exists(adt_hash_t *this, const char *pKey, uint32_t u32KeyLen);
-uint32_t	adt_hash_keys(adt_hash_t *this,adt_array_t* pArray);
+uint32_t	adt_hash_keys(adt_hash_t *this,adt_ary_t* pArray);
 
 #endif //ADT_HASH_H__

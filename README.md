@@ -22,10 +22,10 @@ adt_str_delete(str);
 
 ## ADT Array
 ``` c
-adt_array_t *pArray = adt_array_new(free);
-adt_array_push(pArray,strdup("elem1"));
-char *pElem = (char*) adt_array_pop(pArray);
-adt_array_delete(pArray);
+adt_ary_t *pArray = adt_ary_new(free);
+adt_ary_push(pArray,strdup("elem1"));
+char *pElem = (char*) adt_ary_pop(pArray);
+adt_ary_delete(pArray);
 free(pElem);
 ```
 

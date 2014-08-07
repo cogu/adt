@@ -12,7 +12,10 @@
 #include <limits.h>
 #include <malloc.h>
 #include <assert.h>
+#ifdef _DEBUG
 #include "CMemLeak.h"
+#endif
+
 
 /*
  * Each string starts out being 16 bytes in length

@@ -12,7 +12,10 @@
 #include <malloc.h>
 #include <assert.h>
 #include <string.h>
+#ifdef _DEBUG
 #include "CMemLeak.h"
+#endif
+
 
 /**************** Private Function Declarations *******************/
 static void adt_hnode_create(adt_hnode_t *node);
@@ -205,7 +208,7 @@ BEGIN:
 	}
 }
 
-uint32_t adt_hash_keys(adt_hash_t *this,adt_array_t *pArray){
+uint32_t adt_hash_keys(adt_hash_t *this,adt_ary_t *pArray){
 	const char *pKey;
 	uint32_t u32KeyLen;
 	int32_t s32i=0;
@@ -214,12 +217,12 @@ uint32_t adt_hash_keys(adt_hash_t *this,adt_array_t *pArray){
 
 	if(pArray){
 		adt_hash_iter_init(this);
-		adt_array_clear(pArray);
-		adt_array_extend(pArray,adt_hash_size(this));
+		adt_ary_clear(pArray);
+		adt_ary_extend(pArray,adt_hash_size(this));
 		do{
 			adt_hash_iter_next(this,&pKey,&u32KeyLen);
 			if(pKey){
-				adt_array_set(pArray,s32i++,strdup(pKey));
+				adt_ary_set(pArray,s32i++,strdup(pKey));
 			}
 		}while(pKey);
 	}
