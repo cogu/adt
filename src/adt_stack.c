@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include "adt_stack.h"
-#ifdef _DEBUG
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif
 

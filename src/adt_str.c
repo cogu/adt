@@ -12,7 +12,7 @@
 #include <limits.h>
 #include <malloc.h>
 #include <assert.h>
-#ifdef _DEBUG
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif
 
