@@ -30,6 +30,7 @@ typedef struct adt_ary_tag{
 adt_ary_t*	adt_ary_new(void (*pDestructor)(void*));
 adt_ary_t*	adt_ary_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*));
 void	adt_ary_delete(adt_ary_t *self);
+void  adt_ary_vdelete(void *arg);
 void 	adt_ary_create(adt_ary_t *self, void (*pDestructor)(void*));
 void 	adt_ary_destroy(adt_ary_t *self);
 void  adt_ary_destructorEnable(adt_ary_t *self, uint8_t enable);
@@ -47,6 +48,7 @@ void	adt_ary_unshift(adt_ary_t *self, void *pElem);
 //Utility functions
 void	adt_ary_extend(adt_ary_t *self, int32_t s32Len);
 void	adt_ary_fill(adt_ary_t *self, int32_t s32Len);
+void  adt_ary_resize(adt_ary_t *self, int32_t s32Len);
 void	adt_ary_clear(adt_ary_t *self);
 int32_t adt_ary_length(adt_ary_t *self);
 void 	adt_ary_set_fill_elem(adt_ary_t *self,void* pFillElem);

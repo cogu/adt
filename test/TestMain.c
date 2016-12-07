@@ -15,9 +15,9 @@ void RunAllTests(void)
 
 	CuSuiteAddSuite(suite, testsuite_adt_str());
 	CuSuiteAddSuite(suite, testsuite_adt_ary());
-	CuSuiteAddSuite(suite, testsuite_adt_hash());
-	CuSuiteAddSuite(suite, testsuite_adt_stack());
-	CuSuiteAddSuite(suite, testsuite_adt_u16Map());
+	//CuSuiteAddSuite(suite, testsuite_adt_hash());
+	//CuSuiteAddSuite(suite, testsuite_adt_stack());
+	//CuSuiteAddSuite(suite, testsuite_adt_u16Map());
 
 
 	CuSuiteRun(suite);

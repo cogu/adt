@@ -95,6 +95,42 @@ void test_adt_ary_shift_unshift(CuTest* tc)
 	adt_ary_delete(pArray);
 }
 
+void test_adt_ary_resize(CuTest* tc)
+{
+   int one = 1;
+   int two = 2;
+   int three = 3;
+   int four = 4;
+   int five = 4;
+   int *p;
+   adt_ary_t *a = adt_ary_new(0);
+   adt_ary_push(a,&one);
+   adt_ary_push(a,&two);
+   adt_ary_push(a,&three);
+   adt_ary_push(a,&four);
+   adt_ary_push(a,&five);
+   CuAssertIntEquals(tc,5,adt_ary_length(a));
+   adt_ary_resize(a,3);
+   CuAssertIntEquals(tc,3,adt_ary_length(a));
+   p = (int*) *adt_ary_get(a,0);
+   CuAssertPtrEquals(tc,&one,p);
+   p = (int*) *adt_ary_get(a,1);
+   CuAssertPtrEquals(tc,&two,p);
+   p = (int*) *adt_ary_get(a,2);
+   CuAssertPtrEquals(tc,&three,p);
+   adt_ary_resize(a,0);
+   CuAssertIntEquals(tc,0,adt_ary_length(a));
+   adt_ary_push(a,&one);
+   adt_ary_push(a,&two);
+   adt_ary_push(a,&three);
+   adt_ary_push(a,&four);
+   adt_ary_push(a,&five);
+   CuAssertIntEquals(tc,5,adt_ary_length(a));
+   adt_ary_resize(a,5);
+   CuAssertIntEquals(tc,5,adt_ary_length(a));
+   adt_ary_delete(a);
+}
+
 
 CuSuite* testsuite_adt_ary(void)
 {
@@ -103,6 +139,7 @@ CuSuite* testsuite_adt_ary(void)
 	SUITE_ADD_TEST(suite, test_adt_ary_new);
 	//SUITE_ADD_TEST(suite, test_adt_ary_push_pop);
 	SUITE_ADD_TEST(suite, test_adt_ary_shift_unshift);
+	SUITE_ADD_TEST(suite, test_adt_ary_resize);
 
 	return suite;
 }

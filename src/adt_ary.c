@@ -1,5 +1,4 @@
 /*****************************************************************************
-* \file:       adt_array.c
 * \author:     Conny Gustafsson
 * \date:       2013-06-03
 * \brief:      array data structure
@@ -62,6 +61,11 @@ void adt_ary_delete(adt_ary_t *self){
 		adt_ary_destroy(self);
 		free(self);
 	}
+}
+
+void  adt_ary_vdelete(void *arg)
+{
+   adt_ary_delete((adt_ary_t*) arg);
 }
 
 void adt_ary_destructorEnable(adt_ary_t *self, uint8_t enable){
@@ -200,19 +204,34 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
 		self->s32AllocLen = self->s32CurLen = s32Len;
 	}
 }
+
 void adt_ary_fill(adt_ary_t *self, int32_t s32Len){
 	int32_t s32Index;
 	int32_t s32CurLen = self->s32CurLen;
 	assert( self != 0);
 	if(self->s32CurLen >= s32Len) return; //increase not necessary
 	adt_ary_extend(self,(int32_t)s32Len);
-	//set undef to all newly created array elements
+	//set pFillElem to all newly created array elements
 	for(s32Index=s32CurLen; s32Index<s32Len; s32Index++){
 		self->pFirst[s32Index]=self->pFillElem;
 	}
 	assert(self->s32CurLen>=s32Len);
 	assert(s32Index==self->s32CurLen);
 }
+
+void  adt_ary_resize(adt_ary_t *self, int32_t s32Len)
+{
+   if ( (self != 0) && (s32Len >= 0) )
+   {
+      adt_ary_fill(self,s32Len);
+      if (s32Len < self->s32CurLen)
+      {
+         int32_t delta = self->s32CurLen-s32Len;
+         adt_ary_splice(self,s32Len,delta);
+      }
+   }
+}
+
 void adt_ary_clear(adt_ary_t *self){
 	if(self){
 		adt_ary_destroy(self);
@@ -253,6 +272,7 @@ void adt_ary_create(adt_ary_t *self,void (*pDestructor)(void*)){
 	self->s32CurLen = 0;
 	self->pDestructor = pDestructor;
 	self->pFillElem = (void*)0;
+	self->destructorEnable = 1u;
 }
 
 void adt_ary_destroy(adt_ary_t *self){

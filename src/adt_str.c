@@ -268,8 +268,8 @@ int32_t adt_str_calcLen(int32_t u32CurLen, int32_t u32NewLen){
 		return u32CurLen;
 	}
 
-	if(u32NewLen > (ULONG_MAX - LARGE_BLOCK_SIZE) ){
-		return ULONG_MAX;
+	if(u32NewLen > (LONG_MAX - LARGE_BLOCK_SIZE) ){
+		return (int32_t) LONG_MAX;
 	}
 	else if( u32NewLen>=LARGE_BLOCK_SIZE ){
 		//upgrade u32CurLen to LARGE_BLOCK_SIZE
