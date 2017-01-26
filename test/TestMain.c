@@ -7,6 +7,8 @@ CuSuite* testsuite_adt_ary(void);
 CuSuite* testsuite_adt_hash(void);
 CuSuite* testsuite_adt_stack(void);
 CuSuite* testsuite_adt_u16Map(void);
+CuSuite* testsuite_adt_list(void);
+CuSuite* testsuite_adt_bytearray(void);
 
 void RunAllTests(void)
 {
@@ -16,8 +18,10 @@ void RunAllTests(void)
 	CuSuiteAddSuite(suite, testsuite_adt_str());
 	CuSuiteAddSuite(suite, testsuite_adt_ary());
 	//CuSuiteAddSuite(suite, testsuite_adt_hash());
-	//CuSuiteAddSuite(suite, testsuite_adt_stack());
-	//CuSuiteAddSuite(suite, testsuite_adt_u16Map());
+	CuSuiteAddSuite(suite, testsuite_adt_stack());
+	CuSuiteAddSuite(suite, testsuite_adt_u16Map());
+	CuSuiteAddSuite(suite, testsuite_adt_list());
+	CuSuiteAddSuite(suite, testsuite_adt_bytearray());
 
 
 	CuSuiteRun(suite);

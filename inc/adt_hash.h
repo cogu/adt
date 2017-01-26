@@ -52,10 +52,10 @@
  *  of these 1-8 items to find the matching hash key.
  *
  *  Since a 32-bit value can contain at most 8 nibbles, the maximum depth is thus 8. The performance of the algorithm
- *  should be at most 8 shift/and operations O(1) plus linear search of up to 8 hash value comparisons O(1).
+ *  should be at most 8 shift/and operations O(1) plus linear search of up to 8 hash value comparisons O(n).
  *
  *  Once the item with matching hash value has been found it continues with another linear search of the keys with
- *  that exact hash value (if there are any). Once the key has been matched the value belonging to that key
+ *  that exact hash value (again O(n), if there are any). Once the key has been matched the value belonging to that key
  *  has been found.
  *
  */
@@ -104,17 +104,17 @@ typedef struct adt_hash_tag{
 
 /***************** Public Function Declarations *******************/
 //Constructor/Destructor
-adt_hash_t*	adt_hash_new(void (*pDestructor)(void*));
-void		adt_hash_delete(adt_hash_t *this);
-void 	adt_hash_create(adt_hash_t *this,void (*pDestructor)(void*));
-void 	adt_hash_destroy(adt_hash_t *this);
+adt_hash_t* adt_hash_new(void (*pDestructor)(void*));
+void adt_hash_delete(adt_hash_t *self);
+void adt_hash_create(adt_hash_t *self,void (*pDestructor)(void*));
+void adt_hash_destroy(adt_hash_t *self);
 
 
 //Accessors
-void	adt_hash_set(adt_hash_t *this, const char *pKey, uint32_t u32KeyLen, void *pVal);
-void*	adt_hash_get(adt_hash_t *this, const char *pKey, uint32_t u32KeyLen);
-void*	adt_hash_remove(adt_hash_t *this, const char *pKey, uint32_t u32KeyLen);
-void	adt_hash_iter_init(adt_hash_t *this);
+void	 adt_hash_set(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen, void *pVal);
+void** adt_hash_get(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen);
+void** adt_hash_remove(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen);
+void   adt_hash_iter_init(adt_hash_t *self);
 
 /**
  * \param[in] this adt_hash
@@ -122,13 +122,13 @@ void	adt_hash_iter_init(adt_hash_t *this);
  * \param[out] pKeyLen pointer to integer containing length of key string
  * \return pointer to value or NULL
  */
-void*	adt_hash_iter_next(adt_hash_t *this,const char **ppKey,uint32_t *pKeyLen);
+void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey,uint32_t *pKeyLen);
 
 
 
 //Utility functions
-uint32_t 	adt_hash_size(adt_hash_t *this);
-bool		adt_hash_exists(adt_hash_t *this, const char *pKey, uint32_t u32KeyLen);
-uint32_t	adt_hash_keys(adt_hash_t *this,adt_ary_t* pArray);
+uint32_t 	adt_hash_size(adt_hash_t *self);
+bool		adt_hash_exists(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen);
+uint32_t	adt_hash_keys(adt_hash_t *self,adt_ary_t* pArray);
 
 #endif //ADT_HASH_H__

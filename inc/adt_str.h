@@ -14,8 +14,8 @@
 #define ADT_STR_VERSION 0.1.0
 
 typedef struct {
-	  int32_t u32Cur;
-	  int32_t u32Len;
+	  int32_t s32Cur;
+	  int32_t s32Len;
 	  uint8_t *pStr;
 }adt_str_t;
 
@@ -60,7 +60,7 @@ int32_t adt_str_length(adt_str_t *this);
 void adt_str_clear(adt_str_t *this);
 void adt_str_set(adt_str_t *lhs, adt_str_t *rhs);
 void adt_str_append(adt_str_t *lhs,adt_str_t *rhs);
-void adt_str_reserve(adt_str_t *this,uint32_t u32Len);
+void adt_str_reserve(adt_str_t *this,int32_t s32Len);
 void adt_str_push(adt_str_t *this,const int c);
 int adt_str_pop(adt_str_t *this);
 int adt_str_get_char(adt_str_t *this,int index);

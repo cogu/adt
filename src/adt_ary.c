@@ -305,6 +305,9 @@ void* 	adt_ary_get_fill_elem(adt_ary_t *self){
 	return (void*)0;
 }
 
+/**
+ * removes s32Len items from array starting from s32Index (s32Index can be both positive or negative)
+ */
 void adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
    int32_t s32Source;
    int32_t s32Destination;
