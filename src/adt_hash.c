@@ -16,6 +16,11 @@
 #include "CMemLeak.h"
 #endif
 
+#ifdef _MSC_VER
+#define STRDUP _strdup
+#else
+#define STRDUP strdup
+#endif
 
 /**************** Private Function Declarations *******************/
 static void adt_hnode_create(adt_hnode_t *node);
@@ -196,9 +201,10 @@ BEGIN:
 	}
 
 	if(self->iter.pHkey){
-		*ppKey = self->iter.pHkey->key;
+      void **ppVal;
+      *ppKey = self->iter.pHkey->key;
 		*pKeyLen = strlen(self->iter.pHkey->key);
-		void **ppVal = &self->iter.pHkey->val;
+		ppVal = &self->iter.pHkey->val;
 		self->iter.pHkey = self->iter.pHkey->next;
 		return ppVal;
 	}
@@ -223,7 +229,7 @@ uint32_t adt_hash_keys(adt_hash_t *self,adt_ary_t *pArray){
 		do{
 			adt_hash_iter_next(self,&pKey,&u32KeyLen);
 			if(pKey){
-				adt_ary_set(pArray,s32i++,strdup(pKey));
+				adt_ary_set(pArray,s32i++, STRDUP(pKey));
 			}
 		}while(pKey);
 	}
@@ -265,8 +271,8 @@ void adt_hnode_destroy(adt_hnode_t *node,void (*pDestructor)(void*)){
 		free(node->child.match);
 	}
 	else{
-		assert(node->u8Width==16);
-		uint8_t i;
+      uint8_t i; 
+      assert(node->u8Width==16);		
 		for(i=0;i<16;i++){
 			adt_hnode_destroy(&node->child.node[i],pDestructor);
 		}
@@ -279,8 +285,8 @@ void adt_hnode_destroy_shallow(adt_hnode_t *node){
 		free(node->child.match);
 	}
 	else{
-		assert(node->u8Width==16);
-		uint8_t i;
+      uint8_t i;
+		assert(node->u8Width==16);		
 		for(i=0;i<16;i++){
 			adt_hnode_destroy_shallow(&node->child.node[i]);
 		}
@@ -334,6 +340,8 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 			}
 			else{
 				adt_hmatch_t* old = node->child.match;
+            uint32_t u32Bits;
+            uint8_t u8Bucket;
 				assert(node->u8Width==16);
 				node->child.node = (adt_hnode_t*) malloc(sizeof(adt_hnode_t)*16);
 				assert(node->child.node);
@@ -342,13 +350,13 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 					node->child.node[i].u8Depth = node->u8Depth+1;
 				}
 				assert(node->u8Depth<=8);
-				uint32_t u32Bits = (node->u8Depth)*4;
+            u32Bits = (node->u8Depth)*4;
 				for(i=0;i<node->u8Cur;i++){
 					uint8_t u8Bucket = (uint8_t) ( (old[i].u32Hash >> u32Bits) & 0xF);
 					adt_hnode_insert(&node->child.node[u8Bucket],old[i].key,old[i].u32Hash);
 				}
 				free(old);
-				uint8_t u8Bucket = (uint8_t) ((u32Hash >> u32Bits) & 0xF);
+            u8Bucket = (uint8_t) ((u32Hash >> u32Bits) & 0xF);
 				adt_hnode_insert(&node->child.node[u8Bucket],key,u32Hash);
 			}
 		}
@@ -379,9 +387,10 @@ adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Has
 	adt_hnode_t *parent = 0;
 	adt_hkey_t *hkey = 0;
 	while(node){
+      uint8_t u8Bucket;
 		if(node->u8Width == 16){
 			parent = node;
-			uint8_t u8Bucket = (uint8_t) ( (u32Hash >> (node->u8Depth*4)) & 0xF);
+         u8Bucket = (uint8_t) ( (u32Hash >> (node->u8Depth*4)) & 0xF);
 			node = &node->child.node[u8Bucket];
 		}
 		else{
@@ -472,7 +481,7 @@ adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Has
 
 void adt_hkey_create(adt_hkey_t *hkey, const char *key, void *value){
 	if(hkey){
-		hkey->key = strdup(key);
+		hkey->key = STRDUP(key);
 		hkey->val = value;
 		hkey->next = 0;
 	}

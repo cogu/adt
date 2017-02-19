@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <malloc.h>
 #include <assert.h>
+#include <stdint.h>
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif
@@ -114,12 +115,13 @@ void adt_str_set(adt_str_t *lhs, adt_str_t *rhs){
 void adt_str_append(adt_str_t *lhs,adt_str_t *rhs);
 
 void adt_str_reserve(adt_str_t *this,int32_t s32Len){
-	s32Len++; //reserve 1 byte for null terminator
+   uint8_t *pStr;
+   s32Len++; //reserve 1 byte for null terminator
 	if(s32Len <= this->s32Len){
 		return;
 	}
 	this->s32Len = adt_str_calcLen(this->s32Len,s32Len);
-	uint8_t *pStr = (uint8_t*) malloc(this->s32Len);
+   pStr = (uint8_t*) malloc(this->s32Len);
 	assert(pStr);
 	if(this->pStr){
 		memcpy(pStr,this->pStr,this->s32Cur);
@@ -207,9 +209,10 @@ void adt_str_prepend_cstr(adt_str_t *this,const char *cstr);
 
 
 void adt_str_copy_range(adt_str_t *this,const char *pBegin,const char *pEnd){
-	if( (this == 0) || (pBegin == 0) || (pEnd == 0)) return;
+   int32_t s32Len;
+   if( (this == 0) || (pBegin == 0) || (pEnd == 0)) return;
 	if(pBegin>=pEnd) return;
-	int32_t s32Len = (int32_t) (pEnd-pBegin);
+   s32Len = (int32_t) (pEnd-pBegin);
 	adt_str_reserve(this,s32Len);
 	assert(this->s32Len>s32Len);
 	assert(this->pStr);
@@ -218,10 +221,12 @@ void adt_str_copy_range(adt_str_t *this,const char *pBegin,const char *pEnd){
 }
 
 void adt_str_append_range(adt_str_t *this,const char *pBegin,const char *pEnd){
-	if( (this == 0) || (pBegin == 0) || (pEnd == 0)) return;
+   int32_t s32Len;
+   int32_t s32NewLen;
+   if ((this == 0) || (pBegin == 0) || (pEnd == 0)) return;
 	if(pBegin>=pEnd) return;
-	int32_t s32Len = (int32_t) (pEnd-pBegin);
-	int32_t s32NewLen = this->s32Len + s32Len;
+   s32Len = (int32_t) (pEnd-pBegin);
+   s32NewLen = this->s32Len + s32Len;
 	adt_str_reserve(this,s32NewLen);
 	assert(this->s32Len>s32NewLen);
 	assert(this->pStr);

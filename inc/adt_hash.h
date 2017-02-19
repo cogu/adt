@@ -10,7 +10,17 @@
 #ifndef ADT_HASH_H__
 #define ADT_HASH_H__
 #include <stdint.h>
+#if defined(_MSC_PLATFORM_TOOLSET) && (_MSC_PLATFORM_TOOLSET<=100)
+#ifndef _MSC_BOOL_DEFINED
+#define _MSC_BOOL_DEFINED
+#define false 0
+#define true 1
+typedef uint8_t bool;
+#endif
+#else
 #include <stdbool.h>
+#endif
+
 #include "adt_stack.h"
 #include "adt_ary.h"
 
