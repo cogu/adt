@@ -8,7 +8,7 @@
 * Copyright (c) 2013-2014 Conny Gustafsson
 *
 ******************************************************************************/
-#include "adt_u16map.h"
+#include "adt_u16Map.h"
 #include <assert.h>
 #include <malloc.h>
 
