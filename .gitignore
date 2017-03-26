@@ -1,1 +1,5 @@
 *~
+
+#sphinx-doc files
+/doc/make.bat
+/doc/_build/
