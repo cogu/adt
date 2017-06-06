@@ -93,6 +93,10 @@ void**	adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem){
 	return &self->pFirst[s32Index];
 }
 
+/**
+ * This returns pointer to pointer, make sure to dereference the result.
+ * It returns NULL in case the index is out of range
+ */
 void**	adt_ary_get(adt_ary_t *self, int32_t s32Index){
 	if(self==0){
 		return (void**)0;
@@ -361,5 +365,14 @@ void adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
       s32Destination++;
    }
    self->s32CurLen-=s32Removed;
+}
+
+/**
+ * If you are certain that the index is going to be within bounds, you can use
+ * this convenience function for getting the value without additional pointer dereference.
+ */
+void* adt_ary_value(adt_ary_t *self, int32_t s32Index)
+{
+   return *adt_ary_get(self, s32Index);
 }
 /***************** Private Function Definitions *******************/

@@ -1,3 +1,9 @@
+/**
+* cogu 2017-02-19: This is a slighty modified version of CuTest.c v1.5 (http://cutest.sourceforge.net)
+* I have fixed a memory leak in the framework as well as adding test macro for unsigned integer equality (CuAssertUIntEquals).
+* 
+*/
+
 #include <assert.h>
 #include <setjmp.h>
 #include <stdlib.h>
@@ -5,7 +11,6 @@
 #include <string.h>
 #include <math.h>
 #include "CuTest.h"
-#include <CMemLeak.h> //cogu 2013-08-06: Added CMemLeak.h
 
 /*-------------------------------------------------------------------------*
  * CuStr
@@ -13,13 +18,13 @@
 
 char* CuStrAlloc(int size)
 {
-	char* newStr = (char*) malloc( sizeof(char) * (size) );
+	char* newStr = (char*) malloc( sizeof(char) * ((unsigned int) size) );
 	return newStr;
 }
 
 char* CuStrCopy(const char* old)
 {
-	int len = strlen(old);
+	int len = (int) strlen(old);
 	char* newStr = CuStrAlloc(len + 1);
 	strcpy(newStr, old);
 	return newStr;
@@ -33,7 +38,7 @@ void CuStringInit(CuString* str)
 {
 	str->length = 0;
 	str->size = STRING_MAX;
-	str->buffer = (char*) malloc(sizeof(char) * str->size);
+	str->buffer = (char*) malloc(sizeof(char) * ((unsigned int)str->size));
 	str->buffer[0] = '\0';
 }
 
@@ -42,7 +47,7 @@ CuString* CuStringNew(void)
 	CuString* str = (CuString*) malloc(sizeof(CuString));
 	str->length = 0;
 	str->size = STRING_MAX;
-	str->buffer = (char*) malloc(sizeof(char) * str->size);
+	str->buffer = (char*) malloc(sizeof(char) * ((unsigned int)str->size));
 	str->buffer[0] = '\0';
 	return str;
 }
@@ -56,7 +61,7 @@ void CuStringDelete(CuString *str)
 
 void CuStringResize(CuString* str, int newSize)
 {
-	str->buffer = (char*) realloc(str->buffer, sizeof(char) * newSize);
+	str->buffer = (char*) realloc(str->buffer, sizeof(char) * ((unsigned int)newSize));
 	str->size = newSize;
 }
 
@@ -68,7 +73,7 @@ void CuStringAppend(CuString* str, const char* text)
 		text = "NULL";
 	}
 
-	length = strlen(text);
+	length = (int) strlen(text);
 	if (str->length + length + 1 >= str->size)
 		CuStringResize(str, str->length + length + 1 + STRING_INC);
 	str->length += length;
@@ -95,14 +100,14 @@ void CuStringAppendFormat(CuString* str, const char* format, ...)
 
 void CuStringInsert(CuString* str, const char* text, int pos)
 {
-	int length = strlen(text);
+	int length = (int) strlen(text);
 	if (pos > str->length)
 		pos = str->length;
 	if (str->length + length + 1 >= str->size)
 		CuStringResize(str, str->length + length + 1 + STRING_INC);
-	memmove(str->buffer + pos + length, str->buffer + pos, (str->length - pos) + 1);
+	memmove(str->buffer + pos + length, str->buffer + pos, (size_t) ((str->length - pos) + 1));
 	str->length += length;
-	memcpy(str->buffer + pos, text, length);
+	memcpy(str->buffer + pos, text, (size_t) length);
 }
 
 /*-------------------------------------------------------------------------*
@@ -210,6 +215,16 @@ void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	sprintf(buf, "expected <%d> but was <%d>", expected, actual);
 	CuFail_Line(tc, file, line, message, buf);
 }
+
+void CuAssertUIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+   unsigned int expected, unsigned int actual)
+{
+   char buf[STRING_MAX];
+   if (expected == actual) return;
+   sprintf(buf, "expected <%u> but was <%u>", expected, actual);
+   CuFail_Line(tc, file, line, message, buf);
+}
+
 
 void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, 
 	double expected, double actual, double delta)
