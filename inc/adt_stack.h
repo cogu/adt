@@ -24,20 +24,20 @@ typedef struct adt_stack_tag{
 /***************** Public Function Declarations *******************/
 //Constructor/Destructor
 adt_stack_t*	adt_stack_new(void (*pDestructor)(void*));
-void 			adt_stack_delete(adt_stack_t *this);
-void 	adt_stack_create(adt_stack_t *this, void (*pDestructor)(void*));
-void 	adt_stack_destroy(adt_stack_t *this);
-void 	adt_stack_clear(adt_stack_t *this);
+void 			adt_stack_delete(adt_stack_t *self);
+void 	adt_stack_create(adt_stack_t *self, void (*pDestructor)(void*));
+void 	adt_stack_destroy(adt_stack_t *self);
+void 	adt_stack_clear(adt_stack_t *self);
 
 
 //Accessors
-void	adt_stack_push(adt_stack_t *this, void *pVal);
-void*	adt_stack_top(adt_stack_t *this);
-void*	adt_stack_pop(adt_stack_t *this);
+void	adt_stack_push(adt_stack_t *self, void *pVal);
+void*	adt_stack_top(adt_stack_t *self);
+void*	adt_stack_pop(adt_stack_t *self);
 
 //Utility functions
-void	adt_stack_reserve(adt_stack_t *this,uint32_t u32Len);
-void	adt_stack_resize(adt_stack_t *this,uint32_t u32Len);
-uint32_t adt_stack_size(adt_stack_t *this);
+void	adt_stack_reserve(adt_stack_t *self,uint32_t u32Len);
+void	adt_stack_resize(adt_stack_t *self,uint32_t u32Len);
+uint32_t adt_stack_size(adt_stack_t *self);
 
 #endif //ADT_STACK_H__

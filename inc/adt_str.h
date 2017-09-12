@@ -31,21 +31,21 @@ adt_str_t *adt_str_new(void);
 
 /**
  * deletes an adt_str object
- * \param[in]	this	object instance
+ * \param[in]	self	object instance
  */
-void adt_str_delete(adt_str_t *this);
+void adt_str_delete(adt_str_t *self);
 
 /**
  * constructor
- * \param[in]	this	object instance
+ * \param[in]	self	object instance
  */
-void adt_str_create(adt_str_t *this);
+void adt_str_create(adt_str_t *self);
 
 /**
  * destructor
- * \param[in]	this	object instance
+ * \param[in]	self	object instance
  */
-void adt_str_destroy(adt_str_t *this);
+void adt_str_destroy(adt_str_t *self);
 
 
 /* adt_str functions */
@@ -56,23 +56,23 @@ void adt_str_destroy(adt_str_t *this);
  */
 adt_str_t *adt_str_dup(adt_str_t* other);
 adt_str_t *adt_str_make(const char *pBegin, const char *pEnd);
-int32_t adt_str_length(adt_str_t *this);
-void adt_str_clear(adt_str_t *this);
+int32_t adt_str_length(adt_str_t *self);
+void adt_str_clear(adt_str_t *self);
 void adt_str_set(adt_str_t *lhs, adt_str_t *rhs);
 void adt_str_append(adt_str_t *lhs,adt_str_t *rhs);
-void adt_str_reserve(adt_str_t *this,int32_t s32Len);
-void adt_str_push(adt_str_t *this,const int c);
-int adt_str_pop(adt_str_t *this);
-int adt_str_get_char(adt_str_t *this,int index);
+void adt_str_reserve(adt_str_t *self,int32_t s32Len);
+void adt_str_push(adt_str_t *self,const int c);
+int adt_str_pop(adt_str_t *self);
+int adt_str_get_char(adt_str_t *self,int index);
 
 /* C string compatible functions */
 adt_str_t *adt_str_dup_cstr(const char* cstr); //constructor
-void adt_str_set_cstr(adt_str_t *this, const char *cstr);
-void adt_str_append_cstr(adt_str_t *this,const char *cstr);
-void adt_str_prepend_cstr(adt_str_t *this,const char *cstr);
-void adt_str_copy_range(adt_str_t *this,const char *pBegin,const char *pEnd);
-void adt_str_append_range(adt_str_t *this,const char *pBegin,const char *pEnd);
-const char* adt_str_cstr(adt_str_t *this);
+void adt_str_set_cstr(adt_str_t *self, const char *cstr);
+void adt_str_append_cstr(adt_str_t *self,const char *cstr);
+void adt_str_prepend_cstr(adt_str_t *self,const char *cstr);
+void adt_str_copy_range(adt_str_t *self,const char *pBegin,const char *pEnd);
+void adt_str_append_range(adt_str_t *self,const char *pBegin,const char *pEnd);
+const char* adt_str_cstr(adt_str_t *self);
 
 
 
