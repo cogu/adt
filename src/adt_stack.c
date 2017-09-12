@@ -29,130 +29,130 @@
 
 //Constructor/Destructor
 adt_stack_t* adt_stack_new(void (*pDestructor)(void*)){
-	adt_stack_t *this;
-	if((this = (adt_stack_t*) malloc(sizeof(adt_stack_t))) == 0){
+	adt_stack_t *self;
+	if((self = (adt_stack_t*) malloc(sizeof(adt_stack_t))) == 0){
 		return (adt_stack_t*)0;
 	}
-	adt_stack_create(this,pDestructor);
-	return this;
+	adt_stack_create(self,pDestructor);
+	return self;
 }
 
-void adt_stack_delete(adt_stack_t *this){
-	if(this){
-		adt_stack_destroy(this);
-		free(this);
+void adt_stack_delete(adt_stack_t *self){
+	if(self){
+		adt_stack_destroy(self);
+		free(self);
 	}
 }
 
-void adt_stack_create(adt_stack_t *this, void (*pDestructor)(void*)){
-	this->ppAlloc = (void**) 0;
-	this->u32AllocLen = 0;
-	this->u32CurLen = 0;
-	this->u32MinLen = ADT_STACK_DEFAULT_MIN_LEN;
-	this->pDestructor = pDestructor;
+void adt_stack_create(adt_stack_t *self, void (*pDestructor)(void*)){
+	self->ppAlloc = (void**) 0;
+	self->u32AllocLen = 0;
+	self->u32CurLen = 0;
+	self->u32MinLen = ADT_STACK_DEFAULT_MIN_LEN;
+	self->pDestructor = pDestructor;
 }
 
-void adt_stack_destroy(adt_stack_t *this){
+void adt_stack_destroy(adt_stack_t *self){
 	uint32_t u32i;
 
-	void **ppElem=this->ppAlloc;
-	if(this->pDestructor){
-		for(u32i=0;u32i<this->u32CurLen;u32i++){
-			this->pDestructor(*(ppElem++));
+	void **ppElem=self->ppAlloc;
+	if(self->pDestructor){
+		for(u32i=0;u32i<self->u32CurLen;u32i++){
+			self->pDestructor(*(ppElem++));
 		}
 	}
-	if(this->ppAlloc != 0){
-		free(this->ppAlloc);
+	if(self->ppAlloc != 0){
+		free(self->ppAlloc);
 	}
-	this->ppAlloc = (void**) 0;
-	this->u32AllocLen = 0;
-	this->u32CurLen = 0;
+	self->ppAlloc = (void**) 0;
+	self->u32AllocLen = 0;
+	self->u32CurLen = 0;
 }
 
-void adt_stack_clear(adt_stack_t *this){
-	adt_stack_destroy(this);
+void adt_stack_clear(adt_stack_t *self){
+	adt_stack_destroy(self);
 }
 
 
 //Accessors
-void	adt_stack_push(adt_stack_t *this, void *pVal){
-	if(!this) return;
-	if(this->u32CurLen==this->u32AllocLen){
-		if(this->u32AllocLen==0){
-			adt_stack_resize(this,this->u32MinLen);
+void	adt_stack_push(adt_stack_t *self, void *pVal){
+	if(!self) return;
+	if(self->u32CurLen==self->u32AllocLen){
+		if(self->u32AllocLen==0){
+			adt_stack_resize(self,self->u32MinLen);
 		}
 		else{
 			//default growth by doubling items available
-			adt_stack_resize(this,this->u32AllocLen*2);
+			adt_stack_resize(self,self->u32AllocLen*2);
 		}
 	}
-	assert(this->u32CurLen<this->u32AllocLen);
-	assert(this->ppAlloc != 0);
-	this->ppAlloc[this->u32CurLen++] = pVal;
+	assert(self->u32CurLen<self->u32AllocLen);
+	assert(self->ppAlloc != 0);
+	self->ppAlloc[self->u32CurLen++] = pVal;
 }
-void* adt_stack_top(adt_stack_t *this){
-	if(this && (this->u32CurLen>0)){
-		assert(this->ppAlloc);
-		return this->ppAlloc[this->u32CurLen-1];
+void* adt_stack_top(adt_stack_t *self){
+	if(self && (self->u32CurLen>0)){
+		assert(self->ppAlloc);
+		return self->ppAlloc[self->u32CurLen-1];
 	}
 	return (void*)0;
 }
 
-void* adt_stack_pop(adt_stack_t *this){
-	if(this && (this->u32CurLen>0)){
-		assert(this->ppAlloc);
-		return this->ppAlloc[--this->u32CurLen];
+void* adt_stack_pop(adt_stack_t *self){
+	if(self && (self->u32CurLen>0)){
+		assert(self->ppAlloc);
+		return self->ppAlloc[--self->u32CurLen];
 	}
 	return (void*)0;
 }
 
 //Utility functions
-void adt_stack_reserve(adt_stack_t *this,uint32_t u32Len){
-	if(this){
-		this->u32MinLen = u32Len;
-		if(this->u32AllocLen < this->u32MinLen){
-			adt_stack_resize(this,this->u32MinLen);
+void adt_stack_reserve(adt_stack_t *self,uint32_t u32Len){
+	if(self){
+		self->u32MinLen = u32Len;
+		if(self->u32AllocLen < self->u32MinLen){
+			adt_stack_resize(self,self->u32MinLen);
 		}
 	}
 }
 
-void adt_stack_resize(adt_stack_t *this,uint32_t u32Len){
+void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
 	void **ppAlloc = (void**) 0;
-	if(!this) return;
-	if(u32Len == this->u32AllocLen) return; //nothing to do
+	if(!self) return;
+	if(u32Len == self->u32AllocLen) return; //nothing to do
 
-	assert(this->u32AllocLen>=this->u32CurLen);
+	assert(self->u32AllocLen>=self->u32CurLen);
 	if(u32Len>0){
 		ppAlloc = (void**) malloc(u32Len * sizeof(void*));
 		assert(ppAlloc != 0);
 	}
-	if(this->ppAlloc){
-		if(u32Len > this->u32AllocLen){
+	if(self->ppAlloc){
+		if(u32Len > self->u32AllocLen){
 			//grow
-			memcpy(ppAlloc,this->ppAlloc,this->u32AllocLen * sizeof(void*));
+			memcpy(ppAlloc,self->ppAlloc,self->u32AllocLen * sizeof(void*));
 		}
 		else{
 			//shrink
-			if( this->u32CurLen > u32Len){
+			if( self->u32CurLen > u32Len){
 				//call destructor on superfluous elements
-				if(this->pDestructor){
+				if(self->pDestructor){
 					uint32_t u32i;
-					for(u32i=u32Len; u32i < this->u32CurLen;u32i++){
-						this->pDestructor(this->ppAlloc[u32i]);
+					for(u32i=u32Len; u32i < self->u32CurLen;u32i++){
+						self->pDestructor(self->ppAlloc[u32i]);
 					}
 				}
 			}
-			memcpy(ppAlloc,this->ppAlloc,u32Len * sizeof(void*));
+			memcpy(ppAlloc,self->ppAlloc,u32Len * sizeof(void*));
 		}
-		free(this->ppAlloc);
+		free(self->ppAlloc);
 	}
-	this->ppAlloc = ppAlloc;
-	this->u32AllocLen = u32Len;
+	self->ppAlloc = ppAlloc;
+	self->u32AllocLen = u32Len;
 
 }
-uint32_t adt_stack_size(adt_stack_t *this){
-	if(this){
-		return this->u32CurLen;
+uint32_t adt_stack_size(adt_stack_t *self){
+	if(self){
+		return self->u32CurLen;
 	}
 	return 0;
 }
