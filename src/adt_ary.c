@@ -210,10 +210,10 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
 }
 
 void adt_ary_fill(adt_ary_t *self, int32_t s32Len){
+	assert( self != 0);
 	int32_t s32Index;
 	int32_t s32CurLen = self->s32CurLen;
-	assert( self != 0);
-	if(self->s32CurLen >= s32Len) return; //increase not necessary
+	if(s32CurLen >= s32Len) return; //increase not necessary
 	adt_ary_extend(self,(int32_t)s32Len);
 	//set pFillElem to all newly created array elements
 	for(s32Index=s32CurLen; s32Index<s32Len; s32Index++){
