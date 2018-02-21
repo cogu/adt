@@ -314,7 +314,8 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 		for(i=0;i<node->u8Cur;i++){
 			if(node->child.match[i].u32Hash == u32Hash){
 				adt_hkey_t *hkey = node->child.match[i].key;
-				while( (hkey) && (hkey->next) ){
+				assert(hkey != 0);
+				while(hkey->next){
 					hkey = hkey->next;
 				}
 				hkey->next = key;

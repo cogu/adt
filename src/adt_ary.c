@@ -186,10 +186,10 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
 
 	//check if allocated length is greater than requested length
 	if( (self->s32AllocLen>=s32Len) ){
-	  //shift array data to start of allocated array
-      memmove(self->ppAlloc,self->pFirst,((unsigned int)self->s32CurLen) * sizeof(uint16_t));
-      self->pFirst = self->ppAlloc;
-      self->s32CurLen = s32Len;
+		//shift array data to start of allocated array
+		memmove(self->ppAlloc,self->pFirst,((unsigned int)self->s32CurLen) * sizeof(void*));
+		self->pFirst = self->ppAlloc;
+		self->s32CurLen = s32Len;
 	}
 	else {
 		//need to allocate new array data element and copy data to newly allocated memory
@@ -200,7 +200,7 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
 		ppAlloc = (void**) malloc(sizeof(void*)*((unsigned int)s32Len));
 		assert(ppAlloc != 0);
 		if(self->ppAlloc){
-			memset(ppAlloc,0, ((unsigned int)self->s32CurLen) * sizeof(void*));
+			memset(ppAlloc + (((unsigned int)self->s32CurLen) * sizeof(void*)),0, (unsigned int)(s32Len - self->s32CurLen) * sizeof(void*));
 			memcpy(ppAlloc,self->pFirst, ((unsigned int)self->s32CurLen) * sizeof(void*));
 			free(self->ppAlloc);
 		}
@@ -210,10 +210,10 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
 }
 
 void adt_ary_fill(adt_ary_t *self, int32_t s32Len){
+	assert( self != 0);
 	int32_t s32Index;
 	int32_t s32CurLen = self->s32CurLen;
-	assert( self != 0);
-	if(self->s32CurLen >= s32Len) return; //increase not necessary
+	if(s32CurLen >= s32Len) return; //increase not necessary
 	adt_ary_extend(self,(int32_t)s32Len);
 	//set pFillElem to all newly created array elements
 	for(s32Index=s32CurLen; s32Index<s32Len; s32Index++){
