@@ -19,6 +19,7 @@
 #define DATA_BLOCK_MAX 65536 	//maximum amount of bytes that can be copied in memmmove is implementation specific,
 								      //use define to control how many bytes shall be copied
 
+#define ELEM_LEN (sizeof(void*))
 
 /**************** Private Function Declarations *******************/
 
@@ -197,15 +198,16 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
 			//invalid argument
 			return;
 		}
-		ppAlloc = (void**) malloc(sizeof(void*)*((unsigned int)s32Len));
+		ppAlloc = (void**) malloc(ELEM_LEN*((unsigned int)s32Len));
 		assert(ppAlloc != 0);
 		if(self->ppAlloc){
-			memset(ppAlloc + (((unsigned int)self->s32CurLen) * sizeof(void*)),0, (unsigned int)(s32Len - self->s32CurLen) * sizeof(void*));
-			memcpy(ppAlloc,self->pFirst, ((unsigned int)self->s32CurLen) * sizeof(void*));
-			free(self->ppAlloc);
+         size_t numNewElems = (size_t) (s32Len - self->s32CurLen);
+         memset(ppAlloc+self->s32CurLen, 0,  numNewElems * ELEM_LEN);
+         memcpy(ppAlloc,self->pFirst, ((unsigned int)self->s32CurLen) * ELEM_LEN);
+         free(self->ppAlloc);
 		}
-		self->ppAlloc = self->pFirst = ppAlloc;
-		self->s32AllocLen = self->s32CurLen = s32Len;
+      self->ppAlloc = self->pFirst = ppAlloc;
+      self->s32AllocLen = self->s32CurLen = s32Len;
 	}
 }
 
