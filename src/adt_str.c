@@ -28,7 +28,7 @@
 #define LARGE_BLOCK_SIZE 	67108864
 
 /**************** Private Function Declarations *******************/
-static int32_t adt_str_calcLen(int32_t s32CurLen, int32_t u32NewLen);
+static int32_t adt_str_calcLen(int32_t s32CurLen, int32_t s32NewLen);
 
 
 /**************** Private Variable Declarations *******************/
@@ -72,7 +72,7 @@ void adt_str_destroy(adt_str_t *self){
 
 /* adt_str functions */
 
-adt_str_t *adt_str_dup(adt_str_t* other){
+adt_str_t *adt_str_dup(const adt_str_t* other){
 	adt_str_t *self;
 	self = adt_str_new();
 	if(self){
@@ -90,7 +90,7 @@ adt_str_t *adt_str_make(const char *pBegin, const char *pEnd){
 	return self;
 }
 
-int32_t adt_str_length(adt_str_t *self){
+int32_t adt_str_length(const adt_str_t *self){
 	if(self){
 		return self->s32Cur;
 	}
@@ -102,7 +102,7 @@ void adt_str_clear(adt_str_t *self){
 	self->s32Cur = 0;
 }
 
-void adt_str_set(adt_str_t *lhs, adt_str_t *rhs){
+void adt_str_set(adt_str_t *lhs, const adt_str_t *rhs){
 	if( (lhs == 0) || (rhs == 0) ) return;
 	if(lhs->pStr) free(lhs->pStr);
 	lhs->pStr = (uint8_t*) malloc(rhs->s32Len);
@@ -112,7 +112,11 @@ void adt_str_set(adt_str_t *lhs, adt_str_t *rhs){
 	lhs->s32Len = rhs->s32Len;
 }
 
-void adt_str_append(adt_str_t *lhs,adt_str_t *rhs);
+void adt_str_append(adt_str_t *lhs, const adt_str_t *rhs)
+{
+	// Not implemented yet..
+	assert(0);
+}
 
 void adt_str_reserve(adt_str_t *self,int32_t s32Len){
    uint8_t *pStr;
@@ -150,7 +154,7 @@ int adt_str_pop(adt_str_t *self){
 	return retval;
 }
 
-int adt_str_get_char(adt_str_t *self,int index){
+int adt_str_get_char(const adt_str_t *self,int index){
 	if(self){
 		int32_t s32Index;
 		if(index<0){
@@ -268,34 +272,34 @@ void free_void(void *ptr){
 
 /***************** Private Function Definitions *******************/
 
-int32_t adt_str_calcLen(int32_t s32CurLen, int32_t u32NewLen){
-	if(s32CurLen>=u32NewLen){
+int32_t adt_str_calcLen(int32_t s32CurLen, int32_t s32NewLen){
+	if(s32CurLen>=s32NewLen){
 		return s32CurLen;
 	}
 
-	if(u32NewLen > (LONG_MAX - LARGE_BLOCK_SIZE) ){
-		return (int32_t) LONG_MAX;
+	if(s32NewLen > (INT_MAX - LARGE_BLOCK_SIZE) ){
+		return INT_MAX;
 	}
-	else if( u32NewLen>=LARGE_BLOCK_SIZE ){
+	else if( s32NewLen>=LARGE_BLOCK_SIZE ){
 		//upgrade s32CurLen to LARGE_BLOCK_SIZE
 		if( s32CurLen < LARGE_BLOCK_SIZE ){
 			s32CurLen = LARGE_BLOCK_SIZE;
 		}
-		while(s32CurLen<u32NewLen) s32CurLen+=LARGE_BLOCK_SIZE;
+		while(s32CurLen<s32NewLen) s32CurLen+=LARGE_BLOCK_SIZE;
 	}
-	else if(u32NewLen >= MEDIUM_BLOCK_SIZE){
+	else if(s32NewLen >= MEDIUM_BLOCK_SIZE){
 		//upgrade s32CurLen to MEDIUM_BLOCK_SIZE
 		if( s32CurLen < MEDIUM_BLOCK_SIZE ){
 			s32CurLen = MEDIUM_BLOCK_SIZE;
 		}
-		while(s32CurLen<u32NewLen) s32CurLen*=2;
+		while(s32CurLen<s32NewLen) s32CurLen*=2;
 	}
 	else{
 		//upgrade s32CurLen to MIN_BLOCK_SIZE
 		if( s32CurLen < MIN_BLOCK_SIZE ){
 			s32CurLen = MIN_BLOCK_SIZE;
 		}
-		while(s32CurLen<u32NewLen) s32CurLen*=4;
+		while(s32CurLen<s32NewLen) s32CurLen*=4;
 	}
 	return s32CurLen;
 }
