@@ -200,7 +200,7 @@ void adt_list_remove(adt_list_t *self, void *pItem)
    }
 }
 
-bool adt_list_is_empty(adt_list_t *self)
+bool adt_list_is_empty(const adt_list_t *self)
 {
    if (self != 0)
    {
@@ -231,7 +231,7 @@ adt_list_elem_t *adt_list_iter_next(adt_list_t *self)
    return retval;
 }
 
-adt_list_elem_t *adt_list_first(adt_list_t *self)
+adt_list_elem_t *adt_list_first(const adt_list_t *self)
 {
    if (self != 0)
    {
@@ -240,7 +240,7 @@ adt_list_elem_t *adt_list_first(adt_list_t *self)
    return 0;
 }
 
-adt_list_elem_t *adt_list_last(adt_list_t *self)
+adt_list_elem_t *adt_list_last(const adt_list_t *self)
 {
    if (self != 0)
    {
@@ -249,7 +249,7 @@ adt_list_elem_t *adt_list_last(adt_list_t *self)
    return 0;
 }
 
-int32_t adt_list_length(adt_list_t *self)
+int32_t adt_list_length(const adt_list_t *self)
 {
    int32_t result=0;
    if (self != 0)

@@ -96,7 +96,7 @@ void**	adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem){
 
 /**
  * This returns pointer to pointer, make sure to dereference the result.
- * It returns NULL in case the index is out of range
+ * It returns NULL in case a negative index is out of range
  */
 void**	adt_ary_get(adt_ary_t *self, int32_t s32Index){
 	if(self==0){
@@ -113,6 +113,22 @@ void**	adt_ary_get(adt_ary_t *self, int32_t s32Index){
 	}
 	adt_ary_fill(self,(int32_t) (s32Index+1));
 	return &self->pFirst[s32Index];
+}
+
+/**
+ * If you are certain that the index is going to be within bounds, you can use
+ * this convenience function for getting the value without additional pointer dereference.
+ */
+void* adt_ary_value(const adt_ary_t *self, int32_t s32Index)
+{
+	if(self==0){
+		return (void*) 0;
+	}
+	if(s32Index<0){
+		//negative index inside array bounds ensured by caller
+		s32Index=self->s32CurLen+s32Index;
+	}
+	return self->pFirst[s32Index];
 }
 
 void	adt_ary_push(adt_ary_t *self, void *pElem){
@@ -244,7 +260,7 @@ void adt_ary_clear(adt_ary_t *self){
 	}
 }
 
-int32_t adt_ary_length(adt_ary_t *self){
+int32_t adt_ary_length(const adt_ary_t *self){
 	if(self){
 		return self->s32CurLen;
 	}
@@ -252,7 +268,7 @@ int32_t adt_ary_length(adt_ary_t *self){
 }
 
 //Returns nonzero if the element exists
-int32_t	adt_ary_exists(adt_ary_t *self, int32_t s32Index){
+int32_t	adt_ary_exists(const adt_ary_t *self, int32_t s32Index){
 	if(self==0){
 		return 0;
 	}
@@ -304,7 +320,7 @@ void 	adt_ary_set_fill_elem(adt_ary_t *self,void* pFillElem){
 		self->pFillElem = pFillElem;
 	}
 }
-void* 	adt_ary_get_fill_elem(adt_ary_t *self){
+void* 	adt_ary_get_fill_elem(const adt_ary_t *self){
 	if(self){
 		return self->pFillElem;
 	}
@@ -369,12 +385,4 @@ void adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
    self->s32CurLen-=s32Removed;
 }
 
-/**
- * If you are certain that the index is going to be within bounds, you can use
- * this convenience function for getting the value without additional pointer dereference.
- */
-void* adt_ary_value(adt_ary_t *self, int32_t s32Index)
-{
-   return *adt_ary_get(self, s32Index);
-}
 /***************** Private Function Definitions *******************/

@@ -29,7 +29,7 @@ static void adt_hnode_destroy_shallow(adt_hnode_t *node);
 static adt_hnode_t *adt_hnode_new(void);
 static void adt_hnode_delete(adt_hnode_t *node,void (*pDestructor)(void*));
 static void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash);
-static adt_hkey_t * adt_hnode_find(adt_hnode_t *node, const char *key,uint32_t u32Hash);
+static adt_hkey_t * adt_hnode_find(const adt_hnode_t *node, const char *key,uint32_t u32Hash);
 static adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Hash,void (*pDestructor)(void*));
 static void adt_hkey_create(adt_hkey_t *hkey, const char *key, void *value);
 static void adt_hkey_destroy(adt_hkey_t *hkey, void (*pDestructor)(void*));
@@ -102,7 +102,7 @@ void adt_hash_set(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen, void *
 	}
 }
 
-void**	adt_hash_get(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
+void**	adt_hash_get(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
 	if(self && pKey){
 		uint32_t u32HashVal = adt_hash_string(pKey);
 		adt_hkey_t *hkey = adt_hnode_find(self->root,pKey,u32HashVal);
@@ -127,13 +127,13 @@ void**adt_hash_remove(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
 	return (void**) 0;
 }
 
-uint32_t adt_hash_size(adt_hash_t *self){
+uint32_t adt_hash_size(const adt_hash_t *self){
 	if(self){
 		return self->u32Size;
 	}
 	return 0;
 }
-bool adt_hash_exists(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
+bool adt_hash_exists(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
 	if(self){
 		uint32_t u32HashVal = adt_hash_string(pKey);
 		adt_hkey_t *hkey = adt_hnode_find(self->root,pKey,u32HashVal);
@@ -364,7 +364,7 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 	}
 }
 
-adt_hkey_t * adt_hnode_find(adt_hnode_t *node, const char *key,uint32_t u32Hash){
+adt_hkey_t * adt_hnode_find(const adt_hnode_t *node, const char *key,uint32_t u32Hash){
 	if(node->u8Width == 16){
 			uint8_t u8Bucket = (uint8_t) ( (u32Hash >> (node->u8Depth*4)) & 0xF);
 			return adt_hnode_find(&node->child.node[u8Bucket],key,u32Hash);
