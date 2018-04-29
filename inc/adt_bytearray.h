@@ -32,8 +32,8 @@ int8_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen);
 int8_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, uint32_t u32DataLen);
 int8_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc);
 int8_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen);
-uint8_t *adt_bytearray_data(adt_bytearray_t *self);
-uint32_t adt_bytearray_length(adt_bytearray_t *self);
+uint8_t *adt_bytearray_data(const adt_bytearray_t *self);
+uint32_t adt_bytearray_length(const adt_bytearray_t *self);
 void adt_bytearray_clear(adt_bytearray_t *self);
 
 #endif //ADT_BYTE_ARRAY_H

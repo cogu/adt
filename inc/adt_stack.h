@@ -11,7 +11,7 @@
 #define ADT_STACK_H__
 #include <stdint.h>
 
-#define ADT_STACK_VERSION 0.1.0
+#define ADT_STACK_VERSION 0.1.1
 
 typedef struct adt_stack_tag{
 	void **ppAlloc;		//array of (void*)
@@ -32,12 +32,12 @@ void 	adt_stack_clear(adt_stack_t *self);
 
 //Accessors
 void	adt_stack_push(adt_stack_t *self, void *pVal);
-void*	adt_stack_top(adt_stack_t *self);
+void*	adt_stack_top(const adt_stack_t *self);
 void*	adt_stack_pop(adt_stack_t *self);
 
 //Utility functions
 void	adt_stack_reserve(adt_stack_t *self,uint32_t u32Len);
 void	adt_stack_resize(adt_stack_t *self,uint32_t u32Len);
-uint32_t adt_stack_size(adt_stack_t *self);
+uint32_t adt_stack_size(const adt_stack_t *self);
 
 #endif //ADT_STACK_H__

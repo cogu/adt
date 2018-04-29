@@ -90,7 +90,7 @@ void	adt_stack_push(adt_stack_t *self, void *pVal){
 	assert(self->ppAlloc != 0);
 	self->ppAlloc[self->u32CurLen++] = pVal;
 }
-void* adt_stack_top(adt_stack_t *self){
+void* adt_stack_top(const adt_stack_t *self){
 	if(self && (self->u32CurLen>0)){
 		assert(self->ppAlloc);
 		return self->ppAlloc[self->u32CurLen-1];
@@ -150,7 +150,7 @@ void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
 	self->u32AllocLen = u32Len;
 
 }
-uint32_t adt_stack_size(adt_stack_t *self){
+uint32_t adt_stack_size(const adt_stack_t *self){
 	if(self){
 		return self->u32CurLen;
 	}

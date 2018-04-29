@@ -114,7 +114,7 @@ void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
    self->pEnd++;
 }
 
-void adt_u16Map_remove(adt_u16Map_t *self, adt_u16MapElem_t *pElem){
+void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
    if( (self==0) || (self->pBegin==0) || (pElem == 0) ){
       return;
    }
@@ -141,7 +141,7 @@ adt_u16MapElem_t* adt_u16Map_find(adt_u16Map_t *self, uint16_t key){
    return it;
 }
 
-adt_u16MapElem_t* adt_u16Map_findExact(adt_u16Map_t *self, uint16_t key, void *val){
+adt_u16MapElem_t* adt_u16Map_findExact(adt_u16Map_t *self, uint16_t key, const void *val){
    adt_u16MapElem_t *it = adt_u16Map_find(self,key);
    if(it != 0){
       it = adt_u16Map_iterInit(self,it);
@@ -155,14 +155,14 @@ adt_u16MapElem_t* adt_u16Map_findExact(adt_u16Map_t *self, uint16_t key, void *v
    return (adt_u16MapElem_t*) 0;
 }
 
-uint16_t adt_u16Map_size(adt_u16Map_t *self){
+uint16_t adt_u16Map_size(const adt_u16Map_t *self){
    if(self != 0){
       return self->numElem;
    }
    return 0;
 }
 
-adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, adt_u16MapElem_t *pElem){
+adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
    if(self->pBegin < self->pEnd){
       if( (pElem >= self->pBegin) && (pElem < self->pEnd) ){
          self->pIter = pElem;
@@ -239,7 +239,7 @@ uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key
    return 0;
 }
 
-void adt_u16Map_removeVal(adt_u16Map_t *self, void *val){
+void adt_u16Map_removeVal(adt_u16Map_t *self, const void *val){
    uint16_t tmp[MAX_NUM_TRANSFER];
    uint16_t tmpLen = 0;
    adt_u16MapElem_t *it;
@@ -274,10 +274,10 @@ void adt_u16Map_removeVal(adt_u16Map_t *self, void *val){
 
 
 /***************** Private Function Definitions *******************/
-adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16MapElem_t *pEnd, uint16_t key){
-	adt_u16MapElem_t *pMid;
-	adt_u16MapElem_t *pLow = pBegin;
-	adt_u16MapElem_t *pHigh = pEnd;
+adt_u16MapElem_t *adt_u16Map_binarySearchDup(const adt_u16MapElem_t *pBegin, const adt_u16MapElem_t *pEnd, uint16_t key){
+   const adt_u16MapElem_t *pMid;
+   const adt_u16MapElem_t *pLow = pBegin;
+   const adt_u16MapElem_t *pHigh = pEnd;
 
    uint32_t numElem;
    while(1){

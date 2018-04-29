@@ -186,14 +186,14 @@ int8_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
    return -1;
 }
 
-uint8_t *adt_bytearray_data(adt_bytearray_t *self){
+uint8_t *adt_bytearray_data(const adt_bytearray_t *self){
    if(self != 0){
       return self->pData;
    }
    return 0;
 }
 
-uint32_t adt_bytearray_length(adt_bytearray_t *self){
+uint32_t adt_bytearray_length(const adt_bytearray_t *self){
    if(self != 0){
       return self->u32CurLen;
    }

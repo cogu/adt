@@ -12,9 +12,8 @@
 #define ADT_ARY_H
 #include <stdint.h>
 
-#define ADT_ARRAY_VERSION 0.1.0
+#define ADT_ARRAY_VERSION 0.1.1
 
-/***************** Public Function Declarations *******************/
 typedef struct adt_ary_tag{
 	void **ppAlloc;		//array of (void*)
 	void **pFirst;		//pointer to first array element
@@ -43,7 +42,7 @@ void	 adt_ary_push(adt_ary_t *self, void *pElem);
 void*	 adt_ary_pop(adt_ary_t *self);
 void*	 adt_ary_shift(adt_ary_t *self);
 void	 adt_ary_unshift(adt_ary_t *self, void *pElem);
-void*  adt_ary_value(adt_ary_t *self, int32_t s32Index);
+void*  adt_ary_value(const adt_ary_t *self, int32_t s32Index);
 
 
 //Utility functions
@@ -51,11 +50,11 @@ void	adt_ary_extend(adt_ary_t *self, int32_t s32Len);
 void	adt_ary_fill(adt_ary_t *self, int32_t s32Len);
 void  adt_ary_resize(adt_ary_t *self, int32_t s32Len);
 void	adt_ary_clear(adt_ary_t *self);
-int32_t adt_ary_length(adt_ary_t *self);
+int32_t adt_ary_length(const adt_ary_t *self);
 void 	adt_ary_set_fill_elem(adt_ary_t *self,void* pFillElem);
-void* 	adt_ary_get_fill_elem(adt_ary_t *self);
+void* 	adt_ary_get_fill_elem(const adt_ary_t *self);
 void adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len);
 
-int32_t	adt_ary_exists(adt_ary_t *self, int32_t s32Index);
+int32_t	adt_ary_exists(const adt_ary_t *self, int32_t s32Index);
 
 #endif //ADT_ARY_H

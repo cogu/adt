@@ -98,9 +98,9 @@ typedef struct adt_rbfu16_tag   //ring buffer (fixed block size) -
 uint8_t adt_rbfs_create(adt_rbfs_t* rbf, uint8_t* u8Buffer, uint16_t u32NumElem, uint8_t u8ElemSize);
 uint8_t adt_rbfs_insert(adt_rbfs_t* rbf, const uint8_t* u8Data);
 uint8_t adt_rbfs_remove(adt_rbfs_t* rbf, uint8_t* u8Data);
-uint8_t adt_rbfs_peek(adt_rbfs_t* rbf, uint8_t* u8Data);
-uint16_t adt_rbfs_size(adt_rbfs_t* rbf);
-uint16_t adt_rbfs_free(adt_rbfs_t* rbf);
+uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data);
+uint16_t adt_rbfs_size(const adt_rbfs_t* rbf);
+uint16_t adt_rbfs_free(const adt_rbfs_t* rbf);
 void adt_rbfs_clear(adt_rbfs_t* rbf);
 #endif
 
@@ -108,18 +108,18 @@ void adt_rbfs_clear(adt_rbfs_t* rbf);
 uint8_t adt_rbfd_create(adt_rbfd_t* rbfd, uint8_t* u8Buffer, uint16_t u16BufferSize);
 uint8_t adt_rbfd_insert(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len);
 uint8_t adt_rbfd_remove(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len);
-uint16_t adt_rbfd_size(adt_rbfd_t* rbfd);
-uint8_t adt_rbfd_peekU8(adt_rbfd_t* rbfd, uint8_t* u8Value);
-uint8_t adt_rbfd_peekU16(adt_rbfd_t* rbfd, uint16_t* u16Value);
-uint8_t adt_rbfd_peekU32(adt_rbfd_t* rbfd, uint32_t* u32Value);
+uint16_t adt_rbfd_size(const adt_rbfd_t* rbfd);
+uint8_t adt_rbfd_peekU8(const adt_rbfd_t* rbfd, uint8_t* u8Value);
+uint8_t adt_rbfd_peekU16(const adt_rbfd_t* rbfd, uint16_t* u16Value);
+uint8_t adt_rbfd_peekU32(const adt_rbfd_t* rbfd, uint32_t* u32Value);
 #endif
 
 #if(ADT_RBFU16_ENABLE)
 uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem);
 uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data);
 uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data);
-uint8_t adt_rbfu16_peek(adt_rbfu16_t* rbf, uint16_t* u16Data);
-uint16_t adt_rbfu16_length(adt_rbfu16_t* rbf);
+uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data);
+uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf);
 #endif
 
 #endif
