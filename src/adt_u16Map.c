@@ -162,7 +162,7 @@ uint16_t adt_u16Map_size(const adt_u16Map_t *self){
    return 0;
 }
 
-adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
+adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, adt_u16MapElem_t *pElem){
    if(self->pBegin < self->pEnd){
       if( (pElem >= self->pBegin) && (pElem < self->pEnd) ){
          self->pIter = pElem;
@@ -274,10 +274,10 @@ void adt_u16Map_removeVal(adt_u16Map_t *self, const void *val){
 
 
 /***************** Private Function Definitions *******************/
-adt_u16MapElem_t *adt_u16Map_binarySearchDup(const adt_u16MapElem_t *pBegin, const adt_u16MapElem_t *pEnd, uint16_t key){
-   const adt_u16MapElem_t *pMid;
-   const adt_u16MapElem_t *pLow = pBegin;
-   const adt_u16MapElem_t *pHigh = pEnd;
+adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16MapElem_t *pEnd, uint16_t key){
+   adt_u16MapElem_t *pMid;
+   adt_u16MapElem_t *pLow = pBegin;
+   adt_u16MapElem_t *pHigh = pEnd;
 
    uint32_t numElem;
    while(1){
