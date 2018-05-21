@@ -39,11 +39,11 @@ void  adt_ary_destructorEnable(adt_ary_t *self, uint8_t enable);
 void** adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem);
 void** adt_ary_get(adt_ary_t *self, int32_t s32Index);
 void	 adt_ary_push(adt_ary_t *self, void *pElem);
+void   adt_ary_push_unique(adt_ary_t *self, void *pElem);
 void*	 adt_ary_pop(adt_ary_t *self);
 void*	 adt_ary_shift(adt_ary_t *self);
 void	 adt_ary_unshift(adt_ary_t *self, void *pElem);
 void*  adt_ary_value(const adt_ary_t *self, int32_t s32Index);
-
 
 //Utility functions
 void	adt_ary_extend(adt_ary_t *self, int32_t s32Len);

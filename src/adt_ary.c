@@ -139,6 +139,25 @@ void	adt_ary_push(adt_ary_t *self, void *pElem){
 	adt_ary_extend(self,((int32_t) s32Index+1));
 	self->pFirst[s32Index]=pElem;
 }
+
+/**
+ * Same as adt_ary_push but skips adding if it already exists.
+ * Runs in linear time.
+ */
+void   adt_ary_push_unique(adt_ary_t *self, void *pElem){
+   if (self != 0)
+   {
+      int32_t s32Index;
+      for(s32Index = 0; s32Index < self->s32CurLen; s32Index++ )
+      {
+         if (self->pFirst[s32Index] == pElem){
+            return;
+         }
+      }
+      adt_ary_push(self, pElem);
+   }
+}
+
 void*	adt_ary_pop(adt_ary_t *self){
 	void *pElem;
 	assert( (self!=0) );

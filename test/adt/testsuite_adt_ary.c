@@ -10,7 +10,7 @@ void void_free(void* p){
 	free(p);
 }
 
-void test_adt_ary_new(CuTest* tc)
+static void test_adt_ary_new(CuTest* tc)
 {
 	adt_ary_t *pArray = adt_ary_new(NULL);
 	CuAssertPtrNotNull(tc, pArray);
@@ -21,7 +21,7 @@ void test_adt_ary_new(CuTest* tc)
 	adt_ary_delete(pArray);
 }
 
-void test_adt_ary_push_pop(CuTest* tc)
+static void test_adt_ary_push_pop(CuTest* tc)
 {
 	char *pVal;
 	adt_ary_t *pArray = adt_ary_new(void_free);
@@ -53,7 +53,7 @@ void test_adt_ary_push_pop(CuTest* tc)
 	adt_ary_delete(pArray);
 }
 
-void test_adt_ary_shift_unshift(CuTest* tc)
+static void test_adt_ary_shift_unshift(CuTest* tc)
 {
 	void **ppVal;
 	char *pVal;
@@ -95,7 +95,7 @@ void test_adt_ary_shift_unshift(CuTest* tc)
 	adt_ary_delete(pArray);
 }
 
-void test_adt_ary_resize(CuTest* tc)
+static void test_adt_ary_resize(CuTest* tc)
 {
    int one = 1;
    int two = 2;
@@ -131,15 +131,45 @@ void test_adt_ary_resize(CuTest* tc)
    adt_ary_delete(a);
 }
 
+static void test_adt_ary_push_unique(CuTest* tc)
+{
+   int *a;
+   int *b;
+   int *c;
+   adt_ary_t *pArray = adt_ary_new(void_free);
+   a = (int*) malloc(sizeof(int));
+   b = (int*) malloc(sizeof(int));
+   c = (int*) malloc(sizeof(int));
+   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, a);
+   CuAssertIntEquals(tc, 1, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, a);
+   CuAssertIntEquals(tc, 1, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, b);
+   CuAssertIntEquals(tc, 2, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, b);
+   CuAssertIntEquals(tc, 2, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, c);
+   CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, c);
+   CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
+   adt_ary_push_unique(pArray, c);
+   adt_ary_push_unique(pArray, b);
+   adt_ary_push_unique(pArray, a);
+   CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
+   adt_ary_delete(pArray);
+}
+
 
 CuSuite* testsuite_adt_ary(void)
 {
 	CuSuite* suite = CuSuiteNew();
 
 	SUITE_ADD_TEST(suite, test_adt_ary_new);
-	//SUITE_ADD_TEST(suite, test_adt_ary_push_pop);
+	SUITE_ADD_TEST(suite, test_adt_ary_push_pop);
 	SUITE_ADD_TEST(suite, test_adt_ary_shift_unshift);
 	SUITE_ADD_TEST(suite, test_adt_ary_resize);
+	SUITE_ADD_TEST(suite, test_adt_ary_push_unique);
 
 	return suite;
 }
