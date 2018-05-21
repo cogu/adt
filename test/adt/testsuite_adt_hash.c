@@ -72,24 +72,23 @@ void test_adt_hash_iterator2(CuTest* tc){
 
 	start = clock();
 	FILE *fh = fopen("test/3esl.txt","r");
-	if(fh){
-		do{
-			read = getline(&line,&len,fh);
-			if(read>1){
-				line[read-1]=0;
-				items++;
-				if(adt_hash_get(pHash,line,strlen(line))!=0){
-					printf("duplicate item: %s\n",line);
-					dup++;
-				}
-				adt_hash_set(pHash,line,strlen(line),&value);
-			}
-		}while(read>=0);
-		end = clock();
-		elapsed_time = (double)(end - start) / (double)CLOCKS_PER_SEC;
-		printf("added %d items in %.002fs\n",items,elapsed_time);
-		fclose(fh);
-	}
+	assert(fh != 0);
+	do{
+	   read = getline(&line,&len,fh);
+	   if(read>1){
+	      line[read-1]=0;
+	      items++;
+	      if(adt_hash_get(pHash,line,strlen(line))!=0){
+	         printf("duplicate item: %s\n",line);
+	         dup++;
+	      }
+	      adt_hash_set(pHash,line,strlen(line),&value);
+	   }
+	}while(read>=0);
+	end = clock();
+	elapsed_time = (double)(end - start) / (double)CLOCKS_PER_SEC;
+	printf("added %d items in %.002fs\n",items,elapsed_time);
+	fclose(fh);
 	CuAssertIntEquals(tc,items,adt_hash_size(pHash));
 	adt_hash_iter_init(pHash);
 	void *pVal = 0;
