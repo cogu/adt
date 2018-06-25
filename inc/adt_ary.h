@@ -11,6 +11,16 @@
 #ifndef ADT_ARY_H
 #define ADT_ARY_H
 #include <stdint.h>
+#if defined(_MSC_PLATFORM_TOOLSET) && (_MSC_PLATFORM_TOOLSET<=110)
+#ifndef _MSC_BOOL_DEFINED
+#define _MSC_BOOL_DEFINED
+#define false 0
+#define true 1
+typedef uint8_t bool;
+#endif
+#else
+#include <stdbool.h>
+#endif
 
 #define ADT_ARRAY_VERSION 0.1.1
 
@@ -21,7 +31,7 @@ typedef struct adt_ary_tag{
 	int32_t s32CurLen;	//number of elements currently in the array
 	void (*pDestructor)(void*);
 	void *pFillElem;
-	uint8_t destructorEnable;
+	bool destructorEnable;
 } adt_ary_t;
 
 /***************** Public Function Declarations *******************/
@@ -32,7 +42,7 @@ void	adt_ary_delete(adt_ary_t *self);
 void  adt_ary_vdelete(void *arg);
 void 	adt_ary_create(adt_ary_t *self, void (*pDestructor)(void*));
 void 	adt_ary_destroy(adt_ary_t *self);
-void  adt_ary_destructorEnable(adt_ary_t *self, uint8_t enable);
+void  adt_ary_destructorEnable(adt_ary_t *self, bool enable);
 
 
 //Accessors

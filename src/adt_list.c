@@ -21,6 +21,7 @@ void  adt_list_create(adt_list_t *self, void (*pDestructor)(void*))
    if (self != 0)
    {
       self->pDestructor = pDestructor;
+      self->destructorEnable = true;
       self->pFirst = 0;
       self->pLast = 0;
       self->pIter = 0;
@@ -32,16 +33,21 @@ void  adt_list_destroy(adt_list_t *self)
    if (self != 0)
    {
       adt_list_elem_t *iter = self->pFirst; //create a local iterator, don't mess with the users' iterator located in self->pIter
+      void (*destructor)(void*) = (void (*)(void*)) 0;
       if (iter == 0)
       {
          return; //empty list
       }
+      if ( (self->destructorEnable != false) && (self->pDestructor != 0) )
+      {
+         destructor = self->pDestructor;
+      }
       while( iter != 0 )
       {
          adt_list_elem_t *pNext = iter->pNext;
-         if (self->pDestructor != 0)
+         if (destructor != 0)
          {
-            self->pDestructor(iter->pItem);
+            destructor(iter->pItem);
          }
          adt_list_elem_delete(iter);
          iter=pNext;
@@ -77,6 +83,13 @@ void  adt_list_vdelete(void *arg)
 {
    adt_list_delete((adt_list_t*) arg);
 }
+
+void adt_list_destructorEnable(adt_list_t *self, bool enable){
+   if(self != 0){
+      self->destructorEnable = enable;
+   }
+}
+
 
 /**
  * inserts at end of the list

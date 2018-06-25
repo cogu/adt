@@ -69,9 +69,9 @@ void  adt_ary_vdelete(void *arg)
    adt_ary_delete((adt_ary_t*) arg);
 }
 
-void adt_ary_destructorEnable(adt_ary_t *self, uint8_t enable){
+void adt_ary_destructorEnable(adt_ary_t *self, bool enable){
    if(self != 0){
-      self->destructorEnable = (enable != 0)? 1 : 0;
+      self->destructorEnable = enable;
    }
 }
 
@@ -313,14 +313,14 @@ void adt_ary_create(adt_ary_t *self,void (*pDestructor)(void*)){
 	self->s32CurLen = 0;
 	self->pDestructor = pDestructor;
 	self->pFillElem = (void*)0;
-	self->destructorEnable = 1u;
+	self->destructorEnable = true;
 }
 
 void adt_ary_destroy(adt_ary_t *self){
 	int32_t s32i;
 
 	void **ppElem=self->pFirst;
-	if( (self->pDestructor != 0) && (self->destructorEnable != 0) ){
+	if( (self->pDestructor != 0) && (self->destructorEnable != false) ){
 		for(s32i=0;s32i<(int32_t) self->s32CurLen;s32i++){
 			self->pDestructor(*(ppElem++));
 		}

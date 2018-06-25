@@ -12,7 +12,6 @@ typedef uint8_t bool;
 #include <stdbool.h>
 #endif
 
-
 typedef struct adt_list_elem_tag
 {
    struct adt_list_elem_tag *pNext;
@@ -25,6 +24,7 @@ typedef struct adt_list_tag{
    adt_list_elem_t *pLast;
    adt_list_elem_t *pIter;
    void (*pDestructor)(void*);
+   bool destructorEnable;
 } adt_list_t;
 
 /***************** Public Function Declarations *******************/
@@ -33,6 +33,7 @@ void  adt_list_destroy(adt_list_t *self);
 adt_list_t*  adt_list_new(void (*pDestructor)(void*));
 void  adt_list_delete(adt_list_t *self);
 void  adt_list_vdelete(void *arg);
+void  adt_list_destructorEnable(adt_list_t *self, bool enable);
 
 void adt_list_insert(adt_list_t *self, void *pItem);
 void adt_list_insertBefore(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
