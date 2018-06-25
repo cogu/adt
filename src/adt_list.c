@@ -277,6 +277,17 @@ int32_t adt_list_length(const adt_list_t *self)
    return result;
 }
 
+void adt_list_clear(adt_list_t *self)
+{
+   if (self != 0)
+   {
+      adt_list_destroy(self);
+      self->pFirst = 0;
+      self->pLast = 0;
+      self->pIter = 0;
+   }
+}
+
 
 /***************** Private Function Definitions *******************/
 void  adt_list_elem_create(adt_list_elem_t *self, void *pItem, adt_list_elem_t *pNext, adt_list_elem_t *pPrev)

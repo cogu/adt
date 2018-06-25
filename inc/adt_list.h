@@ -45,5 +45,6 @@ adt_list_elem_t *adt_list_last(const adt_list_t *self);
 void adt_list_iter_init(adt_list_t *self);
 adt_list_elem_t *adt_list_iter_next(adt_list_t *self);
 int32_t adt_list_length(const adt_list_t *self);
+void adt_list_clear(adt_list_t *self);
 
 #endif //ADT_LIST_H
