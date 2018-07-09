@@ -164,6 +164,27 @@ void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem
    }
 }
 
+/**
+ * Same as adt_list_insert with the exception that it prevents pItem from getting added twice to the list
+ */
+void adt_list_insert_unique(adt_list_t *self, void *pItem)
+{
+   if (self != 0)
+   {
+      adt_list_elem_t *pIter = self->pFirst; //create a local iterator
+      while( pIter != 0 )
+      {
+         adt_list_elem_t *pNext = pIter->pNext;
+         if (pIter->pItem == pItem)
+         {
+            return; //pItem already in list
+         }
+         pIter=pNext;
+      }
+      adt_list_insert(self, pItem);
+   }
+}
+
 void adt_list_remove(adt_list_t *self, void *pItem)
 {
    if (self != 0)
