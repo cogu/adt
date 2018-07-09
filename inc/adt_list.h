@@ -33,11 +33,11 @@ void  adt_list_destroy(adt_list_t *self);
 adt_list_t*  adt_list_new(void (*pDestructor)(void*));
 void  adt_list_delete(adt_list_t *self);
 void  adt_list_vdelete(void *arg);
-void  adt_list_destructorEnable(adt_list_t *self, bool enable);
+void  adt_list_destructor_enable(adt_list_t *self, bool enable);
 
 void adt_list_insert(adt_list_t *self, void *pItem);
-void adt_list_insertBefore(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
-void adt_list_insertAfter(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
+void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
+void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
 void adt_list_remove(adt_list_t *self, void *pItem);
 bool adt_list_is_empty(const adt_list_t *self);
 adt_list_elem_t *adt_list_first(const adt_list_t *self);

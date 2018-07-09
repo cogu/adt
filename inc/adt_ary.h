@@ -42,7 +42,7 @@ void	adt_ary_delete(adt_ary_t *self);
 void  adt_ary_vdelete(void *arg);
 void 	adt_ary_create(adt_ary_t *self, void (*pDestructor)(void*));
 void 	adt_ary_destroy(adt_ary_t *self);
-void  adt_ary_destructorEnable(adt_ary_t *self, bool enable);
+void  adt_ary_destructor_enable(adt_ary_t *self, bool enable);
 
 
 //Accessors

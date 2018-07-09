@@ -69,7 +69,7 @@ void  adt_ary_vdelete(void *arg)
    adt_ary_delete((adt_ary_t*) arg);
 }
 
-void adt_ary_destructorEnable(adt_ary_t *self, bool enable){
+void adt_ary_destructor_enable(adt_ary_t *self, bool enable){
    if(self != 0){
       self->destructorEnable = enable;
    }

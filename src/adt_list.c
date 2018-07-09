@@ -84,7 +84,7 @@ void  adt_list_vdelete(void *arg)
    adt_list_delete((adt_list_t*) arg);
 }
 
-void adt_list_destructorEnable(adt_list_t *self, bool enable){
+void adt_list_destructor_enable(adt_list_t *self, bool enable){
    if(self != 0){
       self->destructorEnable = enable;
    }
@@ -119,7 +119,7 @@ void adt_list_insert(adt_list_t *self, void *pItem)
 /**
  * insert pItem before pIter
  */
-void adt_list_insertBefore(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
+void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
 {
    if( (self != 0) && (pIter != 0) && (pItem != 0) )
    {
@@ -143,7 +143,7 @@ void adt_list_insertBefore(adt_list_t *self, adt_list_elem_t *pIter, void *pItem
 /**
  * insert pElem after pIter
  */
-void adt_list_insertAfter(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
+void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
 {
    if( (self != 0) && (pIter != 0) && (pItem != 0) )
    {
