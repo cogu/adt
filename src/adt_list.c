@@ -445,7 +445,7 @@ void adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, ui
 /**
  * Removes the item pointed to by the iterator. The iterator must be pointing to an element in this list (obviously).
  */
-void adt_u32List_remove(adt_u32List_t *self, adt_u32List_elem_t *pIter)
+void adt_u32List_erase(adt_u32List_t *self, adt_u32List_elem_t *pIter)
 {
    if ( (self != 0) && (pIter != 0) )
    {

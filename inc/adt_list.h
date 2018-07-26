@@ -77,7 +77,7 @@ void  adt_u32List_vdelete(void *arg);
 void adt_u32List_insert(adt_u32List_t *self, uint32_t item);
 void adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item);
 void adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item);
-void adt_u32List_remove(adt_u32List_t *self, adt_u32List_elem_t *pIter);
+void adt_u32List_erase(adt_u32List_t *self, adt_u32List_elem_t *pIter);
 bool adt_u32List_is_empty(const adt_u32List_t *self);
 adt_u32List_elem_t *adt_u32List_iter_first(const adt_u32List_t *self);
 adt_u32List_elem_t *adt_u32List_iter_last(const adt_u32List_t *self);

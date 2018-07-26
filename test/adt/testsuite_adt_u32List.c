@@ -10,7 +10,7 @@
 static void test_adt_u32List_create(CuTest* tc);
 static void test_adt_u32List_new(CuTest* tc);
 static void test_adt_u32List_insert(CuTest* tc);
-static void test_adt_u32List_remove(CuTest* tc);
+static void test_adt_u32List_erase(CuTest* tc);
 static void test_adt_u32List_insert_before(CuTest* tc);
 static void test_adt_u32List_insert_after(CuTest* tc);
 
@@ -26,7 +26,7 @@ CuSuite* testsuite_adt_u32List(void)
    SUITE_ADD_TEST(suite, test_adt_u32List_create);
    SUITE_ADD_TEST(suite, test_adt_u32List_new);
    SUITE_ADD_TEST(suite, test_adt_u32List_insert);
-   SUITE_ADD_TEST(suite, test_adt_u32List_remove);
+   SUITE_ADD_TEST(suite, test_adt_u32List_erase);
    SUITE_ADD_TEST(suite, test_adt_u32List_insert_before);
    SUITE_ADD_TEST(suite, test_adt_u32List_insert_after);
 
@@ -78,28 +78,28 @@ static void test_adt_u32List_insert(CuTest* tc)
    adt_u32List_delete(list);
 }
 
-static void test_adt_u32List_remove(CuTest* tc)
+static void test_adt_u32List_erase(CuTest* tc)
 {
    adt_u32List_t *list;
    adt_u32List_elem_t *iter1, *iter2;
    list = adt_u32List_new();
-   //remove on an empty list
+   //erase on an empty list
    CuAssertIntEquals(tc, 0, adt_u32List_length(list));
-   adt_u32List_remove(list, 0);
+   adt_u32List_erase(list, 0);
    CuAssertIntEquals(tc, 0, adt_u32List_length(list));
 
-   //remove on a list with one element
+   //erase on a list with one element
    adt_u32List_clear(list);
    adt_u32List_insert(list, 1);
    CuAssertTrue(tc, !adt_u32List_is_empty(list));
-   adt_u32List_remove(list, adt_u32List_iter_first(list));
+   adt_u32List_erase(list, adt_u32List_iter_first(list));
    CuAssertTrue(tc, adt_u32List_is_empty(list));
 
-   //remove first on a list with two elements
+   //erase first on a list with two elements
    adt_u32List_clear(list);
    adt_u32List_insert(list, 1);
    adt_u32List_insert(list, 2);
-   adt_u32List_remove(list, adt_u32List_iter_first(list));
+   adt_u32List_erase(list, adt_u32List_iter_first(list));
    CuAssertIntEquals(tc, 1, adt_u32List_length(list));
    CuAssertTrue(tc, !adt_u32List_is_empty(list));
    iter1 = adt_u32List_iter_first(list);
@@ -107,18 +107,18 @@ static void test_adt_u32List_remove(CuTest* tc)
    CuAssertUIntEquals(tc, 2, iter1->item);
    CuAssertPtrEquals(tc, iter1, iter2);
 
-   //remove last on a list with two elements
+   //erase last on a list with two elements
    adt_u32List_clear(list);
    adt_u32List_insert(list, 1);
    adt_u32List_insert(list, 2);
-   adt_u32List_remove(list, adt_u32List_iter_last(list));
+   adt_u32List_erase(list, adt_u32List_iter_last(list));
    CuAssertIntEquals(tc, 1, adt_u32List_length(list));
    iter1 = adt_u32List_iter_first(list);
    iter2 = adt_u32List_iter_last(list);
    CuAssertUIntEquals(tc, 1, iter1->item);
    CuAssertPtrEquals(tc, iter1, iter2);
 
-   //remove middle on a list with three elements
+   //erase middle on a list with three elements
    adt_u32List_clear(list);
    adt_u32List_insert(list, 1);
    adt_u32List_insert(list, 2);
@@ -126,14 +126,14 @@ static void test_adt_u32List_remove(CuTest* tc)
    iter1 = adt_u32List_iter_first(list);
    iter1 = adt_u32List_iter_next(iter1);
    CuAssertUIntEquals(tc, 2, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    CuAssertIntEquals(tc, 2, adt_u32List_length(list));
    iter1 = adt_u32List_iter_first(list);
    iter2 = adt_u32List_iter_last(list);
    CuAssertUIntEquals(tc, 1, iter1->item);
    CuAssertUIntEquals(tc, 3, iter2->item);
 
-   //remove first items until empty
+   //erase first items until empty
    adt_u32List_clear(list);
    adt_u32List_insert(list, 1);
    adt_u32List_insert(list, 2);
@@ -141,16 +141,16 @@ static void test_adt_u32List_remove(CuTest* tc)
    CuAssertTrue(tc, !adt_u32List_is_empty(list));
    iter1 = adt_u32List_iter_first(list);
    CuAssertUIntEquals(tc, 1, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    iter1 = adt_u32List_iter_first(list);
    CuAssertUIntEquals(tc, 2, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    iter1 = adt_u32List_iter_first(list);
    CuAssertUIntEquals(tc, 3, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    CuAssertTrue(tc, adt_u32List_is_empty(list));
 
-   //remove last items until empty
+   //erase last items until empty
    adt_u32List_clear(list);
    adt_u32List_insert(list, 1);
    adt_u32List_insert(list, 2);
@@ -158,13 +158,13 @@ static void test_adt_u32List_remove(CuTest* tc)
    CuAssertTrue(tc, !adt_u32List_is_empty(list));
    iter1 = adt_u32List_iter_last(list);
    CuAssertUIntEquals(tc, 3, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    iter1 = adt_u32List_iter_last(list);
    CuAssertUIntEquals(tc, 2, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    iter1 = adt_u32List_iter_last(list);
    CuAssertUIntEquals(tc, 1, iter1->item);
-   adt_u32List_remove(list, iter1);
+   adt_u32List_erase(list, iter1);
    CuAssertTrue(tc, adt_u32List_is_empty(list));
 
    //cleanup
