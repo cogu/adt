@@ -71,7 +71,7 @@ void test_adt_hash_iterator2(CuTest* tc){
 	int dup = 0;
 
 	start = clock();
-	FILE *fh = fopen("test/3esl.txt","r");
+	FILE *fh = fopen("../../../test/3esl.txt","r");
 	assert(fh != 0);
 	do{
 	   read = getline(&line,&len,fh);

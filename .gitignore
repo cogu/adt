@@ -3,3 +3,6 @@
 #sphinx-doc files
 /doc/make.bat
 /doc/_build/
+
+**/CMemLeak.txt
+projects/eclipse/adt_test/.settings/*
