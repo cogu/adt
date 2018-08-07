@@ -12,6 +12,8 @@ typedef uint8_t bool;
 #include <stdbool.h>
 #endif
 
+#define ADT_LIST_VERSION 0.2.0
+
 #define ADT_LIST_ELEM_HEAD(struct_name, item_type_name) \
       struct struct_name *pNext;\
       struct struct_name *pPrev;\
@@ -36,7 +38,6 @@ typedef struct adt_u32List_elem_tag
 
 typedef struct adt_list_tag{
    ADT_LIST_HEAD(adt_list_elem_t)
-   adt_list_elem_t *pIter;
    void (*pDestructor)(void*);
    bool destructorEnable;
 } adt_list_t;
@@ -59,12 +60,14 @@ void adt_list_insert(adt_list_t *self, void *pItem);
 void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
 void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
 void adt_list_insert_unique(adt_list_t *self, void *pItem);
-void adt_list_remove(adt_list_t *self, void *pItem);
+bool adt_list_remove(adt_list_t *self, void *pItem);
 bool adt_list_is_empty(const adt_list_t *self);
-adt_list_elem_t *adt_list_first(const adt_list_t *self);
-adt_list_elem_t *adt_list_last(const adt_list_t *self);
-void adt_list_iter_init(adt_list_t *self);
-adt_list_elem_t *adt_list_iter_next(adt_list_t *self);
+void *adt_list_first(const adt_list_t *self);
+void *adt_list_last(const adt_list_t *self);
+adt_list_elem_t *adt_list_iter_first(adt_list_t *self);
+adt_list_elem_t *adt_list_iter_last(adt_list_t *self);
+adt_list_elem_t *adt_list_iter_next(adt_list_elem_t *pElem);
+adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem);
 int32_t adt_list_length(const adt_list_t *self);
 void adt_list_clear(adt_list_t *self);
 

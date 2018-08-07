@@ -31,7 +31,6 @@ void  adt_list_create(adt_list_t *self, void (*pDestructor)(void*))
       self->destructorEnable = true;
       self->pFirst = 0;
       self->pLast = 0;
-      self->pIter = 0;
    }
 }
 
@@ -39,7 +38,7 @@ void  adt_list_destroy(adt_list_t *self)
 {
    if (self != 0)
    {
-      adt_list_elem_t *iter = self->pFirst; //create a local iterator, don't mess with the users' iterator located in self->pIter
+      adt_list_elem_t *iter = self->pFirst;
       void (*destructor)(void*) = (void (*)(void*)) 0;
       if (iter == 0)
       {
@@ -191,14 +190,17 @@ void adt_list_insert_unique(adt_list_t *self, void *pItem)
    }
 }
 
-void adt_list_remove(adt_list_t *self, void *pItem)
+/**
+ * returns true if item is found, false otherwise
+ */
+bool adt_list_remove(adt_list_t *self, void *pItem)
 {
    if (self != 0)
    {
       adt_list_elem_t *iter = self->pFirst; //create a local iterator, we do not want to mess with the users' iterator located in self->pIter
       if (iter == 0)
       {
-         return; //empty list
+         return false; //empty list
       }
       while( iter != 0 )
       {
@@ -234,11 +236,12 @@ void adt_list_remove(adt_list_t *self, void *pItem)
 #endif
             //OK, now delete element
             adt_list_elem_delete(iter);
-            return;
+            return true;
          }
          iter=iter->pNext;
       }
    }
+   return false;
 }
 
 bool adt_list_is_empty(const adt_list_t *self)
@@ -254,29 +257,26 @@ bool adt_list_is_empty(const adt_list_t *self)
    return false;
 }
 
-void adt_list_iter_init(adt_list_t *self)
+
+void *adt_list_first(const adt_list_t *self)
 {
-   if (self != 0)
+   if ( (self != 0) && (self->pFirst != 0))
    {
-      self->pIter=self->pFirst;
+      return self->pFirst->pItem;
    }
+   return 0;
 }
 
-adt_list_elem_t *adt_list_iter_next(adt_list_t *self)
+void* adt_list_last(const adt_list_t *self)
 {
-   adt_list_elem_t *retval = 0;
-   if (self != 0)
+   if ( (self != 0) && (self->pLast != 0) )
    {
-      retval = self->pIter;
-      if (self->pIter != 0)
-      {
-         self->pIter = self->pIter->pNext;
-      }
+      return self->pLast->pItem;
    }
-   return retval;
+   return 0;
 }
 
-adt_list_elem_t *adt_list_first(const adt_list_t *self)
+adt_list_elem_t *adt_list_iter_first(adt_list_t *self)
 {
    if (self != 0)
    {
@@ -285,11 +285,29 @@ adt_list_elem_t *adt_list_first(const adt_list_t *self)
    return 0;
 }
 
-adt_list_elem_t *adt_list_last(const adt_list_t *self)
+adt_list_elem_t *adt_list_iter_last(adt_list_t *self)
 {
    if (self != 0)
    {
       return self->pLast;
+   }
+   return 0;
+}
+
+adt_list_elem_t *adt_list_iter_next(adt_list_elem_t *pElem)
+{
+   if (pElem != 0)
+   {
+      return pElem->pNext;
+   }
+   return 0;
+}
+
+adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem)
+{
+   if (pElem != 0)
+   {
+      return pElem->pPrev;
    }
    return 0;
 }
@@ -316,7 +334,6 @@ void adt_list_clear(adt_list_t *self)
       adt_list_destroy(self);
       self->pFirst = 0;
       self->pLast = 0;
-      self->pIter = 0;
    }
 }
 
