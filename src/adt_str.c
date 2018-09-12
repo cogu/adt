@@ -1,10 +1,10 @@
 /*****************************************************************************
-* \file:   		cstr.c
-* \author:		Conny Gustafsson
-* \date:		2013-05-31
-* \brief:		string container
+* @file:    adt_str.c
+* @author:  Conny Gustafsson
+* @date:    2013-05-09
+* @brief:   String Container
 *
-* Copyright 2013 Conny Gustafsson
+* Copyright 2013-2018 Conny Gustafsson
 *
 ******************************************************************************/
 #include "adt_str.h"

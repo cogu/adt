@@ -1,10 +1,10 @@
 /*****************************************************************************
-* @file:   		adt_str.h
-* @author:		Conny Gustafsson
-* @date:		2013-05-09
-* @brief:		String Container
+* @file:    adt_str.h
+* @author:  Conny Gustafsson
+* @date:    2013-05-09
+* @brief:   String Container
 *
-* Copyright 2013 Conny Gustafsson
+* Copyright 2013-2018 Conny Gustafsson
 *
 ******************************************************************************/
 #ifndef ADT_STR_H__
@@ -13,7 +13,7 @@
 
 #define ADT_STR_VERSION 0.1.1
 
-typedef struct {
+typedef struct adt_str_tag{
 	  int32_t s32Cur;
 	  int32_t s32Len;
 	  uint8_t *pStr;
