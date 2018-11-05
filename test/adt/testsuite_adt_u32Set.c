@@ -272,4 +272,8 @@ static void test_adt_u32Set_is_empty(CuTest* tc)
    CuAssertTrue(tc, adt_u32Set_is_empty(&set));
    adt_u32Set_insert(&set, 1);
    CuAssertTrue(tc, !adt_u32Set_is_empty(&set));
+
+   //cleanup
+   adt_u32Set_destroy(&set);
+
 }
