@@ -52,7 +52,11 @@ extern void  XWBPreallocate (const int iInitialAllocations);
 #define malloc(x) XWBMalloc((x), __FILE__, __LINE__)
 #define realloc(x,size) XWBRealloc(x,(size),__FILE__,__LINE__)
 #define free(x)   XWBFree(x, #x, __FILE__, __LINE__)
+#ifdef _MSC_VER
+#define _strdup(x) XWBStrDup(x, __FILE__, __LINE__)
+#else
 #define strdup(x) XWBStrDup(x, __FILE__, __LINE__)
+#endif
 #define calloc(num,size) XWBCalloc((num), (size), __FILE__, __LINE__)
 #endif
 

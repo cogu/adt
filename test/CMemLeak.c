@@ -19,14 +19,17 @@
 #undef free
 #undef strdup
 #undef calloc
+#undef _strdup
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+#include <assert.h>
 
 /* Guards for checking illegal memory writes */
 static const char xwbProtect[] = "DeAd";
 static const unsigned int xwbProtSize = sizeof (xwbProtect);
+static unsigned int m_totalAlloc = 0;
 
 /* Filename of report file */
 static const char xwbReportFilename[] = "CMemLeak.txt";
@@ -76,7 +79,15 @@ struct XWBList
 static struct XWBList xwbMem = 
 {
     (struct XWBNode*) 0,
-    (struct XWBNode*) 0
+    (struct XWBNode*) 0,
+    (FILE*) 0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
 };
 /*******************************************************************************
 * Forward declarations
@@ -271,6 +282,8 @@ void* XWBMalloc (unsigned int iSize, const char* iFile, const unsigned int iLine
     result = malloc (usize);
     memset (result, xwbUninit, usize);
     memcpy (&result[iSize], xwbProtect, xwbProtSize);
+    m_totalAlloc += iSize;
+    //printf("%s(%d) malloc(%d), total=%u\n",iFile,iLine,iSize,m_totalAlloc);
     
     XWBMemInsert (result, iSize, iFile, iLine);
     return (void*) result;
@@ -295,12 +308,18 @@ void* XWBRealloc (void* iPtr, unsigned int iSize, const char* iFile, const unsig
     name = iFile;
     line = iLine;
     node = XWBMemFind (iPtr, &size, &name, &line);
-    XWBNodeSet (node, result, iSize, name, line);
-
-    xwbMem.mAllocCurrent -= size;
-    xwbMem.mAllocCurrent += iSize;
-    if (xwbMem.mAllocUsed < xwbMem.mAllocCurrent)
-        xwbMem.mAllocUsed = xwbMem.mAllocCurrent;
+    if (node == 0)
+    {
+       XWBMemInsert (result, iSize, iFile, iLine);
+    }
+    else
+    {
+       XWBNodeSet (node, result, iSize, name, line);
+       xwbMem.mAllocCurrent -= size;
+       xwbMem.mAllocCurrent += iSize;
+       if (xwbMem.mAllocUsed < xwbMem.mAllocCurrent)
+           xwbMem.mAllocUsed = xwbMem.mAllocCurrent;
+    }
     return (void*) result;
 }
 /*******************************************************************************

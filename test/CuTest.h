@@ -73,12 +73,19 @@ void CuAssertIntEquals_LineMsg(CuTest* tc,
 void CuAssertUIntEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
    unsigned int expected, unsigned int actual);
+void CuAssertULIntEquals_LineMsg(CuTest* tc,
+   const char* file, int line, const char* message,
+   unsigned long long int expected, unsigned long long int actual);
 void CuAssertDblEquals_LineMsg(CuTest* tc, 
 	const char* file, int line, const char* message, 
 	double expected, double actual, double delta);
 void CuAssertPtrEquals_LineMsg(CuTest* tc, 
 	const char* file, int line, const char* message, 
 	void* expected, void* actual);
+void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
+   const char* file, int line, const char* message,
+   const void* expected, const void* actual);
+
 
 /* public assert functions */
 
@@ -92,10 +99,15 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc,
 #define CuAssertIntEquals_Msg(tc,ms,ex,ac)    CuAssertIntEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
 #define CuAssertUIntEquals(tc,ex,ac)          CuAssertUIntEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertUIntEquals_Msg(tc,ms,ex,ac)   CuAssertUIntEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
+#define CuAssertULIntEquals(tc,ex,ac)         CuAssertULIntEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
+#define CuAssertULIntEquals_Msg(tc,ms,ex,ac)  CuAssertULIntEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
 #define CuAssertDblEquals(tc,ex,ac,dl)        CuAssertDblEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac),(dl))
 #define CuAssertDblEquals_Msg(tc,ms,ex,ac,dl) CuAssertDblEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac),(dl))
 #define CuAssertPtrEquals(tc,ex,ac)           CuAssertPtrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertPtrEquals_Msg(tc,ms,ex,ac)    CuAssertPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
+#define CuAssertConstPtrEquals(tc,ex,ac)           CuAssertConstPtrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
+#define CuAssertConstPtrEquals_Msg(tc,ms,ex,ac)    CuAssertConstPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
+
 
 #define CuAssertPtrNotNull(tc,p)        CuAssert_Line((tc),__FILE__,__LINE__,"null pointer unexpected",(p != NULL))
 #define CuAssertPtrNotNullMsg(tc,msg,p) CuAssert_Line((tc),__FILE__,__LINE__,(msg),(p != NULL))
