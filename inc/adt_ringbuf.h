@@ -53,16 +53,12 @@ typedef uint8_t adt_buf_err_t;
 #define ADT_RBFS_ENABLE 0
 #endif
 
-#ifndef ADT_RBFD_ENABLE
-#define ADT_RBFD_ENABLE 0
-#endif
-
 #ifndef ADT_RBFU16_ENABLE
 #define ADT_RBFU16_ENABLE 0
 #endif
 
-#ifndef ADT_RBFSH_ENABLE
-#define ADT_RBFSH_ENABLE 0
+#ifndef ADT_RBFH_ENABLE
+#define ADT_RBFH_ENABLE 0
 #endif
 
 //RBFS: Ringbuffers containing elements of equal size
@@ -102,8 +98,21 @@ typedef struct adt_rbfu16_tag   //ring buffer (fixed block size) -
 } adt_rbfu16_t;
 #endif
 
-#if(ADT_RBFSH_ENABLE)
-#include "adt_ringbuf_heap.h"
+#if(ADT_RBFH_ENABLE)
+
+#define ADT_RBFSH_MIN_NUM_ELEMS_DEFAULT 10 //minimum number of elements (1-65535)
+#define ADT_RBFSH_MAX_NUM_ELEM_DEFAULT 65535 //maximum number of elements (1-65535)
+
+typedef struct adt_rbfh_tag   //ring buffer (fixed block size) -
+{
+   uint8_t* u8AllocBuf; //automatically maintained on heap
+   uint8_t* u8WritePtr;
+   uint8_t* u8ReadPtr;
+   uint16_t u16AllocLen;
+   uint16_t u16MaxNumElem;
+   uint16_t u16NumElem;
+   uint8_t u8ElemSize;
+} adt_rbfh_t;
 #endif
 
 /***************** Public Function Declarations *******************/
@@ -115,17 +124,7 @@ uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data);
 uint16_t adt_rbfs_size(const adt_rbfs_t* rbf);
 uint16_t adt_rbfs_free(const adt_rbfs_t* rbf);
 void adt_rbfs_clear(adt_rbfs_t* rbf);
-#endif
-
-#if(ADT_RBFD_ENABLE)
-uint8_t adt_rbfd_create(adt_rbfd_t* rbfd, uint8_t* u8Buffer, uint16_t u16BufferSize);
-uint8_t adt_rbfd_insert(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len);
-uint8_t adt_rbfd_remove(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len);
-uint16_t adt_rbfd_size(const adt_rbfd_t* rbfd);
-uint8_t adt_rbfd_peekU8(const adt_rbfd_t* rbfd, uint8_t* u8Value);
-uint8_t adt_rbfd_peekU16(const adt_rbfd_t* rbfd, uint16_t* u16Value);
-uint8_t adt_rbfd_peekU32(const adt_rbfd_t* rbfd, uint32_t* u32Value);
-#endif
+#endif //ADT_RBFS_ENABLE
 
 #if(ADT_RBFU16_ENABLE)
 uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem);
@@ -133,9 +132,26 @@ uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data);
 uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data);
 uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data);
 uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf);
-#endif
+#endif //ADT_RBFU16_ENABLE
 
+#if(ADT_RBFH_ENABLE)
+adt_buf_err_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize);
+adt_buf_err_t adt_rbfh_createEx(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems);
+void adt_rbfh_destroy(adt_rbfh_t* self);
+adt_rbfh_t *adt_rbfh_new(uint8_t u8ElemSize);
+adt_rbfh_t *adt_rbfh_newEx(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems);
+void adt_rbfh_delete(adt_rbfh_t* self);
+adt_buf_err_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data);
+adt_buf_err_t adt_rbfh_remove(adt_rbfh_t* self, uint8_t* u8Data);
+adt_buf_err_t adt_rbfh_peek(const adt_rbfh_t* self, uint8_t* u8Data);
+uint16_t adt_rbfh_length(const adt_rbfh_t* self);
+uint16_t adt_rbfh_free(const adt_rbfh_t* self);
+void adt_rbfh_clear(adt_rbfh_t* self);
 
+# ifdef UNIT_TEST
+uint16_t adt_rbfh_nextLen(uint16_t wanted);
+# endif
+#endif //ADT_RBFH_ENABLE
 
-#endif
+#endif //ADT_RINGBUF_H__
 

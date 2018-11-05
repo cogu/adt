@@ -38,11 +38,12 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
+#if (ADT_RBFH_ENABLE)
 static void test_adt_rbfh_nextLen(CuTest* tc);
 static void test_adt_rbfh_insert_then_grow(CuTest* tc);
 static void test_adt_rbfh_insert_then_remove(CuTest* tc);
 static void test_adt_rbfh_peek(CuTest* tc);
-
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -55,11 +56,12 @@ CuSuite* testsuite_adt_ringbuf(void)
 {
    CuSuite* suite = CuSuiteNew();
 
+#if (ADT_RBFH_ENABLE)
    SUITE_ADD_TEST(suite, test_adt_rbfh_nextLen);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_grow);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_remove);
    SUITE_ADD_TEST(suite, test_adt_rbfh_peek);
-
+#endif
 
 
 
@@ -69,6 +71,7 @@ CuSuite* testsuite_adt_ringbuf(void)
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
+#if (ADT_RBFH_ENABLE)
 static void test_adt_rbfh_nextLen(CuTest* tc)
 {
    CuAssertUIntEquals(tc, 10u, adt_rbfh_nextLen(1));
@@ -179,3 +182,4 @@ static void test_adt_rbfh_peek(CuTest* tc)
 
    adt_rbfh_destroy(&buf);
 }
+#endif

@@ -28,17 +28,18 @@
 * This is a template file.
 * Steps to use:
 * 1. Copy this file as adt_ringbuf_cfg.h into your local C project
-* 2. Define ADT_RBF_CFG amongst your compiler defines (e.g. using cflags).
+* 2. Define ADT_RBF_CFG amongst your compiler defines (e.g. using CFLAGS).
 *
 * Alternatives:
-* You can instead add the defines below amongst your global compiler defines (e.g. using cflags).
+* You can instead add the defines below amongst your global compiler defines (e.g. using CFLAGS).
 */
 
 #ifndef ADT_RINGBUF_CFG_H__
 #define ADT_RINGBUF_CFG_H__
 
-#define ADT_RBFS_ENABLE 1    //ringbuffer static (fixed sized blocks)
-#define ADT_RBFD_ENABLE 0    //ringbuffer dynamic (dynamically sized blocks)
-#define ADT_RBFU16_ENABLE 1  //special ringbuffer for uint16 values
+#define ADT_RBFS_ENABLE 1    //ringbuffer static (fixed sized elements)
+#define ADT_RBFU16_ENABLE 1  //special ringbuffer for uint16 elements
+#define ADT_RBFH_ENABLE 1    //ringbuffer with fized size elements (same as RBFS) but manages memory automatically on heap
+
 
 #endif //RINGBUF_CFG_H__
