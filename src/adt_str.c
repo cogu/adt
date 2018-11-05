@@ -115,6 +115,8 @@ void adt_str_set(adt_str_t *lhs, const adt_str_t *rhs){
 void adt_str_append(adt_str_t *lhs, const adt_str_t *rhs)
 {
 	// Not implemented yet..
+   (void) lhs;
+   (void) rhs;
 	assert(0);
 }
 
