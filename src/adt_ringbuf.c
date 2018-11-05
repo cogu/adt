@@ -44,7 +44,7 @@ uint8_t adt_rbfs_create(adt_rbfs_t* u8Rbf, uint8_t* u8Buffer, uint16_t u16NumEle
    u8Rbf->u8ElemSize = u8ElemSize;
    u8Rbf->u16MaxNumElem = u16NumElem;
    u8Rbf->u16NumElem = 0;
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -56,7 +56,7 @@ uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
    
    if (u8Rbf->u16NumElem >= u8Rbf->u16MaxNumElem)
    {
-      return E_BUF_OVERFLOW;
+      return BUF_E_OVERFLOW;
    }
    
    u8Rbf->u16NumElem++;
@@ -73,7 +73,7 @@ uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
       u8Rbf->u8WritePtr = u8Rbf->u8Buffer;
    }
    
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -85,7 +85,7 @@ uint8_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
    
    if (u8Rbf->u16NumElem == 0)
    {
-      return E_BUF_UNDERFLOW;
+      return BUF_E_UNDERFLOW;
    }
    
    for (u8i = 0; u8i < u8Rbf->u8ElemSize; u8i++)
@@ -100,7 +100,7 @@ uint8_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
    }
    
    u8Rbf->u16NumElem--;
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -121,7 +121,7 @@ uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data)
    
    if (rbf->u16NumElem == 0)
    {
-      return E_BUF_UNDERFLOW;
+      return BUF_E_UNDERFLOW;
    }
    
    for (u8i = 0; u8i < rbf->u8ElemSize; u8i++)
@@ -129,7 +129,7 @@ uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data)
       *(u8Data++) = *(u8ReadPtr++);
    }
    
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 void adt_rbfs_clear(adt_rbfs_t* rbf)
@@ -150,7 +150,7 @@ uint8_t adt_rbfd_create(adt_rbfd_t* rbfd, uint8_t* u8Buffer, uint16_t u16BufferS
    rbfd->u8WritePtr = u8Buffer;
    rbfd->u16BufferSize = u16BufferSize;
    rbfd->u16BytesAvail = u16BufferSize;
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -178,7 +178,7 @@ uint8_t adt_rbfd_insert(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len)
    }
    
    rbfd->u16BytesAvail -= u8Len;
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -191,7 +191,7 @@ uint8_t adt_rbfd_remove(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len)
    
    if (u8Len > u16BytesToRead)
    {
-      return E_BUF_UNDERFLOW;
+      return BUF_E_UNDERFLOW;
    }
    
    for (u8i = 0; u8i < u8Len; u8i++)
@@ -206,7 +206,7 @@ uint8_t adt_rbfd_remove(adt_rbfd_t* rbfd, uint8_t* u8Data, uint8_t u8Len)
    }
    
    rbfd->u16BytesAvail += u8Len;
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -224,11 +224,11 @@ uint8_t adt_rbfd_peekU8(const adt_rbfd_t* rbfd, uint8_t* u8Value)
    
    if (u16BytesToRead < 1)
    {
-      return E_BUF_UNDERFLOW;
+      return BUF_E_UNDERFLOW;
    }
    
    *u8Value = *(rbfd->u8ReadPtr);
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -239,12 +239,12 @@ uint8_t adt_rbfd_peekU16(const adt_rbfd_t* rbfd, uint16_t* u16Value)
    
    if (u16BytesToRead < 2)
    {
-      return E_BUF_UNDERFLOW;
+      return BUF_E_UNDERFLOW;
    }
    
    #warning unaligned memory access in adt_rbfd_peekU16
    *u16Value = *((uint16_t*) rbfd->u8ReadPtr);
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 
 
@@ -255,12 +255,12 @@ uint8_t adt_rbfd_peekU32(const adt_rbfd_t* rbfd, uint32_t* u32Value)
    
    if (u16BytesToRead < 4)
    {
-      return E_BUF_UNDERFLOW;
+      return BUF_E_UNDERFLOW;
    }
    
    #warning unaligned memory access in adt_rbfd_peekU32
    *u32Value = *((uint32_t*) rbfd->u8ReadPtr);
-   return E_BUF_OK;
+   return BUF_E_OK;
 }
 #endif
 
@@ -272,9 +272,9 @@ uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16Nu
       rbf->u16NumElem = 0;
       rbf->u16ReadPtr = u16Buffer;
       rbf->u16WritePtr = u16Buffer;
-      return E_BUF_OK;
+      return BUF_E_OK;
    }
-   return E_BUF_NOT_OK;
+   return BUF_E_NOT_OK;
 }
 
 uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
@@ -282,7 +282,7 @@ uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
       uint16_t *pEndPtr = rbf->u16Buffer + rbf->u16MaxNumElem;
       if(rbf->u16NumElem >= rbf->u16MaxNumElem){
          //full
-         return E_BUF_OVERFLOW;
+         return BUF_E_OVERFLOW;
       }
       rbf->u16NumElem++;
       *rbf->u16WritePtr++ = u16Data;
@@ -291,9 +291,9 @@ uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
           //rewind
          rbf->u16WritePtr = rbf->u16Buffer;
       }
-      return E_BUF_OK;
+      return BUF_E_OK;
    }
-   return E_BUF_NOT_OK;
+   return BUF_E_NOT_OK;
 }
 
 uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
@@ -301,7 +301,7 @@ uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
       uint16_t *pEndPtr = rbf->u16Buffer + rbf->u16MaxNumElem;
       if(rbf->u16NumElem == 0){
          //full
-         return E_BUF_UNDERFLOW;
+         return BUF_E_UNDERFLOW;
       }
       *u16Data = *rbf->u16ReadPtr++;
       if (rbf->u16ReadPtr >= pEndPtr)
@@ -310,21 +310,21 @@ uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
          rbf->u16ReadPtr = rbf->u16Buffer;
       }
       rbf->u16NumElem--;
-      return E_BUF_OK;
+      return BUF_E_OK;
    }
-   return E_BUF_NOT_OK;
+   return BUF_E_NOT_OK;
 }
 
 uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data){
    if( (rbf != 0) && (u16Data != 0) ){
       if(rbf->u16NumElem == 0){
          //full
-         return E_BUF_UNDERFLOW;
+         return BUF_E_UNDERFLOW;
       }
       *u16Data = *rbf->u16ReadPtr;
-      return E_BUF_OK;
+      return BUF_E_OK;
    }
-   return E_BUF_NOT_OK;
+   return BUF_E_NOT_OK;
 }
 
 uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf){

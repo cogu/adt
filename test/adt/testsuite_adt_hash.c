@@ -97,7 +97,7 @@ void test_adt_hash_iterator2(CuTest* tc){
 	uint32_t n = 0;
 	do{
 		pVal = adt_hash_iter_next(pHash,&pKey,&u32KeyLen);
-		if(n<items){
+		if((int) n<items){
 			CuAssertPtrNotNull(tc, pVal);
 			n++;
 		}
