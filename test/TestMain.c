@@ -16,6 +16,7 @@ CuSuite* testsuite_adt_u32List(void);
 CuSuite* testsuite_adt_bytearray(void);
 CuSuite* testsuite_adt_priorityHeap(void);
 CuSuite* testsuite_adt_u32Set(void);
+CuSuite* testsuite_adt_ringbuf(void);
 
 
 void RunAllTests(void)
@@ -35,6 +36,8 @@ void RunAllTests(void)
 	CuSuiteAddSuite(suite, testsuite_adt_bytearray());
 	CuSuiteAddSuite(suite, testsuite_adt_priorityHeap());
 	CuSuiteAddSuite(suite, testsuite_adt_u32Set());
+	CuSuiteAddSuite(suite, testsuite_adt_ringbuf());
+
 
 
 

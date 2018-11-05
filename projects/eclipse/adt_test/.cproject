@@ -36,6 +36,7 @@
 									<listOptionValue builtIn="false" value="ADT_RBFU16_ENABLE=1"/>
 									<listOptionValue builtIn="false" value="ADT_RBFS_ENABLE=1"/>
 									<listOptionValue builtIn="false" value="ADT_RBFD_ENABLE=0"/>
+									<listOptionValue builtIn="false" value="ADT_RBFSH_ENABLE=1"/>
 									<listOptionValue builtIn="false" value="TEST_ADT_HASH_ENABLE=0"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.1084835778" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">

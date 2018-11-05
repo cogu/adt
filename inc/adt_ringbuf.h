@@ -4,7 +4,7 @@
 * \date      2013-12-19
 * \brief     Ringbuffer data structure
 *
-* Copyright (c) 2013-2017 Conny Gustafsson
+* Copyright (c) 2013-2018 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the "Software"), to deal in
 * the Software without restriction, including without limitation the rights to
@@ -25,24 +25,29 @@
 ******************************************************************************/
 #ifndef ADT_RINGBUF_H__
 #define ADT_RINGBUF_H__
+
+#define ADT_RINGBUF_VERSION 0.1.1
+
 #include <stdint.h>
 
 #ifdef ADT_RBF_CFG
 #include "adt_ringbuf_cfg.h"
 #endif
 
-#ifndef E_BUF_OK
-#define E_BUF_OK        0
+#ifndef BUF_E_OK
+#define BUF_E_OK        0
 #endif
-#ifndef E_BUF_NOT_OK
-#define E_BUF_NOT_OK    1
+#ifndef BUF_E_NOT_OK
+#define BUF_E_NOT_OK    1
 #endif
-#ifndef E_BUF_OVERFLOW
-#define E_BUF_OVERFLOW  2
+#ifndef BUF_E_OVERFLOW
+#define BUF_E_OVERFLOW  2
 #endif
-#ifndef E_BUF_UNDERFLOW
-#define E_BUF_UNDERFLOW 3
+#ifndef BUF_E_UNDERFLOW
+#define BUF_E_UNDERFLOW 3
 #endif
+
+typedef uint8_t adt_buf_err_t;
 
 #ifndef ADT_RBFS_ENABLE
 #define ADT_RBFS_ENABLE 0
@@ -54,6 +59,10 @@
 
 #ifndef ADT_RBFU16_ENABLE
 #define ADT_RBFU16_ENABLE 0
+#endif
+
+#ifndef ADT_RBFSH_ENABLE
+#define ADT_RBFSH_ENABLE 0
 #endif
 
 //RBFS: Ringbuffers containing elements of equal size
@@ -93,6 +102,10 @@ typedef struct adt_rbfu16_tag   //ring buffer (fixed block size) -
 } adt_rbfu16_t;
 #endif
 
+#if(ADT_RBFSH_ENABLE)
+#include "adt_ringbuf_heap.h"
+#endif
+
 /***************** Public Function Declarations *******************/
 #if(ADT_RBFS_ENABLE)
 uint8_t adt_rbfs_create(adt_rbfs_t* rbf, uint8_t* u8Buffer, uint16_t u32NumElem, uint8_t u8ElemSize);
@@ -121,6 +134,8 @@ uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data);
 uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data);
 uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf);
 #endif
+
+
 
 #endif
 
