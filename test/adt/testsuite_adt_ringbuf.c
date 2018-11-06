@@ -28,6 +28,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "adt_ringbuf.h"
 #include <stdint.h>
+#include <limits.h>
 #include "CuTest.h"
 #include "CMemLeak.h"
 
@@ -43,6 +44,7 @@ static void test_adt_rbfh_nextLen(CuTest* tc);
 static void test_adt_rbfh_insert_then_grow(CuTest* tc);
 static void test_adt_rbfh_insert_then_remove(CuTest* tc);
 static void test_adt_rbfh_peek(CuTest* tc);
+static void test_adt_rbfh_limits(CuTest* tc);
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ CuSuite* testsuite_adt_ringbuf(void)
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_grow);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_remove);
    SUITE_ADD_TEST(suite, test_adt_rbfh_peek);
+   SUITE_ADD_TEST(suite, test_adt_rbfh_limits);
 #endif
 
 
@@ -179,6 +182,36 @@ static void test_adt_rbfh_peek(CuTest* tc)
    CuAssertUIntEquals(tc, 3, outValue);
    CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_remove(&buf, (uint8_t*) &outValue));
    CuAssertUIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfh_peek(&buf, (uint8_t*) &outValue));
+
+   adt_rbfh_destroy(&buf);
+}
+
+static void test_adt_rbfh_limits(CuTest* tc)
+{
+   adt_rbfh_t buf;
+   uint32_t i;
+   uint32_t outValue;
+   uint32_t expectedSize = 0;
+   adt_rbfh_create(&buf, sizeof(uint32_t));
+   CuAssertUIntEquals(tc, 0, adt_rbfh_length(&buf));
+   CuAssertUIntEquals(tc, USHRT_MAX, adt_rbfh_free(&buf));
+   for (i=0;i<USHRT_MAX;i++)
+   {
+      CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &i));
+      CuAssertUIntEquals(tc, ++expectedSize, adt_rbfh_length(&buf));
+   }
+   CuAssertUIntEquals(tc, BUF_E_OVERFLOW, adt_rbfh_insert(&buf, (uint8_t*) &i));
+   CuAssertUIntEquals(tc, USHRT_MAX, buf.u16AllocLen);
+   CuAssertUIntEquals(tc, 0, adt_rbfh_free(&buf));
+
+   for (i=0;i<USHRT_MAX;i++)
+   {
+      CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_remove(&buf, (uint8_t*) &outValue));
+      CuAssertUIntEquals(tc, i, outValue);
+      CuAssertUIntEquals(tc, --expectedSize, adt_rbfh_length(&buf));
+   }
+   CuAssertUIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfh_remove(&buf, (uint8_t*) &outValue));
+   CuAssertUIntEquals(tc, USHRT_MAX, adt_rbfh_free(&buf));
 
    adt_rbfh_destroy(&buf);
 }
