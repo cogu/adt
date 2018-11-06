@@ -74,18 +74,6 @@ typedef struct adt_rbfs_tag   //ring buffer (fixed block size) -
 } adt_rbfs_t;
 #endif
 
-//RBFD: Ringbuffers containing elements of dynamic size
-#if(ADT_RBFD_ENABLE)
-typedef struct adt_rbfd_tag   //ring buffer (dynamic block size)
-{
-   uint8_t* u8Buffer;
-   uint8_t* u8WritePtr;
-   uint8_t* u8ReadPtr;
-   uint16_t u16BufferSize;
-   uint16_t u16BytesAvail;
-} adt_rbfd_t;
-#endif
-
 //RBFU16 Ringbuffers containing elements of uint16_t
 #if (ADT_RBFU16_ENABLE)
 typedef struct adt_rbfu16_tag   //ring buffer (fixed block size) -
