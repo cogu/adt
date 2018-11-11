@@ -53,6 +53,11 @@ void adt_str_delete(adt_str_t *self){
 	}
 }
 
+void adt_str_vdelete(void *ptr){
+   adt_str_delete((adt_str_t*) ptr);
+}
+
+
 void adt_str_create(adt_str_t *self){
 	if(self){
 		self->s32Cur = 0;
@@ -69,10 +74,9 @@ void adt_str_destroy(adt_str_t *self){
 	}
 }
 
-
 /* adt_str functions */
 
-adt_str_t *adt_str_dup(const adt_str_t* other){
+adt_str_t *adt_str_new_cstr(const adt_str_t* other){
 	adt_str_t *self;
 	self = adt_str_new();
 	if(self){
@@ -81,7 +85,7 @@ adt_str_t *adt_str_dup(const adt_str_t* other){
 	return self;
 }
 
-adt_str_t *adt_str_make(const char *pBegin, const char *pEnd){
+adt_str_t *adt_str_new_bstr(const char *pBegin, const char *pEnd){
 	adt_str_t *self;
 	self = adt_str_new();
 	if(self){
@@ -250,20 +254,6 @@ const char* adt_str_cstr(adt_str_t *self){
 		return (const char*) self->pStr;
 	}
 	return 0;
-}
-
-
-
-
-
-
-
-
-
-void adt_str_delete_void(void *ptr){
-	if(ptr){
-		adt_str_delete((adt_str_t*) ptr);
-	}
 }
 
 void free_void(void *ptr){

@@ -283,7 +283,7 @@ int32_t adt_ary_length(const adt_ary_t *self){
 	if(self){
 		return self->s32CurLen;
 	}
-	return 0;
+	return -1;
 }
 
 //Returns nonzero if the element exists
@@ -303,7 +303,7 @@ int32_t	adt_ary_exists(const adt_ary_t *self, int32_t s32Index){
 	if(s32Index<self->s32CurLen){
 		return 1;
 	}
-	return 0;
+	return -1;
 }
 
 void adt_ary_create(adt_ary_t *self,void (*pDestructor)(void*)){

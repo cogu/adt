@@ -36,6 +36,11 @@ adt_str_t *adt_str_new(void);
 void adt_str_delete(adt_str_t *self);
 
 /**
+ * delete from void pointer
+ */
+void adt_str_vdelete(void *ptr);
+
+/**
  * constructor
  * \param[in]	self	object instance
  */
@@ -54,8 +59,8 @@ void adt_str_destroy(adt_str_t *self);
  * copy constructor
  * @param[in]	other	object instance to copy from
  */
-adt_str_t *adt_str_dup(const adt_str_t* other);
-adt_str_t *adt_str_make(const char *pBegin, const char *pEnd);
+adt_str_t *adt_str_new_cstr(const adt_str_t* other);
+adt_str_t *adt_str_new_bstr(const char *pBegin, const char *pEnd);
 int32_t adt_str_length(const adt_str_t *self);
 void adt_str_clear(adt_str_t *self);
 void adt_str_set(adt_str_t *lhs, const adt_str_t *rhs);
@@ -76,11 +81,14 @@ const char* adt_str_cstr(adt_str_t *self);
 
 
 
-
+/*Backard-compatible function macros */
+#define adt_str_delete_void adt_str_vdelete
+#define adt_str_dup adt_str_new_cstr
+#define adt_str_make adt_str_new_bstr
 
 
 /* utility functions */
-void adt_str_delete_void(void *ptr);
 void free_void(void *ptr);
+
 
 #endif //ADT_STR_H__
