@@ -26,10 +26,10 @@ static void test_adt_ary_push_pop(CuTest* tc)
 	char *pVal;
 	adt_ary_t *pArray = adt_ary_new(void_free);
 	CuAssertPtrNotNull(tc, pArray);
-	adt_ary_push(pArray,strdup("The"));
-	adt_ary_push(pArray,strdup("quick"));
-	adt_ary_push(pArray,strdup("brown"));
-	adt_ary_push(pArray,strdup("fox"));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("The")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("quick")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("brown")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("fox")));
 	CuAssertPtrNotNull(tc,pArray->ppAlloc);
 	CuAssertPtrEquals(tc, void_free,pArray->pDestructor);
 	CuAssertIntEquals(tc,4,pArray->s32AllocLen);
@@ -64,28 +64,28 @@ static void test_adt_ary_shift_unshift(CuTest* tc)
 	CuAssertIntEquals(tc,0,adt_ary_length(pArray));
 	CuAssertPtrEquals(tc, void_free,pArray->pDestructor);
 
-	adt_ary_unshift(pArray,tmp=strdup("The"));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("The")));
 	CuAssertIntEquals(tc,1,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
 	CuAssertPtrNotNull(tc, pVal);
 	CuAssertStrEquals(tc, "The",pVal);
 
-	adt_ary_unshift(pArray,tmp=strdup("quick"));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("quick")));
 	CuAssertIntEquals(tc,2,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
 	CuAssertPtrNotNull(tc, pVal);
 	CuAssertStrEquals(tc, "quick",pVal);
 
-	adt_ary_unshift(pArray,tmp=strdup("brown"));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("brown")));
 	CuAssertIntEquals(tc,3,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
 	CuAssertPtrNotNull(tc, pVal);
 	CuAssertStrEquals(tc, "brown",pVal);
 
-	adt_ary_unshift(pArray,tmp=strdup("fox"));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("fox")));
 	CuAssertIntEquals(tc,4,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
@@ -141,21 +141,21 @@ static void test_adt_ary_push_unique(CuTest* tc)
    b = (int*) malloc(sizeof(int));
    c = (int*) malloc(sizeof(int));
    CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, a);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, a));
    CuAssertIntEquals(tc, 1, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, a);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, a));
    CuAssertIntEquals(tc, 1, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, b);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, b));
    CuAssertIntEquals(tc, 2, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, b);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, b));
    CuAssertIntEquals(tc, 2, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, c);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, c));
    CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, c);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, c));
    CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
-   adt_ary_push_unique(pArray, c);
-   adt_ary_push_unique(pArray, b);
-   adt_ary_push_unique(pArray, a);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, c));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, b));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push_unique(pArray, a));
    CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
    adt_ary_delete(pArray);
 }
