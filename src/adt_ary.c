@@ -132,6 +132,27 @@ void* adt_ary_value(const adt_ary_t *self, int32_t s32Index)
 }
 
 /**
+ * Removes the first occurrence of pElem from the array
+ */
+adt_error_t adt_ary_remove(adt_ary_t *self, void *pElem)
+{
+   if (self != 0)
+   {
+      int32_t s32Index;
+      adt_error_t result = ADT_NO_ERROR;
+      for(s32Index = 0; s32Index < self->s32CurLen; s32Index++ )
+      {
+         if (self->pFirst[s32Index] == pElem){
+            result = adt_ary_splice(self, s32Index, 1);
+            break;
+         }
+      }
+      return result;
+   }
+   return ADT_INVALID_ARGUMENT_ERROR;
+}
+
+/**
  * Appends pElem to the end of the array
  */
 adt_error_t	adt_ary_push(adt_ary_t *self, void *pElem){

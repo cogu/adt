@@ -160,6 +160,33 @@ static void test_adt_ary_push_unique(CuTest* tc)
    adt_ary_delete(pArray);
 }
 
+static void test_adt_ary_remove(CuTest* tc)
+{
+   int *a;
+   int *b;
+   int *c;
+   adt_ary_t *pArray = adt_ary_new(void_free);
+   a = (int*) malloc(sizeof(int));
+   b = (int*) malloc(sizeof(int));
+   c = (int*) malloc(sizeof(int));
+   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, a));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, b));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, c));
+   CuAssertIntEquals(tc, 3, adt_ary_length(pArray));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_remove(pArray, a));
+   CuAssertIntEquals(tc, 2, adt_ary_length(pArray));
+   CuAssertPtrEquals(tc, b, adt_ary_value(pArray, 0));
+   CuAssertPtrEquals(tc, c, adt_ary_value(pArray, 1));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_remove(pArray, c));
+   CuAssertIntEquals(tc, 1, adt_ary_length(pArray));
+   CuAssertPtrEquals(tc, b, adt_ary_value(pArray, 0));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_remove(pArray, b));
+   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
+   CuAssertIntEquals(tc, 3, pArray->s32AllocLen);
+   adt_ary_delete(pArray);
+}
+
 
 CuSuite* testsuite_adt_ary(void)
 {
@@ -170,6 +197,7 @@ CuSuite* testsuite_adt_ary(void)
 	SUITE_ADD_TEST(suite, test_adt_ary_shift_unshift);
 	SUITE_ADD_TEST(suite, test_adt_ary_resize);
 	SUITE_ADD_TEST(suite, test_adt_ary_push_unique);
+	SUITE_ADD_TEST(suite, test_adt_ary_remove);
 
 	return suite;
 }

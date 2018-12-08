@@ -71,6 +71,7 @@ void*	      adt_ary_pop(adt_ary_t *self);
 void*	      adt_ary_shift(adt_ary_t *self);
 adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem);
 void*       adt_ary_value(const adt_ary_t *self, int32_t s32Index);
+adt_error_t adt_ary_remove(adt_ary_t *self, void *pElem);
 
 //Utility functions
 adt_error_t	adt_ary_extend(adt_ary_t *self, int32_t s32Len);
