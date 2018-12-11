@@ -24,7 +24,7 @@ typedef uint8_t bool;
 #include "adt_stack.h"
 #include "adt_ary.h"
 
-#define ADT_HASH_VERSION 0.1.1
+#define ADT_HASH_VERSION 0.1.2
 
 /*
  * ADT-hash is implemented as a tree of nodes containing items. Each item contains a (unique) hash value+linked
@@ -121,9 +121,9 @@ void adt_hash_destroy(adt_hash_t *self);
 
 
 //Accessors
-void	 adt_hash_set(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen, void *pVal);
-void** adt_hash_get(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen);
-void** adt_hash_remove(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen);
+void	 adt_hash_set(adt_hash_t *self, const char *pKey,  void *pVal);
+void** adt_hash_get(const adt_hash_t *self, const char *pKey);
+void** adt_hash_remove(adt_hash_t *self, const char *pKey);
 void   adt_hash_iter_init(adt_hash_t *self);
 
 /**
@@ -137,8 +137,8 @@ void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey,uint32_t *pKeyLen)
 
 
 //Utility functions
-uint32_t 	adt_hash_size(const adt_hash_t *self);
-bool		adt_hash_exists(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen);
+uint32_t 	adt_hash_length(const adt_hash_t *self);
+bool		adt_hash_exists(const adt_hash_t *self, const char *pKey);
 uint32_t	adt_hash_keys(adt_hash_t *self,adt_ary_t* pArray);
 
 #endif //ADT_HASH_H__

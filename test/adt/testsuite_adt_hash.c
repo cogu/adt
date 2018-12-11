@@ -21,10 +21,10 @@ void test_adt_hash_iterator(CuTest* tc){
 	CuAssertPtrNotNull(tc, pHash);
 	int value = 42;
 
-	adt_hash_set(pHash,"The",3,&value);
-	adt_hash_set(pHash,"quick",4,&value);
-	adt_hash_set(pHash,"brown",4,&value);
-	adt_hash_set(pHash,"fox",3,&value);
+	adt_hash_set(pHash,"The",&value);
+	adt_hash_set(pHash,"quick",&value);
+	adt_hash_set(pHash,"brown",&value);
+	adt_hash_set(pHash,"fox",&value);
 	adt_hash_iter_init(pHash);
 	void *pVal = 0;
 	const char *pKey;
@@ -54,7 +54,7 @@ void test_adt_hash_iterator(CuTest* tc){
 			break;
 		}
 	}while(pVal);
-	CuAssertIntEquals(tc,4,adt_hash_size(pHash));
+	CuAssertIntEquals(tc,4,adt_hash_length(pHash));
 	adt_hash_delete(pHash);
 }
 
@@ -82,18 +82,18 @@ void test_adt_hash_iterator2(CuTest* tc){
 	   if(read>1){
 	      line[read-1]=0;
 	      items++;
-	      if(adt_hash_get(pHash,line,strlen(line))!=0){
+	      if(adt_hash_get(pHash,line)!=0){
 	         printf("duplicate item: %s\n",line);
 	         dup++;
 	      }
-	      adt_hash_set(pHash,line,strlen(line),&value);
+	      adt_hash_set(pHash,line,&value);
 	   }
 	}while(read>=0);
 	end = clock();
 	elapsed_time = (double)(end - start) / (double)CLOCKS_PER_SEC;
 	printf("added %d items in %.002fs\n",items,elapsed_time);
 	fclose(fh);
-	CuAssertIntEquals(tc,items,adt_hash_size(pHash));
+	CuAssertIntEquals(tc,items,adt_hash_length(pHash));
 	adt_hash_iter_init(pHash);
 	void *pVal = 0;
 	const char *pKey;
@@ -110,7 +110,7 @@ void test_adt_hash_iterator2(CuTest* tc){
 		}
 	}while(pVal);
 	CuAssertIntEquals(tc,items,n);
-	CuAssertIntEquals(tc,items,adt_hash_size(pHash));
+	CuAssertIntEquals(tc,items,adt_hash_length(pHash));
 	adt_hash_delete(pHash);
 	free(line);
 }

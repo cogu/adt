@@ -59,6 +59,7 @@ void adt_heap_elem_create(adt_heap_elem_t *self, void *pItem, uint32_t u32Value)
 }
 
 void adt_heap_elem_destroy(adt_heap_elem_t *self){
+   (void) self;
    //nothing to do (self->pItem is a weak reference)
 }
 

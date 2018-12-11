@@ -30,7 +30,7 @@ static adt_hnode_t *adt_hnode_new(void);
 static void adt_hnode_delete(adt_hnode_t *node,void (*pDestructor)(void*));
 static void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash);
 static adt_hkey_t * adt_hnode_find(const adt_hnode_t *node, const char *key,uint32_t u32Hash);
-static adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Hash,void (*pDestructor)(void*));
+static adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Hash);
 static void adt_hkey_create(adt_hkey_t *hkey, const char *key, void *value);
 static void adt_hkey_destroy(adt_hkey_t *hkey, void (*pDestructor)(void*));
 static adt_hkey_t *adt_hkey_new(const char *key, void *value);
@@ -80,7 +80,7 @@ void adt_hash_destroy(adt_hash_t *self){
 	self->u32Size = 0;
 }
 
-void adt_hash_set(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen, void *pVal){
+void adt_hash_set(adt_hash_t *self, const char *pKey, void *pVal){
 	if(self && pKey){
 		uint32_t u32HashVal = adt_hash_string(pKey);
 		adt_hkey_t *hkey = adt_hnode_find(self->root,pKey,u32HashVal);
@@ -102,7 +102,7 @@ void adt_hash_set(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen, void *
 	}
 }
 
-void**	adt_hash_get(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
+void**	adt_hash_get(const adt_hash_t *self, const char *pKey){
 	if(self && pKey){
 		uint32_t u32HashVal = adt_hash_string(pKey);
 		adt_hkey_t *hkey = adt_hnode_find(self->root,pKey,u32HashVal);
@@ -113,10 +113,10 @@ void**	adt_hash_get(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen
 	return (void**)0;
 }
 
-void**adt_hash_remove(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
+void**adt_hash_remove(adt_hash_t *self, const char *pKey){
 	if(self && pKey){
 		uint32_t u32HashVal = adt_hash_string(pKey);
-		adt_hkey_t *hkey = adt_hnode_remove(self->root,pKey,u32HashVal,0);
+		adt_hkey_t *hkey = adt_hnode_remove(self->root,pKey,u32HashVal);
 		if(hkey){
 			void **pVal = &hkey->val;
 			adt_hkey_delete(hkey,0);
@@ -127,13 +127,13 @@ void**adt_hash_remove(adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
 	return (void**) 0;
 }
 
-uint32_t adt_hash_size(const adt_hash_t *self){
+uint32_t adt_hash_length(const adt_hash_t *self){
 	if(self){
 		return self->u32Size;
 	}
 	return 0;
 }
-bool adt_hash_exists(const adt_hash_t *self, const char *pKey, uint32_t u32KeyLen){
+bool adt_hash_exists(const adt_hash_t *self, const char *pKey){
 	if(self){
 		uint32_t u32HashVal = adt_hash_string(pKey);
 		adt_hkey_t *hkey = adt_hnode_find(self->root,pKey,u32HashVal);
@@ -225,7 +225,7 @@ uint32_t adt_hash_keys(adt_hash_t *self,adt_ary_t *pArray){
 	if(pArray){
 		adt_hash_iter_init(self);
 		adt_ary_clear(pArray);
-		adt_ary_extend(pArray,adt_hash_size(self));
+		adt_ary_extend(pArray,adt_hash_length(self));
 		do{
 			adt_hash_iter_next(self,&pKey,&u32KeyLen);
 			if(pKey){
@@ -384,7 +384,7 @@ adt_hkey_t * adt_hnode_find(const adt_hnode_t *node, const char *key,uint32_t u3
 	return 0;
 }
 
-adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Hash, void (*pDestructor)(void*)){
+adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key,uint32_t u32Hash){
 	adt_hnode_t *parent = 0;
 	adt_hkey_t *hkey = 0;
 	while(node){
