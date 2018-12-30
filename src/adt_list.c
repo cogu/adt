@@ -206,36 +206,7 @@ bool adt_list_remove(adt_list_t *self, void *pItem)
       {
          if (iter->pItem == pItem)
          {
-            //disconnect element from list
-            if (iter->pPrev != 0)
-            {
-               iter->pPrev->pNext = iter->pNext;
-            }
-            if (iter->pNext != 0)
-            {
-               iter->pNext->pPrev = iter->pPrev;
-            }
-            if (iter == self->pFirst)
-            {
-               //we are removing the first element, adjust pFirst
-               self->pFirst = iter->pNext;
-               if (self->pFirst == 0)
-               {
-                  self->pLast = 0; //if pFirst becomes 0, then pLast must also be set to 0
-               }
-            }
-            if (iter == self->pLast)
-            {
-               //last element was removed adjust pLast
-               self->pLast = iter->pPrev;
-            }
-#ifdef UNIT_TEST
-            //sanity check, these conditions must be true at all times
-            if (self->pFirst == 0) { assert (self->pLast == 0); }
-            if (self->pLast == 0) { assert (self->pFirst == 0); }
-#endif
-            //OK, now delete element
-            adt_list_elem_delete(iter);
+            adt_list_erase(self, iter);
             return true;
          }
          iter=iter->pNext;
@@ -310,6 +281,45 @@ adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem)
       return pElem->pPrev;
    }
    return 0;
+}
+
+/**
+ * Removes the item pointed to by the iterator. The iterator must be pointing to an element in this list.
+ */
+void adt_list_erase(adt_list_t *self, adt_list_elem_t *pIter)
+{
+   if ( (self != 0) && (pIter != 0) )
+   {
+      //disconnect element from list
+      if (pIter->pPrev != 0)
+      {
+         pIter->pPrev->pNext = pIter->pNext;
+      }
+      if (pIter->pNext != 0)
+      {
+         pIter->pNext->pPrev = pIter->pPrev;
+      }
+      if (pIter == self->pFirst)
+      {
+         //we are removing the first element, adjust pFirst
+         self->pFirst = pIter->pNext;
+         if (self->pFirst == 0)
+         {
+            self->pLast = 0; //if pFirst becomes 0, then pLast must also be set to 0
+         }
+      }
+      if (pIter == self->pLast)
+      {
+         //last element was removed adjust pLast
+         self->pLast = pIter->pPrev;
+      }
+#ifdef UNIT_TEST
+      //sanity check, these conditions must be true at all times
+      if (self->pFirst == 0) { assert (self->pLast == 0); }
+      if (self->pLast == 0) { assert (self->pFirst == 0); }
+#endif
+      adt_list_elem_delete(pIter);
+   }
 }
 
 int32_t adt_list_length(const adt_list_t *self)

@@ -68,6 +68,7 @@ adt_list_elem_t *adt_list_iter_first(adt_list_t *self);
 adt_list_elem_t *adt_list_iter_last(adt_list_t *self);
 adt_list_elem_t *adt_list_iter_next(adt_list_elem_t *pElem);
 adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem);
+void adt_list_erase(adt_list_t *self, adt_list_elem_t *pElem);
 int32_t adt_list_length(const adt_list_t *self);
 void adt_list_clear(adt_list_t *self);
 
