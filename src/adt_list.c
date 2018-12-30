@@ -197,19 +197,15 @@ bool adt_list_remove(adt_list_t *self, void *pItem)
 {
    if (self != 0)
    {
-      adt_list_elem_t *iter = self->pFirst; //create a local iterator, we do not want to mess with the users' iterator located in self->pIter
+      adt_list_elem_t *iter = adt_list_find(self, pItem);
       if (iter == 0)
       {
-         return false; //empty list
+         return false;
       }
-      while( iter != 0 )
+      else
       {
-         if (iter->pItem == pItem)
-         {
-            adt_list_erase(self, iter);
-            return true;
-         }
-         iter=iter->pNext;
+         adt_list_erase(self, iter);
+         return true;
       }
    }
    return false;
@@ -281,6 +277,30 @@ adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem)
       return pElem->pPrev;
    }
    return 0;
+}
+
+/**
+ * Finds an item in the list and returns an iterator if found.
+ */
+adt_list_elem_t *adt_list_find(const adt_list_t *self, void *pItem)
+{
+   if (self != 0)
+   {
+      adt_list_elem_t *iter = self->pFirst;
+      if (iter == 0)
+      {
+         return (adt_list_elem_t*) 0; //empty list
+      }
+      while(iter != 0 )
+      {
+         if (iter->pItem == pItem)
+         {
+            return iter;
+         }
+         iter=iter->pNext;
+      }
+   }
+   return (adt_list_elem_t*) 0;
 }
 
 /**
@@ -555,6 +575,30 @@ adt_u32List_elem_t* adt_u32List_iter_prev(adt_u32List_elem_t *pElem)
       return pElem->pPrev;
    }
    return 0;
+}
+
+/**
+ * Finds an item in the list and returns an iterator if found.
+ */
+adt_u32List_elem_t* adt_u32List_find(const adt_u32List_t *self, uint32_t item)
+{
+   if (self != 0)
+   {
+      adt_u32List_elem_t *iter = self->pFirst;
+      if (iter == 0)
+      {
+         return (adt_u32List_elem_t*) 0; //empty list
+      }
+      while(iter != 0 )
+      {
+         if (iter->item == item)
+         {
+            return iter;
+         }
+         iter=iter->pNext;
+      }
+   }
+   return (adt_u32List_elem_t*) 0;
 }
 
 int32_t adt_u32List_length(const adt_u32List_t *self)

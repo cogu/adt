@@ -68,6 +68,7 @@ adt_list_elem_t *adt_list_iter_first(adt_list_t *self);
 adt_list_elem_t *adt_list_iter_last(adt_list_t *self);
 adt_list_elem_t *adt_list_iter_next(adt_list_elem_t *pElem);
 adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem);
+adt_list_elem_t *adt_list_find(const adt_list_t *self, void *pItem);
 void adt_list_erase(adt_list_t *self, adt_list_elem_t *pElem);
 int32_t adt_list_length(const adt_list_t *self);
 void adt_list_clear(adt_list_t *self);
@@ -87,6 +88,7 @@ adt_u32List_elem_t *adt_u32List_iter_first(const adt_u32List_t *self);
 adt_u32List_elem_t *adt_u32List_iter_last(const adt_u32List_t *self);
 adt_u32List_elem_t* adt_u32List_iter_next(adt_u32List_elem_t *pElem);
 adt_u32List_elem_t* adt_u32List_iter_prev(adt_u32List_elem_t *pElem);
+adt_u32List_elem_t* adt_u32List_find(const adt_u32List_t *self, uint32_t item);
 int32_t adt_u32List_length(const adt_u32List_t *self);
 void adt_u32List_clear(adt_u32List_t *self);
 

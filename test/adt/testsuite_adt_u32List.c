@@ -13,6 +13,7 @@ static void test_adt_u32List_insert(CuTest* tc);
 static void test_adt_u32List_erase(CuTest* tc);
 static void test_adt_u32List_insert_before(CuTest* tc);
 static void test_adt_u32List_insert_after(CuTest* tc);
+static void test_adt_u32List_find(CuTest* tc);
 
 
 /**************** Private Variable Declarations *******************/
@@ -29,6 +30,7 @@ CuSuite* testsuite_adt_u32List(void)
    SUITE_ADD_TEST(suite, test_adt_u32List_erase);
    SUITE_ADD_TEST(suite, test_adt_u32List_insert_before);
    SUITE_ADD_TEST(suite, test_adt_u32List_insert_after);
+   SUITE_ADD_TEST(suite, test_adt_u32List_find);
 
    return suite;
 }
@@ -248,5 +250,26 @@ static void test_adt_u32List_insert_after(CuTest* tc)
    CuAssertPtrEquals(tc, 0, iter);
 
    //cleanup
+   adt_u32List_delete(list);
+}
+
+static void test_adt_u32List_find(CuTest* tc)
+{
+   adt_u32List_t *list;
+   adt_u32List_elem_t *iter;
+   list = adt_u32List_new();
+   adt_u32List_insert(list, 1);
+   adt_u32List_insert(list, 2);
+   adt_u32List_insert(list, 3);
+   CuAssertIntEquals(tc, 3, adt_u32List_length(list));
+   iter = adt_u32List_find(list, 3);
+   CuAssertPtrNotNull(tc, iter);
+   CuAssertUIntEquals(tc, 3, iter->item);
+   iter = adt_u32List_find(list, 2);
+   CuAssertPtrNotNull(tc, iter);
+   CuAssertUIntEquals(tc, 2, iter->item);
+   iter = adt_u32List_find(list, 1);
+   CuAssertPtrNotNull(tc, iter);
+   CuAssertUIntEquals(tc, 1, iter->item);
    adt_u32List_delete(list);
 }
