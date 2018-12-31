@@ -127,7 +127,7 @@ void**adt_hash_remove(adt_hash_t *self, const char *pKey){
 	return (void**) 0;
 }
 
-uint32_t adt_hash_length(const adt_hash_t *self){
+int32_t adt_hash_length(const adt_hash_t *self){
 	if(self){
 		return self->u32Size;
 	}
@@ -153,8 +153,8 @@ void	adt_hash_iter_init(adt_hash_t *self){
 	}
 }
 
-void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey,uint32_t *pKeyLen){
-	if(!self || !ppKey || !pKeyLen) return (void*) 0;
+void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey){
+	if(!self || !ppKey ) return (void*) 0;
 
 	if(self->iter.pHkey == 0){
 		//find next hkey
@@ -203,37 +203,51 @@ BEGIN:
 	if(self->iter.pHkey){
       void **ppVal;
       *ppKey = self->iter.pHkey->key;
-		*pKeyLen = strlen(self->iter.pHkey->key);
 		ppVal = &self->iter.pHkey->val;
 		self->iter.pHkey = self->iter.pHkey->next;
 		return ppVal;
 	}
 	else{
 		*ppKey=0;
-		*pKeyLen=0;
 		return (void**) 0; //done
 	}
 }
 
-uint32_t adt_hash_keys(adt_hash_t *self,adt_ary_t *pArray){
+int32_t adt_hash_keys(adt_hash_t *self,adt_ary_t *pArray){
 	const char *pKey;
-	uint32_t u32KeyLen;
 	int32_t s32i=0;
 
-	if(!self) return 0;
+	if( (self==0) || (pArray==0)) return 0;
 
-	if(pArray){
-		adt_hash_iter_init(self);
-		adt_ary_clear(pArray);
-		adt_ary_extend(pArray,adt_hash_length(self));
-		do{
-			adt_hash_iter_next(self,&pKey,&u32KeyLen);
-			if(pKey){
-				adt_ary_set(pArray,s32i++, STRDUP(pKey));
-			}
-		}while(pKey);
-	}
+   adt_hash_iter_init(self);
+   adt_ary_clear(pArray);
+   adt_ary_extend(pArray, adt_hash_length(self));
+   do{
+      (void) adt_hash_iter_next(self,&pKey);
+      if(pKey != 0){
+         adt_ary_set(pArray,s32i++, STRDUP(pKey));
+      }
+   }while(pKey);
+
 	return (uint32_t) s32i;
+}
+
+int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray)
+{
+   const char *pKey;
+   int32_t s32i=0;
+
+   if( (self==0) || (pArray==0)) return 0;
+   adt_hash_iter_init(self);
+   adt_ary_clear(pArray);
+   adt_ary_extend(pArray,adt_hash_length(self));
+   do{
+      void **ppValue = adt_hash_iter_next(self,&pKey);
+      if(ppValue != 0){
+         adt_ary_set(pArray,s32i++, *ppValue);
+      }
+   } while(pKey);
+   return s32i;
 }
 
 

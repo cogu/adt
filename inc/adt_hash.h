@@ -103,7 +103,7 @@ typedef struct adt_hit_stored_tag{
 }adt_hit_stored_t;
 
 typedef struct adt_hash_tag{
-	uint32_t u32Size;		//number of elements in hash
+	int32_t u32Size;		//number of elements in hash
 	adt_stack_t iter_stack;	//stack of hiter_stored objects
 	adt_hit_t iter;			//iterator state
 	adt_hnode_t *root;		//root node
@@ -132,13 +132,14 @@ void   adt_hash_iter_init(adt_hash_t *self);
  * \param[out] pKeyLen pointer to integer containing length of key string
  * \return pointer to value or NULL
  */
-void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey,uint32_t *pKeyLen);
+void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey);
 
 
 
 //Utility functions
-uint32_t 	adt_hash_length(const adt_hash_t *self);
+int32_t 	adt_hash_length(const adt_hash_t *self);
 bool		adt_hash_exists(const adt_hash_t *self, const char *pKey);
-uint32_t	adt_hash_keys(adt_hash_t *self,adt_ary_t* pArray);
+int32_t	adt_hash_keys(adt_hash_t *self, adt_ary_t* pArray);
+int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray);
 
 #endif //ADT_HASH_H__

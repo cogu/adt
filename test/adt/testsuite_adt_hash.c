@@ -6,7 +6,13 @@
 #include <time.h>
 #include "CuTest.h"
 #include "adt_hash.h"
+#include "adt_ary.h"
 #include "CMemLeak.h"
+
+static void vfree(void *arg)
+{
+   free(arg);
+}
 
 
 void test_adt_hash_constructor(CuTest* tc)
@@ -28,10 +34,9 @@ void test_adt_hash_iterator(CuTest* tc){
 	adt_hash_iter_init(pHash);
 	void *pVal = 0;
 	const char *pKey;
-	uint32_t u32KeyLen;
 	uint32_t i = 0;
 	do{
-		pVal = adt_hash_iter_next(pHash,&pKey,&u32KeyLen);
+		pVal = adt_hash_iter_next(pHash,&pKey);
 		switch(i++){
 		case 0:
 			CuAssertPtrNotNull(tc, pVal);
@@ -97,10 +102,10 @@ void test_adt_hash_iterator2(CuTest* tc){
 	adt_hash_iter_init(pHash);
 	void *pVal = 0;
 	const char *pKey;
-	uint32_t u32KeyLen;
+
 	uint32_t n = 0;
 	do{
-		pVal = adt_hash_iter_next(pHash,&pKey,&u32KeyLen);
+		pVal = adt_hash_iter_next(pHash,&pKey);
 		if((int) n<items){
 			CuAssertPtrNotNull(tc, pVal);
 			n++;
@@ -115,7 +120,66 @@ void test_adt_hash_iterator2(CuTest* tc){
 	free(line);
 }
 
+void test_adt_hash_keys(CuTest* tc)
+{
+   int val1 = 1;
+   int val2 = 2;
+   int val3 = 3;
+   int val4 = 4;
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   adt_ary_t *pKeys = adt_ary_new(vfree);
 
+   CuAssertPtrNotNull(tc, pHash);
+   CuAssertPtrNotNull(tc, pKeys);
+
+   adt_hash_set(pHash,"The",&val1);
+   adt_hash_set(pHash,"quick",&val2);
+   adt_hash_set(pHash,"brown",&val3);
+   adt_hash_set(pHash,"fox",&val4);
+
+   CuAssertIntEquals(tc, 0, adt_ary_length(pKeys));
+   adt_hash_keys(pHash, pKeys);
+   CuAssertIntEquals(tc, 4, adt_ary_length(pKeys));
+   CuAssertStrEquals(tc, "The", (const char*) adt_ary_value(pKeys, 0));
+   CuAssertStrEquals(tc, "quick", (const char*) adt_ary_value(pKeys, 1));
+   CuAssertStrEquals(tc, "brown", (const char*) adt_ary_value(pKeys, 2));
+   CuAssertStrEquals(tc, "fox", (const char*) adt_ary_value(pKeys, 3));
+
+   adt_hash_delete(pHash);
+   adt_ary_delete(pKeys);
+
+}
+
+void test_adt_hash_values(CuTest* tc)
+{
+   int val1 = 1;
+   int val2 = 2;
+   int val3 = 3;
+   int val4 = 4;
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   adt_ary_t *pValues = adt_ary_new(NULL);
+
+   CuAssertPtrNotNull(tc, pHash);
+   CuAssertPtrNotNull(tc, pValues);
+
+   adt_hash_set(pHash,"The",&val1);
+   adt_hash_set(pHash,"quick",&val2);
+   adt_hash_set(pHash,"brown",&val3);
+   adt_hash_set(pHash,"fox",&val4);
+
+   CuAssertIntEquals(tc, 0, adt_ary_length(pValues));
+   adt_hash_values(pHash, pValues);
+   CuAssertIntEquals(tc, 4, adt_ary_length(pValues));
+
+   CuAssertPtrEquals(tc, &val1, adt_ary_value(pValues, 0));
+   CuAssertPtrEquals(tc, &val2, adt_ary_value(pValues, 1));
+   CuAssertPtrEquals(tc, &val3, adt_ary_value(pValues, 2));
+   CuAssertPtrEquals(tc, &val4, adt_ary_value(pValues, 3));
+
+   adt_hash_delete(pHash);
+   adt_ary_delete(pValues);
+
+}
 
 CuSuite* testsuite_adt_hash(void)
 {
@@ -124,5 +188,7 @@ CuSuite* testsuite_adt_hash(void)
 	SUITE_ADD_TEST(suite, test_adt_hash_constructor);
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator);
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator2);
+	SUITE_ADD_TEST(suite, test_adt_hash_keys);
+	SUITE_ADD_TEST(suite, test_adt_hash_values);
 	return suite;
 }
