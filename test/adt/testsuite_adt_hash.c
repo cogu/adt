@@ -181,14 +181,66 @@ void test_adt_hash_values(CuTest* tc)
 
 }
 
+void test_adt_hash_remove(CuTest* tc)
+{
+   int *val1 = malloc(sizeof(int));
+   int *val2 = malloc(sizeof(int));
+   int *val3 = malloc(sizeof(int));
+   adt_hash_t *pHash = adt_hash_new(vfree);
+
+   CuAssertPtrNotNull(tc, pHash);
+
+   adt_hash_set(pHash,"V1",val1);
+   adt_hash_set(pHash,"V2",val2);
+   adt_hash_set(pHash,"V3",val3);
+
+   CuAssertIntEquals(tc, 3, adt_hash_length(pHash));
+   CuAssertPtrEquals(tc, val2, adt_hash_remove(pHash, "V2"));
+   CuAssertPtrEquals(tc, val3, adt_hash_remove(pHash, "V3"));
+   CuAssertPtrEquals(tc, val1, adt_hash_remove(pHash, "V1"));
+   CuAssertIntEquals(tc, 0, adt_hash_length(pHash));
+
+   adt_hash_delete(pHash);
+   free(val1);
+   free(val2);
+   free(val3);
+
+}
+
+void test_adt_hash_value(CuTest* tc)
+{
+   int *val1 = malloc(sizeof(int));
+   int *val2 = malloc(sizeof(int));
+   int *val3 = malloc(sizeof(int));
+
+   adt_hash_t *pHash = adt_hash_new(vfree);
+
+   CuAssertPtrNotNull(tc, pHash);
+
+   adt_hash_set(pHash,"V1",val1);
+   adt_hash_set(pHash,"V2",val2);
+   adt_hash_set(pHash,"V3",val3);
+
+   CuAssertIntEquals(tc, 3, adt_hash_length(pHash));
+   CuAssertPtrEquals(tc, val1, adt_hash_value(pHash, "V1"));
+   CuAssertPtrEquals(tc, val2, adt_hash_value(pHash, "V2"));
+   CuAssertPtrEquals(tc, val3, adt_hash_value(pHash, "V3"));
+
+   adt_hash_delete(pHash);
+}
+
 CuSuite* testsuite_adt_hash(void)
 {
 	CuSuite* suite = CuSuiteNew();
 
 	SUITE_ADD_TEST(suite, test_adt_hash_constructor);
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator);
+#if TEST_ADT_HASH_FULL //Note that this test takes several seconds to run, normally disabled
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator2);
+#endif
 	SUITE_ADD_TEST(suite, test_adt_hash_keys);
 	SUITE_ADD_TEST(suite, test_adt_hash_values);
+	SUITE_ADD_TEST(suite, test_adt_hash_remove);
+	SUITE_ADD_TEST(suite, test_adt_hash_value);
 	return suite;
 }

@@ -26,9 +26,7 @@ void RunAllTests(void)
 
 	CuSuiteAddSuite(suite, testsuite_adt_str());
 	CuSuiteAddSuite(suite, testsuite_adt_ary());
-#if TEST_ADT_HASH_ENABLE
-	CuSuiteAddSuite(suite, testsuite_adt_hash()); //Note that this test takes several seconds to run, normally disabled
-#endif
+	CuSuiteAddSuite(suite, testsuite_adt_hash());
 	CuSuiteAddSuite(suite, testsuite_adt_stack());
 	CuSuiteAddSuite(suite, testsuite_adt_u16Map());
 	CuSuiteAddSuite(suite, testsuite_adt_list());

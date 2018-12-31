@@ -113,18 +113,29 @@ void**	adt_hash_get(const adt_hash_t *self, const char *pKey){
 	return (void**)0;
 }
 
-void**adt_hash_remove(adt_hash_t *self, const char *pKey){
+void*  adt_hash_value(const adt_hash_t *self, const char *pKey){
+   if(self && pKey){
+      uint32_t u32HashVal = adt_hash_string(pKey);
+      adt_hkey_t *hkey = adt_hnode_find(self->root,pKey,u32HashVal);
+      if(hkey){
+         return hkey->val;
+      }
+   }
+   return (void*)0;
+}
+
+void*  adt_hash_remove(adt_hash_t *self, const char *pKey){
 	if(self && pKey){
 		uint32_t u32HashVal = adt_hash_string(pKey);
 		adt_hkey_t *hkey = adt_hnode_remove(self->root,pKey,u32HashVal);
 		if(hkey){
-			void **pVal = &hkey->val;
+			void *pVal = hkey->val;
 			adt_hkey_delete(hkey,0);
 			self->u32Size--;
 			return pVal;
 		}
 	}
-	return (void**) 0;
+	return (void*) 0;
 }
 
 int32_t adt_hash_length(const adt_hash_t *self){

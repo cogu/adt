@@ -123,7 +123,8 @@ void adt_hash_destroy(adt_hash_t *self);
 //Accessors
 void	 adt_hash_set(adt_hash_t *self, const char *pKey,  void *pVal);
 void** adt_hash_get(const adt_hash_t *self, const char *pKey);
-void** adt_hash_remove(adt_hash_t *self, const char *pKey);
+void*  adt_hash_value(const adt_hash_t *self, const char *pKey);
+void*  adt_hash_remove(adt_hash_t *self, const char *pKey);
 void   adt_hash_iter_init(adt_hash_t *self);
 
 /**
