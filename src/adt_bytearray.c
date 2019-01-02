@@ -4,14 +4,16 @@
 * \date:    2015-02-05
 * \brief:   general purpose data container
 *
-* Copyright (c) 2015-2016 Conny Gustafsson
+* Copyright (c) 2015-2019 Conny Gustafsson
 *
 ******************************************************************************/
 #include "adt_bytearray.h"
-#include <errno.h>
 #include <string.h>
 #include <malloc.h>
 #include <assert.h>
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 
 /**************** Private Function Declarations *******************/
@@ -50,7 +52,23 @@ adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize)
       adt_bytearray_create(self,u32GrowSize);
    }
    else{
-      errno = ENOMEM;
+      adt_setError(ADT_MEM_ERROR);
+   }
+   return self;
+}
+
+adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, uint32_t u32GrowSize)
+{
+   adt_bytearray_t *self = adt_bytearray_new(u32GrowSize);
+   if (self != 0)
+   {
+      adt_error_t errorCode = adt_bytearray_append(self, pData, u32DataLen);
+      if (errorCode != ADT_NO_ERROR)
+      {
+         adt_setError(errorCode);
+         adt_bytearray_delete(self);
+         self = (adt_bytearray_t*) 0;
+      }
    }
    return self;
 }
@@ -70,22 +88,23 @@ void adt_bytearray_vdelete(void *arg)
 }
 
 
-int8_t adt_bytearray_reserve(adt_bytearray_t *self, uint32_t u32NewLen){
+adt_error_t adt_bytearray_reserve(adt_bytearray_t *self, uint32_t u32NewLen){
    if(self){
       if(u32NewLen > self->u32AllocLen){
-         int8_t rc = adt_bytearray_grow(self,u32NewLen);
-         if(rc != 0){
-            return rc;
+         adt_error_t erorCode = adt_bytearray_grow(self,u32NewLen);
+         if(erorCode != ADT_NO_ERROR){
+            return erorCode;
          }
       }
-      return 0;
+      return ADT_NO_ERROR;
    }
-   return -1;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-int8_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, uint32_t u32DataLen){
+adt_error_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, uint32_t u32DataLen){
    if(self && pData && (u32DataLen > 0)){
-      if(adt_bytearray_reserve(self,self->u32CurLen + u32DataLen) == 0){
+      adt_error_t errorCode = adt_bytearray_reserve(self, self->u32CurLen + u32DataLen);
+      if(errorCode == ADT_NO_ERROR){
          uint8_t *pNext, *pEnd;
          pNext = self->pData + self->u32CurLen;
          pEnd = self->pData + self->u32AllocLen;
@@ -93,14 +112,9 @@ int8_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, uint32_
          memcpy(pNext,pData,u32DataLen);
          self->u32CurLen+=u32DataLen;
       }
-      else{
-         errno = ENOMEM;
-         return -1;
-      }
-      return 0;
+      return errorCode;
    }
-   errno = EINVAL;
-   return -1;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 /**
@@ -108,7 +122,7 @@ int8_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, uint32_
  * \param self pointer to bytearray_t
  * \param pSrc pointer to a byte inside the array
  */
-int8_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc){
+adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc){
    if( (self!=0) && (pSrc!=0) && (self->pData <= pSrc) && (pSrc <= self->pData + self->u32CurLen) ){
       uint32_t start, remain;
       /*
@@ -137,16 +151,15 @@ int8_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc){
          memmove(self->pData,pSrc,remain);
          self->u32CurLen = remain;
       }
-      return 0;
+      return ADT_NO_ERROR;
    }
-   errno = EINVAL;
-   return -1;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 /**
  * grows byte array by a predefined size
  */
-int8_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen){
+adt_error_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen){
    if( (self != 0) && (u32MinLen > self->u32AllocLen) && (self->u32GrowSize > 0)){
       uint8_t *pNewData;
       uint32_t u32NewLen = self->u32AllocLen;
@@ -163,27 +176,27 @@ int8_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen){
          self->u32AllocLen = u32NewLen;
       }
       else{
-         return -1;
+         return ADT_MEM_ERROR;
       }
    }
-   return 0;
+   return ADT_NO_ERROR;
 }
 
 /**
  * resizes bytearray to newLen
  */
-int8_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
+adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
 {
    if(self != 0)
    {
-      int8_t result = adt_bytearray_grow(self, u32NewLen);
-      if (result == 0)
+      adt_error_t errorCode = adt_bytearray_grow(self, u32NewLen);
+      if (errorCode == ADT_NO_ERROR)
       {
          self->u32CurLen = u32NewLen;
-         return 0;
       }
+      return errorCode;
    }
-   return -1;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 uint8_t *adt_bytearray_data(const adt_bytearray_t *self){
@@ -204,6 +217,30 @@ void adt_bytearray_clear(adt_bytearray_t *self){
    if(self != 0){
       self->u32CurLen = 0;
    }
+}
+
+/**
+ * Returns true if both bytearrays are of equal length and equal content
+ */
+bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs){
+   if ( (lhs != 0) && (rhs != 0) ) {
+      int32_t leftLen;
+      int32_t rightLen;
+      leftLen = adt_bytearray_length(lhs);
+      rightLen = adt_bytearray_length(rhs);
+      if (leftLen == rightLen) {
+         int32_t i;
+         const uint8_t *pLeft;
+         const uint8_t *pRight;
+         for(i=0, pLeft=lhs->pData, pRight=rhs->pData; i<leftLen; i++){
+            if (*pLeft++ != *pRight++ ) {
+               return false;
+            }
+         }
+         return true;
+      }
+   }
+   return false;
 }
 
 /***************** Private Function Definitions *******************/

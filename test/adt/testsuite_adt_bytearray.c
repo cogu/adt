@@ -1,3 +1,31 @@
+/*****************************************************************************
+* \file      testsuite_adt_bytearray.c
+* \author    Conny Gustafsson
+* \date      2017-01-27
+* \brief     Description
+*
+* Copyright (c) 2017-2019 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+******************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -6,14 +34,49 @@
 #include "adt_bytearray.h"
 #include "CMemLeak.h"
 
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
+#define ARRAY_GROW_LEN 128
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
+static void test_adt_bytearray_new(CuTest* tc);
+static void test_adt_bytearray_resize(CuTest* tc);
+static void test_adt_bytearray_make(CuTest* tc);
+static void test_adt_bytearray_equals(CuTest* tc);
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE VARIABLES
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
+CuSuite* testsuite_adt_bytearray(void)
+{
+   CuSuite* suite = CuSuiteNew();
+
+   SUITE_ADD_TEST(suite, test_adt_bytearray_new);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_resize);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_make);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_equals);
+
+   return suite;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 static void test_adt_bytearray_new(CuTest* tc)
 {
    adt_bytearray_t *pArray = adt_bytearray_new(0);
    CuAssertPtrNotNull(tc, pArray);
    CuAssertPtrEquals(tc, 0,pArray->pData);
    CuAssertIntEquals(tc, 0,pArray->u32CurLen);
-   CuAssertIntEquals(tc,0,pArray->u32AllocLen);
-   CuAssertIntEquals(tc,ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE,pArray->u32GrowSize);
+   CuAssertIntEquals(tc, 0,pArray->u32AllocLen);
+   CuAssertIntEquals(tc, ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE,pArray->u32GrowSize);
    adt_bytearray_delete(pArray);
 }
 
@@ -24,14 +87,41 @@ static void test_adt_bytearray_resize(CuTest* tc)
    result = adt_bytearray_resize(pArray, 1132);
    CuAssertIntEquals(tc,0,result);
    CuAssertIntEquals(tc,1132,pArray->u32CurLen);
+   adt_bytearray_delete(pArray);
 }
 
-CuSuite* testsuite_adt_bytearray(void)
+static void test_adt_bytearray_make(CuTest* tc)
 {
-   CuSuite* suite = CuSuiteNew();
+   adt_bytearray_t *pArray;
+   const uint8_t data[] = {100,240,127,0,5};
+   pArray = adt_bytearray_make(data, 5, 0);
+   CuAssertPtrNotNull(tc, pArray);
+   adt_bytearray_delete(pArray);
 
-   SUITE_ADD_TEST(suite, test_adt_bytearray_new);
-   SUITE_ADD_TEST(suite, test_adt_bytearray_resize);
+}
 
-   return suite;
+static void test_adt_bytearray_equals(CuTest* tc)
+{
+   adt_bytearray_t *pArray1;
+   adt_bytearray_t *pArray2;
+   adt_bytearray_t *pArray3;
+   adt_bytearray_t *pArray4;
+   const uint8_t data1[] = {100,240,127,0,5};
+   const uint8_t data2[] = {100,240,128,0,5};
+   const uint8_t data3[] = {100,240,127};
+   pArray1 = adt_bytearray_make(data1, 5, ARRAY_GROW_LEN);
+   pArray2 = adt_bytearray_make(data1, 5, ARRAY_GROW_LEN);
+   pArray3 = adt_bytearray_make(data2, 5, ARRAY_GROW_LEN);
+   pArray4 = adt_bytearray_make(data3, 3, ARRAY_GROW_LEN);
+   CuAssertPtrNotNull(tc, pArray1);
+   CuAssertPtrNotNull(tc, pArray2);
+   CuAssertPtrNotNull(tc, pArray3);
+   CuAssertPtrNotNull(tc, pArray4);
+   CuAssertTrue(tc, adt_bytearray_equals(pArray1, pArray2) == true);
+   CuAssertTrue(tc, adt_bytearray_equals(pArray1, pArray3) == false);
+   CuAssertTrue(tc, adt_bytearray_equals(pArray1, pArray4) == false);
+   adt_bytearray_delete(pArray1);
+   adt_bytearray_delete(pArray2);
+   adt_bytearray_delete(pArray3);
+   adt_bytearray_delete(pArray4);
 }
