@@ -22,7 +22,7 @@
 #define ELEM_LEN (sizeof(void*))
 
 /**************** Private Function Declarations *******************/
-
+static void adt_block_memmove(void *pDest, void *pSrc, uint32_t u32Remain);
 /**************** Private Variable Declarations *******************/
 
 
@@ -238,21 +238,16 @@ adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem){
       }
       else {
          //no room at beginning of array, move all array data forward by one
-         uint32_t u32Remain,u32ElemSize;
          uint8_t *pBegin,*pEnd;
          adt_error_t result;
-         u32ElemSize = sizeof(void**);
+         uint32_t u32ElemSize = sizeof(void**);
          result = adt_ary_extend(self,(int32_t) (self->s32CurLen+1));
          if (result == ADT_NO_ERROR) {
+            uint32_t u32Remain;
             pBegin = (uint8_t*) self->pFirst+u32ElemSize;
-            pEnd = ((uint8_t*) &self->pFirst[self->s32CurLen])-1;
-            u32Remain = (uint32_t) (pEnd-pBegin+1);
-            while(u32Remain>0){
-               uint32_t u32Size = (u32Remain>DATA_BLOCK_MAX)? DATA_BLOCK_MAX : u32Remain;
-               memmove(pBegin,pBegin-u32ElemSize,u32Size);
-               u32Remain-=u32Size;
-               pBegin+=u32Size;
-            }
+            pEnd = ((uint8_t*) &self->pFirst[self->s32CurLen]);
+            u32Remain = (uint32_t) (pEnd-pBegin);
+            adt_block_memmove(pBegin, self->pFirst, u32Remain);
             self->pFirst[0]=pElem;
          }
          return result;
@@ -416,59 +411,61 @@ void* adt_ary_get_fill_elem(const adt_ary_t *self){
  * removes s32Len items from array starting from s32Index (s32Index can be both positive or negative)
  */
 adt_error_t adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
-   int32_t s32Source;
-   int32_t s32Destination;
-   int32_t s32Removed = 0;
-   int32_t i;
-   if( (self==0) || (s32Len <= 0) ){
-      return ADT_INVALID_ARGUMENT_ERROR; //invalid input argument
-   }
-   if(s32Index<0){
-      s32Index = (-s32Index);
-      if(s32Index > (self->s32CurLen) ){
-         return ADT_INDEX_OUT_OF_BOUNDS_ERROR; //negative index out of bounds
-      }
-      //negative index inside array bounds
-      s32Index=self->s32CurLen-s32Index;
-   }
-   if(s32Index >= self->s32CurLen){
-      return ADT_INDEX_OUT_OF_BOUNDS_ERROR;
-   }
-   s32Destination = s32Index;
-   s32Source = s32Index + s32Len;
-   for(i=0;i<s32Len;i++){
-      if(s32Source < self->s32CurLen){
-         //move item
-         assert(s32Destination != s32Source);
-         assert(s32Destination < self->s32CurLen);
-         assert(s32Source < self->s32CurLen);
-         if( (self->destructorEnable != 0) && (self->pDestructor != 0) ){
-            self->pDestructor(self->pFirst[s32Destination]);
+   if ((self!=0) && (s32Len > 0)) {
+      int32_t s32Source;
+      int32_t s32Destination;
+      int32_t i;
+      int32_t s32ElemsRemain;
+
+
+      if(s32Index<0){
+         s32Index = (-s32Index);
+         if(s32Index > (self->s32CurLen) ){
+            return ADT_INDEX_OUT_OF_BOUNDS_ERROR;
          }
-         s32Removed++;
-         self->pFirst[s32Destination] = self->pFirst[s32Source];
-         self->pFirst[s32Source] = self->pFillElem;
+         s32Index=self->s32CurLen-s32Index;
       }
-      else if(s32Destination < self->s32CurLen){
-         //remove item
-         if( (self->destructorEnable != 0) && (self->pDestructor != 0) ){
-            self->pDestructor(self->pFirst[s32Destination]);
+      else if(s32Index >= self->s32CurLen){
+         return ADT_INDEX_OUT_OF_BOUNDS_ERROR;
+      }
+
+      s32Destination = s32Index;
+      s32Source = s32Index + s32Len;
+
+      if (s32Source > self->s32CurLen) {
+         return ADT_LENGTH_ERROR; //s32Len is too large
+      }
+
+      //call destructor on elements about to be removed
+      if( (self->destructorEnable != 0) && (self->pDestructor != 0) ){
+         for (i=0;i<s32Len; i++) {
+            self->pDestructor(self->pFirst[s32Destination+i]);
          }
-         s32Removed++;
-         self->pFirst[s32Destination] = self->pFillElem;
       }
-      s32Source++;
-      s32Destination++;
+      s32ElemsRemain = self->s32CurLen-s32Source;
+      if (s32ElemsRemain > 0) {
+         uint32_t u32BytesRemain;
+         u32BytesRemain = ((uint32_t)s32ElemsRemain)*((uint32_t) sizeof(void*));
+         adt_block_memmove(&self->pFirst[s32Destination], &self->pFirst[s32Source], u32BytesRemain);
+      }
+      self->s32CurLen-=s32Len;
+      return ADT_NO_ERROR;
    }
-   //move remaining items
-   while(s32Source < self->s32CurLen){
-      self->pFirst[s32Destination] = self->pFirst[s32Source];
-      self->pFirst[s32Source] = self->pFillElem;
-      s32Source++;
-      s32Destination++;
-   }
-   self->s32CurLen-=s32Removed;
-   return ADT_NO_ERROR;
+   return ADT_INVALID_ARGUMENT_ERROR;
+
 }
 
 /***************** Private Function Definitions *******************/
+/**
+ * CG: I had some serious issues with some Microsoft compilers not handling large memmoves.
+ * To mitigate this potential problem I use this function to transform one large memmoves into a series of smaller memmoves.
+ */
+static void adt_block_memmove(void *pDest, void *pSrc, uint32_t u32Remain){
+   while(u32Remain>0){
+      uint32_t u32Size = (u32Remain>DATA_BLOCK_MAX)? DATA_BLOCK_MAX : u32Remain;
+      memmove(pDest, pSrc, u32Size);
+      u32Remain-=u32Size;
+      pDest+=u32Size;
+      pSrc+=u32Size;
+   }
+}

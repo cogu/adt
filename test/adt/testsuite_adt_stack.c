@@ -7,7 +7,7 @@
 #include "adt_stack.h"
 #include "CMemLeak.h"
 
-void void_free(void* p);
+void vfree(void* p);
 
 void test_adt_stack_new(CuTest* tc)
 {
@@ -22,14 +22,14 @@ void test_adt_stack_new(CuTest* tc)
 
 void test_adt_stack_push(CuTest* tc)
 {
-	adt_stack_t *pStack = adt_stack_new(void_free);
+	adt_stack_t *pStack = adt_stack_new(vfree);
 	CuAssertPtrNotNull(tc, pStack);
 	adt_stack_push(pStack,strdup("The"));
 	adt_stack_push(pStack,strdup("quick"));
 	adt_stack_push(pStack,strdup("brown"));
 	adt_stack_push(pStack,strdup("fox"));
 	CuAssertPtrNotNull(tc,pStack->ppAlloc);
-	CuAssertPtrEquals(tc, void_free,pStack->pDestructor);
+	CuAssertPtrEquals(tc, vfree,pStack->pDestructor);
 	CuAssertIntEquals(tc,8,pStack->u32AllocLen);
 	CuAssertIntEquals(tc,4,pStack->u32CurLen);
 	adt_stack_delete(pStack);
