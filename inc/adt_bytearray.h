@@ -30,7 +30,8 @@ typedef struct bytearray_t{
    uint32_t u32GrowSize;
 } adt_bytearray_t;
 
-#define ADT_BYTE_ARRAY_VERSION 0.1.1
+#define ADT_BYTE_ARRAY_VERSION 0.1.2
+#define ADT_BYTE_ARRAY_NO_GROWTH 0u //will malloc exactly the number of bytes it currently needs
 #define ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
 #define ADT_BYTE_ARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
 
