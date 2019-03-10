@@ -17,7 +17,7 @@
 
 
 /**************** Private Function Declarations *******************/
-
+static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewLen);
 
 /**************** Private Variable Declarations *******************/
 
@@ -28,7 +28,7 @@ void adt_bytearray_create(adt_bytearray_t *self,uint32_t u32GrowSize){
       self->pData = 0;
       self->u32AllocLen = 0;
       self->u32CurLen = 0;
-      if ( (u32GrowSize == 0) || (u32GrowSize > ADT_BYTE_ARRAY_MAX_GROW_SIZE) )
+      if ( u32GrowSize > ADT_BYTE_ARRAY_MAX_GROW_SIZE )
       {
          u32GrowSize = ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE;
       }
@@ -160,27 +160,26 @@ adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc){
  * grows byte array by a predefined size
  */
 adt_error_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen){
-   if( (self != 0) && (u32MinLen > self->u32AllocLen) && (self->u32GrowSize > 0)){
-      uint8_t *pNewData;
-      uint32_t u32NewLen = self->u32AllocLen;
-      while(u32NewLen<u32MinLen){
-         u32NewLen += self->u32GrowSize;
-      }
-      pNewData = (uint8_t*) malloc(u32NewLen);
-      if(pNewData){
-         if(self->pData != 0){
-            memcpy(pNewData,self->pData,self->u32CurLen);
-            free(self->pData);
+   if( self != 0 ){
+      if (u32MinLen > self->u32AllocLen) {
+         uint32_t u32NewLen = self->u32AllocLen;
+         if (self->u32GrowSize > 0){
+            while(u32NewLen<u32MinLen){
+               u32NewLen += self->u32GrowSize;
+            }
          }
-         self->pData = pNewData;
-         self->u32AllocLen = u32NewLen;
+         else
+         {
+            u32NewLen = u32MinLen;
+         }
+         return adt_bytearray_realloc(self, u32NewLen);
       }
-      else{
-         return ADT_MEM_ERROR;
-      }
+      return ADT_NO_ERROR;
    }
-   return ADT_NO_ERROR;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
+
+
 
 /**
  * resizes bytearray to newLen
@@ -189,9 +188,14 @@ adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
 {
    if(self != 0)
    {
-      adt_error_t errorCode = adt_bytearray_grow(self, u32NewLen);
-      if (errorCode == ADT_NO_ERROR)
-      {
+      adt_error_t errorCode;
+      if ( (self->u32GrowSize == ADT_BYTE_ARRAY_NO_GROWTH) && (u32NewLen < self->u32CurLen) ) {
+         errorCode = adt_bytearray_realloc(self, u32NewLen); //reduce allocated array
+      }
+      else {
+         errorCode = adt_bytearray_grow(self, u32NewLen);
+      }
+      if (errorCode == ADT_NO_ERROR) {
          self->u32CurLen = u32NewLen;
       }
       return errorCode;
@@ -244,4 +248,22 @@ bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs
 }
 
 /***************** Private Function Definitions *******************/
-
+static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewLen) {
+   if (self != 0) {
+      uint8_t *pNewData = (uint8_t*) malloc(u32NewLen);
+      if(pNewData != 0){
+         if(self->pData != 0) {
+            uint32_t u32CopyLen = (u32NewLen < self->u32CurLen)? u32NewLen : self->u32CurLen;
+            memcpy(pNewData, self->pData, u32CopyLen);
+            free(self->pData);
+         }
+         self->pData = pNewData;
+         self->u32AllocLen = u32NewLen;
+      }
+      else {
+         return ADT_MEM_ERROR;
+      }
+      return ADT_NO_ERROR;
+   }
+   return ADT_INVALID_ARGUMENT_ERROR;
+}
