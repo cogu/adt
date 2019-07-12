@@ -226,7 +226,7 @@ void test_adt_u16Map_find_rand_set(CuTest* tc){
    adt_u16MapElem_t *data;
    adt_u16Map_t map;
    adt_u16MapElem_t *elem;
-   int i;
+   long i;
    srand (time(NULL));
    data = malloc(sizeof(adt_u16MapElem_t)*NUM_ELEM_LARGE);
    CuAssertPtrNotNull(tc,data);

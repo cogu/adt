@@ -39,6 +39,8 @@
 #define ADT_MEM_ERROR                 2
 #define ADT_INDEX_OUT_OF_BOUNDS_ERROR 3 //Used instead of invalid argument error where applicable
 #define ADT_LENGTH_ERROR              4 //Used instead of invalid argument error where applicable
+#define ADT_ARRAY_TOO_LARGE_ERROR     5
+#define ADT_NOT_IMPLEMENTED_ERROR     6
 
 typedef int8_t adt_error_t;
 //////////////////////////////////////////////////////////////////////////////
