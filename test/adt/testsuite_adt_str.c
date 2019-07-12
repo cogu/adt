@@ -1,3 +1,31 @@
+/*****************************************************************************
+* \file      testsuite_adt_str.c
+* \author    Conny Gustafsson
+* \date      2014-08-07
+* \brief     Unit tests for adt_str
+*
+* Copyright (c) 2014-2019 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+******************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
 #include <setjmp.h>
 #include <stdlib.h>
@@ -7,15 +35,283 @@
 #include "adt_str.h"
 #include "CMemLeak.h"
 
-void test_adt_str_constructor(CuTest* tc)
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
+static void test_adt_str_create(CuTest *tc);
+static void test_adt_str_reserve(CuTest *tc);
+static void test_adt_str_set_cstr(CuTest *tc);
+static void test_adt_str_new_cstr(CuTest *tc);
+static void test_adt_str_set_bstr(CuTest *tc);
+static void test_adt_str_new_bstr(CuTest *tc);
+static void test_adt_str_set(CuTest *tc);
+static void test_adt_str_clone(CuTest *tc);
+static void test_adt_str_append_cstr(CuTest *tc);
+static void test_adt_str_append_bstr(CuTest *tc);
+static void test_adt_str_append(CuTest *tc);
+static void test_adt_str_push(CuTest *tc);
+static void test_adt_str_pop(CuTest *tc);
+static void test_adt_str_charAt(CuTest* tc);
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE VARIABLES
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
+CuSuite* testsuite_adt_str(void)
 {
-	adt_str_t *str = adt_str_new();
-	CuAssertPtrNotNull(tc, str);
-	CuAssertStrEquals(tc,"",adt_str_cstr(str));
-	adt_str_delete(str);
+   CuSuite* suite = CuSuiteNew();
+
+   SUITE_ADD_TEST(suite, test_adt_str_create);
+   SUITE_ADD_TEST(suite, test_adt_str_reserve);
+   SUITE_ADD_TEST(suite, test_adt_str_set_cstr);
+   SUITE_ADD_TEST(suite, test_adt_str_new_cstr);
+   SUITE_ADD_TEST(suite, test_adt_str_set_bstr);
+   SUITE_ADD_TEST(suite, test_adt_str_new_bstr);
+   SUITE_ADD_TEST(suite, test_adt_str_set);
+   SUITE_ADD_TEST(suite, test_adt_str_clone);
+   SUITE_ADD_TEST(suite, test_adt_str_append_cstr);
+   SUITE_ADD_TEST(suite, test_adt_str_append_bstr);
+   SUITE_ADD_TEST(suite, test_adt_str_append);
+   SUITE_ADD_TEST(suite, test_adt_str_push);
+   SUITE_ADD_TEST(suite, test_adt_str_pop);
+   SUITE_ADD_TEST(suite, test_adt_str_charAt);
+
+
+   return suite;
+}
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
+
+static void test_adt_str_create(CuTest *tc)
+{
+   adt_str_t str;
+   adt_str_create(&str);
+   CuAssertPtrEquals(tc, 0, str.pStr);
+   CuAssertIntEquals(tc, 0, str.s32Cur);
+   CuAssertIntEquals(tc, 0, str.s32Len);
 }
 
-void test_adt_str_push(CuTest* tc){
+static void test_adt_str_reserve(CuTest *tc)
+{
+   adt_str_t *str = adt_str_new();
+   CuAssertPtrNotNull(tc, str);
+   CuAssertIntEquals(tc, 0, str->s32Len);
+
+   //negative length shall yield error
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_str_reserve(str, -1));
+   CuAssertIntEquals(tc, 0, str->s32Len);
+
+   //length 0 shall reserve 16 bytes
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 0));
+   CuAssertIntEquals(tc, 16, str->s32Len);
+
+   //length 1 shall reserve 16 bytes
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 1));
+   CuAssertIntEquals(tc, 16, str->s32Len);
+
+   //length 16 shall reserve 64 bytes
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 16));
+   CuAssertIntEquals(tc, 64, str->s32Len);
+
+   //length 64 shall reserve 256 bytes
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 64));
+   CuAssertIntEquals(tc, 256, str->s32Len);
+
+   //length 256 shall reserve 1024 bytes
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 256));
+   CuAssertIntEquals(tc, 1024, str->s32Len);
+
+   adt_str_delete(str);
+}
+
+static void test_adt_str_set_cstr(CuTest *tc)
+{
+   const char *cstr1 = "Hello";
+   const char *cstr2 = "World!";
+   adt_str_t *str = adt_str_new();
+   CuAssertPtrNotNull(tc, str);
+
+   adt_str_set_cstr(str, cstr1);
+   CuAssertIntEquals(tc, 5, adt_str_size(str));
+   CuAssertIntEquals(tc, 0, memcmp(str->pStr, cstr1, str->s32Cur));
+
+   adt_str_set_cstr(str, cstr2);
+   CuAssertIntEquals(tc, 6, adt_str_size(str));
+   CuAssertIntEquals(tc, 0, memcmp(str->pStr, cstr2, str->s32Cur));
+
+   adt_str_delete(str);
+}
+
+static void test_adt_str_new_cstr(CuTest *tc)
+{
+   const char *cstr1 = "Hello";
+
+   adt_str_t *str1 = adt_str_new_cstr(cstr1);
+
+   CuAssertPtrNotNull(tc, str1);
+
+
+   CuAssertIntEquals(tc, 5, adt_str_size(str1));
+   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, cstr1, str1->s32Cur));
+
+   adt_str_delete(str1);
+}
+
+static void test_adt_str_set_bstr(CuTest *tc)
+{
+   char buf[20];
+   const char *a, *b, *c, *d;
+   adt_str_t *str1 = adt_str_new();
+   adt_str_t *str2 = adt_str_new();
+   CuAssertPtrNotNull(tc, str1);
+   CuAssertPtrNotNull(tc, str2);
+
+   strcpy(buf, "Hello World!");
+   a=buf, b=buf+5;
+   c=buf+6, d=buf+12;
+
+   adt_str_set_bstr(str1, a, b);
+   adt_str_set_bstr(str2, c, d);
+   CuAssertIntEquals(tc, 5, str1->s32Cur);
+   CuAssertIntEquals(tc, 6, str2->s32Cur);
+   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, a, 5));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, c, 6));
+   adt_str_delete(str1);
+   adt_str_delete(str2);
+}
+
+static void test_adt_str_new_bstr(CuTest *tc)
+{
+   char buf[20];
+   const char *a, *b, *c, *d;
+   adt_str_t *str1, *str2;
+
+   strcpy(buf, "Hello World!");
+   a=buf, b=buf+5;
+   c=buf+6, d=buf+12;
+
+   str1 = adt_str_new_bstr(a, b);
+   str2 = adt_str_new_bstr(c, d);
+   CuAssertPtrNotNull(tc, str1);
+   CuAssertPtrNotNull(tc, str2);
+   CuAssertIntEquals(tc, 5, str1->s32Cur);
+   CuAssertIntEquals(tc, 6, str2->s32Cur);
+   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, a, 5));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, c, 6));
+   adt_str_delete(str1);
+   adt_str_delete(str2);
+}
+
+static void test_adt_str_set(CuTest *tc)
+{
+   char buf[20];
+   const char *a, *b;
+   adt_str_t *str1 = adt_str_new();
+   adt_str_t *str2 = adt_str_new();
+   CuAssertPtrNotNull(tc, str1);
+   CuAssertPtrNotNull(tc, str2);
+
+   strcpy(buf, "Hello World!");
+   a=buf, b=buf+strlen(buf);
+
+   adt_str_set_bstr(str1, a, b);
+   adt_str_set(str2, str1);
+   CuAssertIntEquals(tc, 12, str1->s32Cur);
+   CuAssertIntEquals(tc, 12, str2->s32Cur);
+   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, &buf[0], str1->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, &buf[0], str2->s32Cur));
+   CuAssertTrue(tc, str1->pStr != str2->pStr);
+   adt_str_delete(str1);
+   adt_str_delete(str2);
+}
+
+static void test_adt_str_clone(CuTest *tc)
+{
+   char buf[20];
+   const char *a, *b;
+   adt_str_t *str1 = adt_str_new();
+   adt_str_t *str2;
+   CuAssertPtrNotNull(tc, str1);
+
+   strcpy(buf, "Hello World!");
+   a=buf, b=buf+strlen(buf);
+
+   adt_str_set_bstr(str1, a, b);
+   str2 = adt_str_clone(str1);
+   CuAssertPtrNotNull(tc, str2);
+   CuAssertIntEquals(tc, 12, str1->s32Cur);
+   CuAssertIntEquals(tc, 12, str2->s32Cur);
+   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, &buf[0], str1->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, &buf[0], str2->s32Cur));
+   CuAssertTrue(tc, str1->pStr != str2->pStr);
+   adt_str_delete(str1);
+   adt_str_delete(str2);
+}
+
+static void test_adt_str_append_cstr(CuTest *tc)
+{
+   adt_str_t *str = adt_str_new();
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_cstr(str, "Hello"));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_cstr(str, " "));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_cstr(str, "World!"));
+   CuAssertIntEquals(tc, 12, adt_str_size(str));
+   CuAssertStrEquals(tc, "Hello World!", adt_str_cstr(str));
+   adt_str_delete(str);
+}
+
+static void test_adt_str_append_bstr(CuTest *tc)
+{
+   char buf[20];
+   const char *a, *b, *c, *d;
+   adt_str_t *str;
+
+   strcpy(buf, "Hello World!");
+   a=buf, b=buf+5;
+   c=buf+5, d=buf+12;
+   str = adt_str_new();
+   CuAssertPtrNotNull(tc, str);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, a, b));
+   CuAssertIntEquals(tc, 5, adt_str_size(str));
+   CuAssertStrEquals(tc, "Hello", adt_str_cstr(str));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, c, d));
+   CuAssertIntEquals(tc, 12, adt_str_size(str));
+   CuAssertStrEquals(tc, "Hello World!", adt_str_cstr(str));
+   adt_str_delete(str);
+}
+
+static void test_adt_str_append(CuTest *tc)
+{
+   adt_str_t *str1;
+   adt_str_t *str2;
+   adt_str_t *str3;
+
+   str1 = adt_str_new_cstr("Hello");
+   str2 = adt_str_new_cstr(" ");
+   str3 = adt_str_new_cstr("World!");
+   CuAssertPtrNotNull(tc, str1);
+   CuAssertPtrNotNull(tc, str2);
+   CuAssertPtrNotNull(tc, str3);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append(str1, str2));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append(str1, str3));
+   CuAssertIntEquals(tc, 12, adt_str_size(str1));
+   CuAssertStrEquals(tc, "Hello World!", adt_str_cstr(str1));
+   adt_str_delete(str3);
+   adt_str_delete(str2);
+   adt_str_delete(str1);
+}
+
+
+
+static void test_adt_str_push(CuTest* tc){
 	adt_str_t *str = adt_str_new();
 	CuAssertPtrNotNull(tc, str);
 	int i;
@@ -32,7 +328,7 @@ void test_adt_str_push(CuTest* tc){
 	adt_str_delete(str);
 }
 
-void test_adt_str_pop(CuTest* tc){
+static void test_adt_str_pop(CuTest* tc){
 	adt_str_t *str = adt_str_new();
 	CuAssertPtrNotNull(tc, str);
 	int i;
@@ -52,73 +348,23 @@ void test_adt_str_pop(CuTest* tc){
 	adt_str_delete(str);
 }
 
-void test_adt_str_cdup(CuTest* tc){
-	adt_str_t *str = adt_str_dup_cstr("Hello World");
-	CuAssertPtrNotNull(tc, str);
-	CuAssertIntEquals(tc,11,adt_str_length(str));
-	CuAssertStrEquals(tc,"Hello World",adt_str_cstr(str));
-	adt_str_delete(str);
-}
 
-void test_adt_str_cappend(CuTest* tc){
-	adt_str_t *str = adt_str_dup_cstr("Hello");
+static void test_adt_str_charAt(CuTest* tc){
+	adt_str_t *str = adt_str_new_cstr("Hello");
 	CuAssertPtrNotNull(tc, str);
-	CuAssertIntEquals(tc,5,adt_str_length(str));
-	CuAssertStrEquals(tc,"Hello",adt_str_cstr(str));
-	adt_str_append_cstr(str," World");
-	CuAssertIntEquals(tc,11,adt_str_length(str));
-	CuAssertStrEquals(tc,"Hello World",adt_str_cstr(str));
-	adt_str_delete(str);
-}
-
-void test_adt_str_copy_range(CuTest* tc){
-	char buf[80];
-	strcpy(buf,"Hello World!");
-	const char *a=buf,*b=buf+5;
-	const char *c=buf+6,*d=buf+12;
-	adt_str_t *str1 = adt_str_new();
-	adt_str_t *str2 = adt_str_new();
-	CuAssertPtrNotNull(tc,str1);
-	CuAssertPtrNotNull(tc,str2);
-	adt_str_copy_range(str1,a,b);
-	adt_str_copy_range(str2,c,d);
-	CuAssertStrEquals(tc,"Hello",adt_str_cstr(str1));
-	CuAssertStrEquals(tc,"World!",adt_str_cstr(str2));
-	adt_str_delete(str1);
-	adt_str_delete(str2);
-}
-
-void test_adt_str_get_char(CuTest* tc){
-	adt_str_t *str = adt_str_dup_cstr("Hello");
-	CuAssertPtrNotNull(tc, str);
-	CuAssertIntEquals(tc,'H',adt_str_get_char(str,0));
-	CuAssertIntEquals(tc,'e',adt_str_get_char(str,1));
-	CuAssertIntEquals(tc,'l',adt_str_get_char(str,2));
-	CuAssertIntEquals(tc,'l',adt_str_get_char(str,3));
-	CuAssertIntEquals(tc,'o',adt_str_get_char(str,4));
-	CuAssertIntEquals(tc,-1,adt_str_get_char(str,5));
-	CuAssertIntEquals(tc,'o',adt_str_get_char(str,-1));
-	CuAssertIntEquals(tc,'l',adt_str_get_char(str,-2));
-	CuAssertIntEquals(tc,'l',adt_str_get_char(str,-3));
-	CuAssertIntEquals(tc,'e',adt_str_get_char(str,-4));
-	CuAssertIntEquals(tc,'H',adt_str_get_char(str,-5));
-	CuAssertIntEquals(tc,-1,adt_str_get_char(str,-6));
+	CuAssertIntEquals(tc,'H',adt_str_charAt(str,0));
+	CuAssertIntEquals(tc,'e',adt_str_charAt(str,1));
+	CuAssertIntEquals(tc,'l',adt_str_charAt(str,2));
+	CuAssertIntEquals(tc,'l',adt_str_charAt(str,3));
+	CuAssertIntEquals(tc,'o',adt_str_charAt(str,4));
+	CuAssertIntEquals(tc,-1,adt_str_charAt(str,5));
+	CuAssertIntEquals(tc,'o',adt_str_charAt(str,-1));
+	CuAssertIntEquals(tc,'l',adt_str_charAt(str,-2));
+	CuAssertIntEquals(tc,'l',adt_str_charAt(str,-3));
+	CuAssertIntEquals(tc,'e',adt_str_charAt(str,-4));
+	CuAssertIntEquals(tc,'H',adt_str_charAt(str,-5));
+	CuAssertIntEquals(tc,-1,adt_str_charAt(str,-6));
 	adt_str_delete(str);
 }
 
 
-CuSuite* testsuite_adt_str(void)
-{
-	CuSuite* suite = CuSuiteNew();
-
-	SUITE_ADD_TEST(suite, test_adt_str_constructor);
-	SUITE_ADD_TEST(suite, test_adt_str_push);
-	SUITE_ADD_TEST(suite, test_adt_str_pop);
-	SUITE_ADD_TEST(suite, test_adt_str_cdup);
-	SUITE_ADD_TEST(suite, test_adt_str_cappend);
-	SUITE_ADD_TEST(suite, test_adt_str_copy_range);
-	SUITE_ADD_TEST(suite, test_adt_str_get_char);
-
-
-	return suite;
-}
