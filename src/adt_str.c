@@ -59,8 +59,10 @@
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 static int32_t adt_str_calcSize(int32_t s32CurSize, int32_t s32NewSize);
-DYN_STATIC adt_str_encoding_t adt_utf8_check_encoding(const uint8_t *strBuf, int32_t bufLen);
+DYN_STATIC adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen);
+DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strLen);
 DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint);
+
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -271,7 +273,7 @@ adt_error_t adt_str_set_bstr(adt_str_t *self, const char *pBegin, const char *pE
       if (s32Size > 0)
       {
          adt_error_t result;
-         adt_str_encoding_t encoding = adt_utf8_check_encoding((const uint8_t*) pBegin, s32Size);
+         adt_str_encoding_t encoding = adt_utf8_checkEncoding((const uint8_t*) pBegin, s32Size);
          adt_str_reset(self);
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
@@ -299,11 +301,11 @@ adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr)
    }
    else
    {
-      int32_t s32Size = (int32_t) strlen(cstr);
-      if (s32Size > 0)
+      int32_t s32Size = 0;
+      adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize((const uint8_t*) cstr, &s32Size);
+      if ( (encoding != ADT_STR_ENCODING_UNKNOWN) && (s32Size > 0) )
       {
          adt_error_t result;
-         adt_str_encoding_t encoding = adt_utf8_check_encoding((const uint8_t*) cstr, s32Size);
          adt_str_reset(self);
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
@@ -343,6 +345,10 @@ adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other)
             assert(other->pStr != 0);
             memcpy(self->pStr+self->s32Cur, other->pStr, other->s32Cur);
             self->s32Cur = newLen;
+            if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (other->encoding == ADT_STR_ENCODING_UTF8) )
+            {
+               self->encoding = other->encoding;
+            }
          }
          else
          {
@@ -365,22 +371,34 @@ adt_error_t adt_str_append_bstr(adt_str_t *self, const char *pBegin, const char 
    }
    else
    {
-      int32_t strLen = (int32_t) (pEnd-pBegin);
-      if (strLen > 0)
+      int32_t s32Size = (int32_t) (pEnd-pBegin);
+      if (s32Size > 0)
       {
-         adt_error_t result;
-         int32_t newLen = self->s32Cur + strLen;
-         result = adt_str_reserve(self, newLen);
-         if (result == ADT_NO_ERROR)
+         adt_str_encoding_t encoding = adt_utf8_checkEncoding((const uint8_t*) pBegin, s32Size);
+         if ( (encoding == ADT_STR_ENCODING_ASCII) || (encoding == ADT_STR_ENCODING_UTF8) )
          {
-            assert(self->pStr != 0);
-            assert(self->s32Size > newLen);
-            memcpy(self->pStr + self->s32Cur, pBegin, strLen);
-            self->s32Cur = newLen;
+            adt_error_t result;
+            int32_t newLen = self->s32Cur + s32Size;
+            result = adt_str_reserve(self, newLen);
+            if (result == ADT_NO_ERROR)
+            {
+               assert(self->pStr != 0);
+               assert(self->s32Size > newLen);
+               memcpy(self->pStr + self->s32Cur, pBegin, s32Size);
+               self->s32Cur = newLen;
+               if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (encoding == ADT_STR_ENCODING_UTF8) )
+               {
+                  self->encoding = encoding;
+               }
+            }
+            else
+            {
+               retval = result;
+            }
          }
          else
          {
-            retval = result;
+            retval = ADT_UNKNOWN_ENCODING_ERROR;
          }
       }
    }
@@ -399,17 +417,22 @@ adt_error_t adt_str_append_cstr(adt_str_t *self, const char *cstr)
    }
    else
    {
-      int32_t strLen = (int32_t) strlen(cstr);
-      if (strLen > 0)
+      int32_t s32Size = 0;
+      adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize((const uint8_t*) cstr, &s32Size);
+      if ( (encoding != ADT_STR_ENCODING_UNKNOWN) && (s32Size > 0) )
       {
          adt_error_t result;
-         int32_t newLen = self->s32Cur+strLen;
-         result = adt_str_reserve(self, newLen);
+         int32_t newSize = self->s32Cur+s32Size;
+         result = adt_str_reserve(self, newSize);
          if (result == ADT_NO_ERROR)
          {
-            assert(self->s32Size > newLen);
-            memcpy(self->pStr+self->s32Cur, cstr, strLen);
-            self->s32Cur = newLen;
+            assert(self->s32Size > newSize);
+            memcpy(self->pStr+self->s32Cur, cstr, s32Size);
+            self->s32Cur = newSize;
+            if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (encoding == ADT_STR_ENCODING_UTF8) )
+            {
+               self->encoding = encoding;
+            }
          }
          else
          {
@@ -543,12 +566,48 @@ void adt_str_setEncoding(adt_str_t *self, adt_str_encoding_t newEncoding)
    }
 }
 
+adt_str_encoding_t adt_str_getEncoding(adt_str_t *self)
+{
+   if (self != 0)
+   {
+      return self->encoding;
+   }
+   return ADT_STR_ENCODING_UNKNOWN;
+}
+
 int32_t adt_str_length(const adt_str_t *self)
 {
-   ///TODO: This function needs to return number of characters in the string.
-
-   //In the meantime, report number of bytes in the string since works for ASCII-strings.
-   return adt_str_size(self);
+   int32_t retval = -1;
+   if (self != 0)
+   {
+      if (self->encoding == ADT_STR_ENCODING_ASCII)
+      {
+         retval = self->s32Cur;
+      }
+      else if (self->encoding == ADT_STR_ENCODING_UTF8)
+      {
+         const uint8_t *p = self->pStr;
+         int32_t remain = self->s32Cur;
+         retval = 0;
+         while(remain > 0)
+         {
+            int codePoint;
+            int32_t size = adt_utf8_readCodePoint(p, remain, &codePoint);
+            retval++;
+            remain-=size;
+            if (remain < 0)
+            {
+               retval = -1;
+               break;
+            }
+         }
+      }
+      else
+      {
+         //not implemented
+      }
+   }
+   return retval;
 }
 
 int32_t adt_str_size(const adt_str_t *self)
@@ -675,7 +734,7 @@ static int32_t adt_str_calcSize(int32_t s32CurSize, int32_t s32NewSize)
  * Goes through characters in string buffer and attempts to determine its encoding
  *
  */
-DYN_STATIC adt_str_encoding_t adt_utf8_check_encoding(const uint8_t *strBuf, int32_t bufLen)
+DYN_STATIC adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen)
 {
    int32_t i;
    for(i=0; i<bufLen; i++)
@@ -687,10 +746,47 @@ DYN_STATIC adt_str_encoding_t adt_utf8_check_encoding(const uint8_t *strBuf, int
          {
             return ADT_STR_ENCODING_UTF8;
          }
-         return ADT_STR_ENCODING_UNKNOWN;
+         return ADT_STR_ENCODING_UTF16; //this is a guess
       }
    }
    return ADT_STR_ENCODING_ASCII;
+}
+
+/**
+ * Returns both encoding and size of the string. The input string must be null-terminated.
+ */
+DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strSize)
+{
+   if ( (strBuf == 0) || (strSize == 0) )
+   {
+      return ADT_STR_ENCODING_UNKNOWN;
+   }
+   const uint8_t *p = strBuf;
+   uint8_t c = 0;
+   adt_str_encoding_t retval = ADT_STR_ENCODING_ASCII;
+   int32_t size = 0;
+   while(1)
+   {
+      c = *p++;
+      if (c == 0)
+      {
+         break;
+      }
+      else if ( (retval == ADT_STR_ENCODING_ASCII) && (c > 127) )
+      {
+         if ( ( (c & 0xf8) == 0xf0) || ( (c & 0xf0) == 0xe0) || ( (c & 0xe0) == 0xc0) )
+         {
+            retval = ADT_STR_ENCODING_UTF8;
+         }
+         else
+         {
+            retval = ADT_STR_ENCODING_UTF16; //this is a guess
+         }
+      }
+      size++;
+   }
+   *strSize = size;
+   return retval;
 }
 
 DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint)

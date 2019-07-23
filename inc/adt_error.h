@@ -41,6 +41,7 @@
 #define ADT_LENGTH_ERROR              4 //Used instead of invalid argument error where applicable
 #define ADT_ARRAY_TOO_LARGE_ERROR     5
 #define ADT_NOT_IMPLEMENTED_ERROR     6
+#define ADT_UNKNOWN_ENCODING_ERROR    7
 
 typedef int8_t adt_error_t;
 //////////////////////////////////////////////////////////////////////////////

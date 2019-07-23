@@ -50,9 +50,13 @@ static void test_adt_str_new_cstr(CuTest *tc);
 static void test_adt_str_set_bstr(CuTest *tc);
 static void test_adt_str_new_bstr(CuTest *tc);
 static void test_adt_str_set(CuTest *tc);
+static void test_adt_str_set_bstr_utf8(CuTest *tc);
+static void test_adt_str_set_cstr_utf8(CuTest *tc);
 static void test_adt_str_clone(CuTest *tc);
 static void test_adt_str_append_cstr(CuTest *tc);
+static void test_adt_str_append_cstr_utf8(CuTest *tc);
 static void test_adt_str_append_bstr(CuTest *tc);
+static void test_adt_str_append_bstr_utf8(CuTest *tc);
 static void test_adt_str_append(CuTest *tc);
 static void test_adt_str_push(CuTest *tc);
 static void test_adt_str_pop(CuTest *tc);
@@ -61,8 +65,9 @@ static void test_adt_utf8_readCodePoint1(CuTest* tc);
 static void test_adt_utf8_readCodePoint2(CuTest* tc);
 static void test_adt_utf8_readCodePoint3(CuTest* tc);
 static void test_adt_utf8_readCodePoint4(CuTest* tc);
-static void test_adt_utf8_check_encoding_ascii(CuTest* tc);
-static void test_adt_utf8_check_encoding_utf8(CuTest* tc);
+static void test_adt_utf8_checkEncoding_ascii(CuTest* tc);
+static void test_adt_utf8_checkEncoding_utf8(CuTest* tc);
+static void test_adt_utf8_checkEncodingAndSize(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -82,9 +87,13 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_set_bstr);
    SUITE_ADD_TEST(suite, test_adt_str_new_bstr);
    SUITE_ADD_TEST(suite, test_adt_str_set);
+   SUITE_ADD_TEST(suite, test_adt_str_set_bstr_utf8);
+   SUITE_ADD_TEST(suite, test_adt_str_set_cstr_utf8);
    SUITE_ADD_TEST(suite, test_adt_str_clone);
    SUITE_ADD_TEST(suite, test_adt_str_append_cstr);
+   SUITE_ADD_TEST(suite, test_adt_str_append_cstr_utf8);
    SUITE_ADD_TEST(suite, test_adt_str_append_bstr);
+   SUITE_ADD_TEST(suite, test_adt_str_append_bstr_utf8);
    SUITE_ADD_TEST(suite, test_adt_str_append);
    SUITE_ADD_TEST(suite, test_adt_str_push);
    SUITE_ADD_TEST(suite, test_adt_str_pop);
@@ -93,8 +102,9 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint2);
    SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint3);
    SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint4);
-   SUITE_ADD_TEST(suite, test_adt_utf8_check_encoding_ascii);
-   SUITE_ADD_TEST(suite, test_adt_utf8_check_encoding_utf8);
+   SUITE_ADD_TEST(suite, test_adt_utf8_checkEncoding_ascii);
+   SUITE_ADD_TEST(suite, test_adt_utf8_checkEncoding_utf8);
+   SUITE_ADD_TEST(suite, test_adt_utf8_checkEncodingAndSize);
 
 
    return suite;
@@ -246,6 +256,59 @@ static void test_adt_str_set(CuTest *tc)
    adt_str_delete(str2);
 }
 
+static void test_adt_str_set_bstr_utf8(CuTest *tc)
+{
+   const char *a, *b;
+   const char *test1 = "Test \343\202\206";
+   const char *test2 = "Test2";
+   adt_str_t *str = adt_str_new();
+
+   CuAssertIntEquals(tc, 0, str->s32Cur);
+   CuAssertUIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
+
+   a=test1, b=a+strlen(test1);
+   adt_str_set_bstr(str, a, b);
+
+   CuAssertIntEquals(tc, 8, str->s32Cur);
+   CuAssertUIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+
+   a=test2, b=a+strlen(test2);
+   adt_str_set_bstr(str, a, b);
+
+   CuAssertIntEquals(tc, 5, str->s32Cur);
+   //overwriting with ASCII string switches back to ASCII encoding
+   CuAssertUIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
+
+
+   adt_str_delete(str);
+}
+
+static void test_adt_str_set_cstr_utf8(CuTest *tc)
+{
+   const char *test1 = "Test \343\202\206";
+   const char *test2 = "Test2";
+   adt_str_t *str = adt_str_new();
+
+   CuAssertIntEquals(tc, 0, str->s32Cur);
+   CuAssertUIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
+
+   adt_str_set_cstr(str, test1);
+
+   CuAssertIntEquals(tc, 8, str->s32Cur);
+   CuAssertUIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+
+
+   adt_str_set_cstr(str, test2);
+
+   CuAssertIntEquals(tc, 5, str->s32Cur);
+   //overwriting with ASCII string switches back to ASCII encoding
+   CuAssertUIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
+
+
+   adt_str_delete(str);
+}
+
+
 static void test_adt_str_clone(CuTest *tc)
 {
    char buf[20];
@@ -315,13 +378,56 @@ static void test_adt_str_append(CuTest *tc)
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append(str1, str2));
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append(str1, str3));
    CuAssertIntEquals(tc, 12, adt_str_size(str1));
+   CuAssertIntEquals(tc, 12, adt_str_length(str1));
    CuAssertStrEquals(tc, "Hello World!", adt_str_cstr(str1));
    adt_str_delete(str3);
    adt_str_delete(str2);
    adt_str_delete(str1);
 }
 
+static void test_adt_str_append_cstr_utf8(CuTest *tc)
+{
+   const char *test1 = "\327\220\327\206"; //\xD7\x90 \xD7\x86
+   const char *test2 = "\327\252"; //\xD7\xAA
+   adt_str_t *str = adt_str_new();
 
+   adt_str_append_cstr(str, test1);
+   CuAssertIntEquals(tc, 4, adt_str_size(str));
+   CuAssertIntEquals(tc, 2, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+
+   adt_str_append_cstr(str, test2);
+   CuAssertIntEquals(tc, 6, adt_str_size(str));
+   CuAssertIntEquals(tc, 3, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+
+   adt_str_delete(str);
+}
+
+static void test_adt_str_append_bstr_utf8(CuTest *tc)
+{
+   const char *test1 = "\327\220\327\206"; //\xD7\x90 \xD7\x86
+   const char *test2 = "\327\252"; //\xD7\xAA
+   const char *a, *b;
+   adt_str_t *str = adt_str_new();
+
+
+   a = test1, b = a+strlen(test1);
+   adt_str_append_bstr(str, a, b);
+   CuAssertIntEquals(tc, 4, adt_str_size(str));
+   CuAssertIntEquals(tc, 2, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+
+
+   a = test2, b = a+strlen(test2);
+   adt_str_append_bstr(str, a, b);
+   CuAssertIntEquals(tc, 6, adt_str_size(str));
+   CuAssertIntEquals(tc, 3, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+
+   adt_str_delete(str);
+
+}
 
 static void test_adt_str_push(CuTest* tc){
 	adt_str_t *str = adt_str_new();
@@ -444,7 +550,7 @@ static void test_adt_utf8_readCodePoint4(CuTest* tc)
 
 }
 
-static void test_adt_utf8_check_encoding_ascii(CuTest* tc)
+static void test_adt_utf8_checkEncoding_ascii(CuTest* tc)
 {
    const char *test1 = "abc123";
    const char *test2 = "Hello World";
@@ -454,27 +560,41 @@ static void test_adt_utf8_check_encoding_ascii(CuTest* tc)
 
    test = (const uint8_t*) test1, strLen = (int32_t) strlen( (const char*) test);
    CuAssertIntEquals(tc, 6, strLen);
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_check_encoding(test, strLen));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncoding(test, strLen));
 
    test = (const uint8_t*) test2, strLen = (int32_t) strlen( (const char*) test);
    CuAssertIntEquals(tc, 11, strLen);
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_check_encoding(test, strLen));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncoding(test, strLen));
 
    test = (const uint8_t*) test3, strLen = (int32_t) strlen( (const char*) test);
    CuAssertIntEquals(tc, 13, strLen);
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_check_encoding(test, strLen));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncoding(test, strLen));
 
 }
 
-static void test_adt_utf8_check_encoding_utf8(CuTest* tc)
+static void test_adt_utf8_checkEncoding_utf8(CuTest* tc)
 {
    const uint8_t test1[2] = {0302, 0241};
    const uint8_t test2[3] = {0343, 0202, 0206};
    const uint8_t test3[4] = {0360, 0237, 0245, 0214};
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_check_encoding(test1, sizeof(test1)));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncoding(test1, sizeof(test1)));
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_check_encoding(test2, sizeof(test2)));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncoding(test2, sizeof(test2)));
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_check_encoding(test3, sizeof(test3)));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncoding(test3, sizeof(test3)));
 }
+
+static void test_adt_utf8_checkEncodingAndSize(CuTest* tc)
+{
+   const char *test1 = "Hello World";
+   const char *test2 = "Test \343\202\206";
+   int32_t size;
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncodingAndSize( (const uint8_t*) test1, &size));
+   CuAssertIntEquals(tc, 11, size);
+
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize( (const uint8_t*) test2, &size));
+   CuAssertIntEquals(tc, 8, size);
+
+}
+
