@@ -57,6 +57,12 @@ static void test_adt_str_append(CuTest *tc);
 static void test_adt_str_push(CuTest *tc);
 static void test_adt_str_pop(CuTest *tc);
 static void test_adt_str_charAt(CuTest* tc);
+static void test_adt_utf8_readCodePoint1(CuTest* tc);
+static void test_adt_utf8_readCodePoint2(CuTest* tc);
+static void test_adt_utf8_readCodePoint3(CuTest* tc);
+static void test_adt_utf8_readCodePoint4(CuTest* tc);
+static void test_adt_utf8_check_encoding_ascii(CuTest* tc);
+static void test_adt_utf8_check_encoding_utf8(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -83,6 +89,12 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_push);
    SUITE_ADD_TEST(suite, test_adt_str_pop);
    SUITE_ADD_TEST(suite, test_adt_str_charAt);
+   SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint1);
+   SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint2);
+   SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint3);
+   SUITE_ADD_TEST(suite, test_adt_utf8_readCodePoint4);
+   SUITE_ADD_TEST(suite, test_adt_utf8_check_encoding_ascii);
+   SUITE_ADD_TEST(suite, test_adt_utf8_check_encoding_utf8);
 
 
    return suite;
@@ -97,38 +109,38 @@ static void test_adt_str_create(CuTest *tc)
    adt_str_create(&str);
    CuAssertPtrEquals(tc, 0, str.pStr);
    CuAssertIntEquals(tc, 0, str.s32Cur);
-   CuAssertIntEquals(tc, 0, str.s32Len);
+   CuAssertIntEquals(tc, 0, str.s32Size);
 }
 
 static void test_adt_str_reserve(CuTest *tc)
 {
    adt_str_t *str = adt_str_new();
    CuAssertPtrNotNull(tc, str);
-   CuAssertIntEquals(tc, 0, str->s32Len);
+   CuAssertIntEquals(tc, 0, str->s32Size);
 
    //negative length shall yield error
    CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_str_reserve(str, -1));
-   CuAssertIntEquals(tc, 0, str->s32Len);
+   CuAssertIntEquals(tc, 0, str->s32Size);
 
    //length 0 shall reserve 16 bytes
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 0));
-   CuAssertIntEquals(tc, 16, str->s32Len);
+   CuAssertIntEquals(tc, 16, str->s32Size);
 
    //length 1 shall reserve 16 bytes
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 1));
-   CuAssertIntEquals(tc, 16, str->s32Len);
+   CuAssertIntEquals(tc, 16, str->s32Size);
 
    //length 16 shall reserve 64 bytes
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 16));
-   CuAssertIntEquals(tc, 64, str->s32Len);
+   CuAssertIntEquals(tc, 64, str->s32Size);
 
    //length 64 shall reserve 256 bytes
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 64));
-   CuAssertIntEquals(tc, 256, str->s32Len);
+   CuAssertIntEquals(tc, 256, str->s32Size);
 
    //length 256 shall reserve 1024 bytes
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_reserve(str, 256));
-   CuAssertIntEquals(tc, 1024, str->s32Len);
+   CuAssertIntEquals(tc, 1024, str->s32Size);
 
    adt_str_delete(str);
 }
@@ -367,4 +379,102 @@ static void test_adt_str_charAt(CuTest* tc){
 	adt_str_delete(str);
 }
 
+static void test_adt_utf8_readCodePoint1(CuTest* tc)
+{
+   uint8_t str[1];
+   const int32_t expectedSize = 1;
+   int codePoint;
 
+   str[0] = 0; //lowest codepoint using 1-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 0, codePoint);
+
+   str[0] = 127; //highest codepoint using 1-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 127, codePoint);
+
+}
+
+
+static void test_adt_utf8_readCodePoint2(CuTest* tc)
+{
+   uint8_t str[2];
+   const int32_t expectedSize = 2;
+   int codePoint;
+
+   str[0] = 0xC2, str[1] = 0x80; //lowest codepoint using 2-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 128, codePoint);
+
+   str[0] = 0xDF, str[1] = 0xbf; //highest codepoint using 2-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 2047, codePoint);
+
+}
+
+static void test_adt_utf8_readCodePoint3(CuTest* tc)
+{
+   uint8_t str[3];
+   const int32_t expectedSize = 3;
+   int codePoint;
+
+   str[0] = 0xe0, str[1] = 0xA0, str[2]  = 0x80; //lowest codepoint using 3-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 2048, codePoint);
+
+   str[0] = 0xef, str[1] = 0xbf, str[2]  = 0xbf; //highest codepoint using 3-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 65535, codePoint);
+
+}
+
+static void test_adt_utf8_readCodePoint4(CuTest* tc)
+{
+   uint8_t str[4];
+   const int32_t expectedSize = 4;
+   int codePoint;
+
+   str[0] = 0xf0, str[1] = 0x90, str[2]  = 0x80, str[3] = 0x80; //lowest codepoint using 4-byte encoding
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 65536, codePoint);
+
+   str[0] = 0xf4, str[1] = 0x8f, str[2]  = 0xbf, str[3] = 0xbf; //highest valid codepoint in unicode
+   CuAssertIntEquals(tc, expectedSize, adt_utf8_readCodePoint(&str[0], expectedSize, &codePoint));
+   CuAssertIntEquals(tc, 1114111, codePoint);
+
+}
+
+static void test_adt_utf8_check_encoding_ascii(CuTest* tc)
+{
+   const char *test1 = "abc123";
+   const char *test2 = "Hello World";
+   const char *test3 = "Hello\r\nWorld\b";
+   const uint8_t *test;
+   int32_t strLen;
+
+   test = (const uint8_t*) test1, strLen = (int32_t) strlen( (const char*) test);
+   CuAssertIntEquals(tc, 6, strLen);
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_check_encoding(test, strLen));
+
+   test = (const uint8_t*) test2, strLen = (int32_t) strlen( (const char*) test);
+   CuAssertIntEquals(tc, 11, strLen);
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_check_encoding(test, strLen));
+
+   test = (const uint8_t*) test3, strLen = (int32_t) strlen( (const char*) test);
+   CuAssertIntEquals(tc, 13, strLen);
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_check_encoding(test, strLen));
+
+}
+
+static void test_adt_utf8_check_encoding_utf8(CuTest* tc)
+{
+   const uint8_t test1[2] = {0302, 0241};
+   const uint8_t test2[3] = {0343, 0202, 0206};
+   const uint8_t test3[4] = {0360, 0237, 0245, 0214};
+
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_check_encoding(test1, sizeof(test1)));
+
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_check_encoding(test2, sizeof(test2)));
+
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_check_encoding(test3, sizeof(test3)));
+}
