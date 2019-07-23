@@ -44,6 +44,7 @@ typedef uint8_t adt_str_encoding_t;
 #define ADT_STR_ENCODING_UNKNOWN ((adt_str_encoding_t) 0u) //Unknown/unsupported encoding
 #define ADT_STR_ENCODING_ASCII   ((adt_str_encoding_t) 1u) //all characters in string are in the range 0..127
 #define ADT_STR_ENCODING_UTF8    ((adt_str_encoding_t) 2u) //string is encoded using utf-8
+#define ADT_STR_ENCODING_UTF16   ((adt_str_encoding_t) 3u) //string is encoded using utf-16
 
 #define ADT_UTF8_INVALID_ARGUMENT -1
 #define ADT_UTF8_INVALID_ENCODING -2
@@ -99,6 +100,7 @@ adt_bytearray_t *adt_str_bytearray(adt_str_t *self);
 
 /* utility */
 void adt_str_setEncoding(adt_str_t *self, adt_str_encoding_t newEncoding);
+adt_str_encoding_t adt_str_getEncoding(adt_str_t *self);
 int32_t adt_str_length(const adt_str_t *self);
 int32_t adt_str_size(const adt_str_t *self);
 adt_error_t adt_str_reserve(adt_str_t *self, int32_t s32NewLen);
@@ -117,9 +119,9 @@ bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr);
 #define adt_str_reset adt_str_destroy
 
 #ifdef UNIT_TEST
-adt_str_encoding_t adt_utf8_check_encoding(const uint8_t *strBuf, int32_t bufLen);
+adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen);
+adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strLen);
 int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint);
-
 #endif
 
 #endif //ADT_STR_H__
