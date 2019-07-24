@@ -68,6 +68,7 @@ static void test_adt_utf8_readCodePoint4(CuTest* tc);
 static void test_adt_utf8_checkEncoding_ascii(CuTest* tc);
 static void test_adt_utf8_checkEncoding_utf8(CuTest* tc);
 static void test_adt_utf8_checkEncodingAndSize(CuTest* tc);
+static void test_adt_str_equal_cstr(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -105,6 +106,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_utf8_checkEncoding_ascii);
    SUITE_ADD_TEST(suite, test_adt_utf8_checkEncoding_utf8);
    SUITE_ADD_TEST(suite, test_adt_utf8_checkEncodingAndSize);
+   SUITE_ADD_TEST(suite, test_adt_str_equal_cstr);
 
 
    return suite;
@@ -201,8 +203,8 @@ static void test_adt_str_set_bstr(CuTest *tc)
    a=buf, b=buf+5;
    c=buf+6, d=buf+12;
 
-   adt_str_set_bstr(str1, a, b);
-   adt_str_set_bstr(str2, c, d);
+   adt_str_set_bstr(str1, (const uint8_t*) a, (const uint8_t*) b);
+   adt_str_set_bstr(str2, (const uint8_t*) c, (const uint8_t*) d);
    CuAssertIntEquals(tc, 5, str1->s32Cur);
    CuAssertIntEquals(tc, 6, str2->s32Cur);
    CuAssertIntEquals(tc, 0, memcmp(str1->pStr, a, 5));
@@ -221,8 +223,8 @@ static void test_adt_str_new_bstr(CuTest *tc)
    a=buf, b=buf+5;
    c=buf+6, d=buf+12;
 
-   str1 = adt_str_new_bstr(a, b);
-   str2 = adt_str_new_bstr(c, d);
+   str1 = adt_str_new_bstr((const uint8_t*) a, (const uint8_t*) b);
+   str2 = adt_str_new_bstr((const uint8_t*) c, (const uint8_t*) d);
    CuAssertPtrNotNull(tc, str1);
    CuAssertPtrNotNull(tc, str2);
    CuAssertIntEquals(tc, 5, str1->s32Cur);
@@ -245,7 +247,7 @@ static void test_adt_str_set(CuTest *tc)
    strcpy(buf, "Hello World!");
    a=buf, b=buf+strlen(buf);
 
-   adt_str_set_bstr(str1, a, b);
+   adt_str_set_bstr(str1, (const uint8_t*) a, (const uint8_t*) b);
    adt_str_set(str2, str1);
    CuAssertIntEquals(tc, 12, str1->s32Cur);
    CuAssertIntEquals(tc, 12, str2->s32Cur);
@@ -267,13 +269,13 @@ static void test_adt_str_set_bstr_utf8(CuTest *tc)
    CuAssertUIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
 
    a=test1, b=a+strlen(test1);
-   adt_str_set_bstr(str, a, b);
+   adt_str_set_bstr(str, (const uint8_t*) a, (const uint8_t*) b);
 
    CuAssertIntEquals(tc, 8, str->s32Cur);
    CuAssertUIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
 
    a=test2, b=a+strlen(test2);
-   adt_str_set_bstr(str, a, b);
+   adt_str_set_bstr(str, (const uint8_t*) a, (const uint8_t*) b);
 
    CuAssertIntEquals(tc, 5, str->s32Cur);
    //overwriting with ASCII string switches back to ASCII encoding
@@ -320,7 +322,7 @@ static void test_adt_str_clone(CuTest *tc)
    strcpy(buf, "Hello World!");
    a=buf, b=buf+strlen(buf);
 
-   adt_str_set_bstr(str1, a, b);
+   adt_str_set_bstr(str1, (const uint8_t*) a, (const uint8_t*) b);
    str2 = adt_str_clone(str1);
    CuAssertPtrNotNull(tc, str2);
    CuAssertIntEquals(tc, 12, str1->s32Cur);
@@ -354,10 +356,10 @@ static void test_adt_str_append_bstr(CuTest *tc)
    c=buf+5, d=buf+12;
    str = adt_str_new();
    CuAssertPtrNotNull(tc, str);
-   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, a, b));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, (const uint8_t*) a, (const uint8_t*) b));
    CuAssertIntEquals(tc, 5, adt_str_size(str));
    CuAssertStrEquals(tc, "Hello", adt_str_cstr(str));
-   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, c, d));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, (const uint8_t*) c, (const uint8_t*) d));
    CuAssertIntEquals(tc, 12, adt_str_size(str));
    CuAssertStrEquals(tc, "Hello World!", adt_str_cstr(str));
    adt_str_delete(str);
@@ -413,14 +415,14 @@ static void test_adt_str_append_bstr_utf8(CuTest *tc)
 
 
    a = test1, b = a+strlen(test1);
-   adt_str_append_bstr(str, a, b);
+   adt_str_append_bstr(str, (const uint8_t*) a, (const uint8_t*) b);
    CuAssertIntEquals(tc, 4, adt_str_size(str));
    CuAssertIntEquals(tc, 2, adt_str_length(str));
    CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
 
 
    a = test2, b = a+strlen(test2);
-   adt_str_append_bstr(str, a, b);
+   adt_str_append_bstr(str, (const uint8_t*) a, (const uint8_t*) b);
    CuAssertIntEquals(tc, 6, adt_str_size(str));
    CuAssertIntEquals(tc, 3, adt_str_length(str));
    CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
@@ -595,6 +597,19 @@ static void test_adt_utf8_checkEncodingAndSize(CuTest* tc)
 
    CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize( (const uint8_t*) test2, &size));
    CuAssertIntEquals(tc, 8, size);
+
+}
+
+static void test_adt_str_equal_cstr(CuTest* tc)
+{
+   const char *test1 = "Hello World\n";
+
+   adt_str_t *str = adt_str_new();
+
+   adt_str_set_cstr(str, test1);
+   CuAssertTrue(tc, adt_str_equal_cstr(str, test1));
+
+   adt_str_delete(str);
 
 }
 
