@@ -64,7 +64,7 @@ typedef struct adt_str_tag {
 void adt_str_create(adt_str_t *self);
 adt_str_t *adt_str_new(void);
 adt_str_t *adt_str_clone(const adt_str_t* other);
-adt_str_t *adt_str_new_bstr(const char *pBegin, const char *pEnd);
+adt_str_t *adt_str_new_bstr(const uint8_t *pBegin, const uint8_t *pEnd);
 adt_str_t *adt_str_new_cstr(const char * other);
 adt_str_t *adt_str_new_byterray(adt_bytearray_t *bytearray);
 adt_str_t *adt_str_concat(const adt_str_t *lhs, const adt_str_t *rhs);
@@ -78,15 +78,15 @@ void adt_str_vdelete(void *arg);
 
 /* string manipulation */
 adt_error_t adt_str_set(adt_str_t *self, const adt_str_t* other);
-adt_error_t adt_str_set_bstr(adt_str_t *self, const char *pBegin, const char *pEnd);
+adt_error_t adt_str_set_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd);
 adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr);
 
 adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other);
-adt_error_t adt_str_append_bstr(adt_str_t *self, const char *pBegin, const char *pEnd);
+adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd);
 adt_error_t adt_str_append_cstr(adt_str_t *self, const char *cstr);
 
 void adt_str_prepend(adt_str_t *self, const adt_str_t* other);
-void adt_str_prepend_bstr(adt_str_t *self, const char *pBegin, const char *pEnd);
+void adt_str_prepend_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd);
 void adt_str_prepend_cstr(adt_str_t *self, const char *cstr);
 
 adt_error_t adt_str_push(adt_str_t *self, const int c);

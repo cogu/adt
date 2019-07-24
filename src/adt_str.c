@@ -123,7 +123,7 @@ adt_str_t *adt_str_clone(const adt_str_t* other)
  * Creates a new string based on a bounded string (bstr)
  * alias: adt_str_make
  */
-adt_str_t *adt_str_new_bstr(const char *pBegin, const char *pEnd)
+adt_str_t *adt_str_new_bstr(const uint8_t *pBegin, const uint8_t *pEnd)
 {
    adt_str_t *self = (adt_str_t*) 0;
    if( (pBegin != 0) && (pEnd != 0) && (pEnd >= pBegin) )
@@ -259,7 +259,7 @@ adt_error_t adt_str_set(adt_str_t *self, const adt_str_t* other)
 /**
  * Overwrites this string with data from a bounded string (bstr)
  */
-adt_error_t adt_str_set_bstr(adt_str_t *self, const char *pBegin, const char *pEnd)
+adt_error_t adt_str_set_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd)
 {
    adt_error_t retval = ADT_NO_ERROR;
 
@@ -273,7 +273,7 @@ adt_error_t adt_str_set_bstr(adt_str_t *self, const char *pBegin, const char *pE
       if (s32Size > 0)
       {
          adt_error_t result;
-         adt_str_encoding_t encoding = adt_utf8_checkEncoding((const uint8_t*) pBegin, s32Size);
+         adt_str_encoding_t encoding = adt_utf8_checkEncoding(pBegin, s32Size);
          adt_str_reset(self);
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
@@ -362,7 +362,7 @@ adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other)
 /**
  * Appends data from a bounded string after this string
  */
-adt_error_t adt_str_append_bstr(adt_str_t *self, const char *pBegin, const char *pEnd)
+adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd)
 {
    adt_error_t retval = ADT_NO_ERROR;
    if( (self == 0) || (pBegin == 0) || (pEnd == 0) || (pEnd < pBegin) )
@@ -374,7 +374,7 @@ adt_error_t adt_str_append_bstr(adt_str_t *self, const char *pBegin, const char 
       int32_t s32Size = (int32_t) (pEnd-pBegin);
       if (s32Size > 0)
       {
-         adt_str_encoding_t encoding = adt_utf8_checkEncoding((const uint8_t*) pBegin, s32Size);
+         adt_str_encoding_t encoding = adt_utf8_checkEncoding(pBegin, s32Size);
          if ( (encoding == ADT_STR_ENCODING_ASCII) || (encoding == ADT_STR_ENCODING_UTF8) )
          {
             adt_error_t result;
@@ -444,7 +444,7 @@ adt_error_t adt_str_append_cstr(adt_str_t *self, const char *cstr)
 }
 
 void adt_str_prepend(adt_str_t *self, const adt_str_t* other);
-void adt_str_prepend_bstr(adt_str_t *self, const char *pBegin, const char *pEnd);
+void adt_str_prepend_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd);
 void adt_str_prepend_cstr(adt_str_t *self, const char *cstr);
 
 adt_error_t adt_str_push(adt_str_t *self, const int c)
@@ -674,7 +674,38 @@ void adt_str_clear(adt_str_t *self)
 
 bool adt_str_equal(const adt_str_t *self, const adt_str_t* other);
 bool adt_str_equal_bstr(const adt_str_t *self, const char *pBegin, const char *pEnd);
-bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr);
+bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr)
+{
+   if ( (self != 0) && (cstr != 0))
+   {
+      if ( (*cstr == 0) && (self->s32Cur == 0) )
+      {
+         return true;
+      }
+      else if (self->s32Cur > 0 && self->pStr != 0)
+      {
+         const uint8_t *pStr = (const uint8_t*) cstr;
+         const uint8_t *pNext = self->pStr;
+         const uint8_t *pEnd = self->pStr + self->s32Cur;
+         while(pNext < pEnd)
+         {
+            uint8_t c = *pNext;
+            uint8_t d = *pStr;
+            if ( (c != d) || (d == 0) )
+            {
+               break;
+            }
+            ++pNext;
+            ++pStr;
+         }
+         if ( (*pStr == 0) && (pNext == pEnd) )
+         {
+            return true;
+         }
+      }
+   }
+   return false;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
