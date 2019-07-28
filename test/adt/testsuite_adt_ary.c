@@ -32,6 +32,7 @@
 #include <string.h>
 #include "CuTest.h"
 #include "adt_ary.h"
+#include "adt_str.h"
 #include "CMemLeak.h"
 
 void vfree(void* p);
@@ -54,6 +55,11 @@ static void test_adt_ary_splice_to_empty(CuTest* tc);
 static void test_adt_ary_splice_at_begin(CuTest* tc);
 static void test_adt_ary_splice_at_end(CuTest* tc);
 static void test_adt_ary_splice_at_middle(CuTest* tc);
+static void test_adt_ary_sort_empty_list(CuTest* tc);
+static void test_adt_ary_sort_array_with_one_item(CuTest* tc);
+static void test_adt_ary_sort_array_with_seven_items(CuTest* tc);
+static void test_adt_ary_reverse_sort_array_with_seven_items(CuTest* tc);
+static void test_adt_ary_sort_strings_array_with_four_items(CuTest* tc);
 
 
 
@@ -79,6 +85,11 @@ CuSuite* testsuite_adt_ary(void)
    SUITE_ADD_TEST(suite, test_adt_ary_resize);
    SUITE_ADD_TEST(suite, test_adt_ary_push_unique);
    SUITE_ADD_TEST(suite, test_adt_ary_remove);
+   SUITE_ADD_TEST(suite, test_adt_ary_sort_empty_list);
+   SUITE_ADD_TEST(suite, test_adt_ary_sort_array_with_one_item);
+   SUITE_ADD_TEST(suite, test_adt_ary_sort_array_with_seven_items);
+   SUITE_ADD_TEST(suite, test_adt_ary_reverse_sort_array_with_seven_items);
+   SUITE_ADD_TEST(suite, test_adt_ary_sort_strings_array_with_four_items);
 
    return suite;
 }
@@ -379,4 +390,95 @@ static void test_adt_ary_splice_at_middle(CuTest* tc)
 
    adt_ary_delete(pArray);
 
+}
+
+
+static void test_adt_ary_sort_empty_list(CuTest* tc)
+{
+   adt_ary_t *array = adt_ary_new(NULL);
+
+   CuAssertPtrNotNull(tc, array);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+
+   adt_ary_delete(array);
+}
+
+static void test_adt_ary_sort_array_with_one_item(CuTest* tc)
+{
+   int32_t value = 5;
+   adt_ary_t *array = adt_ary_new(NULL);
+
+   CuAssertPtrNotNull(tc, array);
+   adt_ary_push(array, &value);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+   CuAssertIntEquals(tc, 5, *((int32_t*) adt_ary_value(array, 0)));
+   adt_ary_delete(array);
+
+}
+
+static void test_adt_ary_sort_array_with_seven_items(CuTest* tc)
+{
+   int32_t i;
+   int32_t values[] = {7, 8, 5, 2, 4, 6, 3};
+   adt_ary_t *array = adt_ary_new(NULL);
+   CuAssertPtrNotNull(tc, array);
+   for(i=0; i<7; i++)
+   {
+      adt_ary_push(array, &values[i]);
+   }
+   CuAssertIntEquals(tc, 7, adt_ary_length(array));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+   CuAssertIntEquals(tc, 2, *((int32_t*) adt_ary_value(array, 0)));
+   CuAssertIntEquals(tc, 3, *((int32_t*) adt_ary_value(array, 1)));
+   CuAssertIntEquals(tc, 4, *((int32_t*) adt_ary_value(array, 2)));
+   CuAssertIntEquals(tc, 5, *((int32_t*) adt_ary_value(array, 3)));
+   CuAssertIntEquals(tc, 6, *((int32_t*) adt_ary_value(array, 4)));
+   CuAssertIntEquals(tc, 7, *((int32_t*) adt_ary_value(array, 5)));
+   CuAssertIntEquals(tc, 8, *((int32_t*) adt_ary_value(array, 6)));
+   adt_ary_delete(array);
+
+}
+
+static void test_adt_ary_reverse_sort_array_with_seven_items(CuTest* tc)
+{
+   int32_t i;
+   int32_t values[] = {7, 8, 5, 2, 4, 6, 3};
+   adt_ary_t *array = adt_ary_new(NULL);
+   CuAssertPtrNotNull(tc, array);
+   for(i=0; i<7; i++)
+   {
+      adt_ary_push(array, &values[i]);
+   }
+   CuAssertIntEquals(tc, 7, adt_ary_length(array));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, true));
+   CuAssertIntEquals(tc, 8, *((int32_t*) adt_ary_value(array, 0)));
+   CuAssertIntEquals(tc, 7, *((int32_t*) adt_ary_value(array, 1)));
+   CuAssertIntEquals(tc, 6, *((int32_t*) adt_ary_value(array, 2)));
+   CuAssertIntEquals(tc, 5, *((int32_t*) adt_ary_value(array, 3)));
+   CuAssertIntEquals(tc, 4, *((int32_t*) adt_ary_value(array, 4)));
+   CuAssertIntEquals(tc, 3, *((int32_t*) adt_ary_value(array, 5)));
+   CuAssertIntEquals(tc, 2, *((int32_t*) adt_ary_value(array, 6)));
+   adt_ary_delete(array);
+
+}
+
+static void test_adt_ary_sort_strings_array_with_four_items(CuTest* tc)
+{
+   const char *green = "green";
+   const char *purple = "purple";
+   const char *blue = "blue";
+   const char *black = "black";
+
+   adt_ary_t *array = adt_ary_new(adt_str_vdelete);
+   CuAssertPtrNotNull(tc, array);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, adt_str_new_cstr(green)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, adt_str_new_cstr(purple)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, adt_str_new_cstr(blue)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, adt_str_new_cstr(black)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_str_vlt, false));
+   CuAssertStrEquals(tc, "black", adt_str_cstr((adt_str_t*) adt_ary_value(array, 0)));
+   CuAssertStrEquals(tc, "blue", adt_str_cstr((adt_str_t*) adt_ary_value(array, 1)));
+   CuAssertStrEquals(tc, "green", adt_str_cstr((adt_str_t*) adt_ary_value(array, 2)));
+   CuAssertStrEquals(tc, "purple", adt_str_cstr((adt_str_t*) adt_ary_value(array, 3)));
+   adt_ary_delete(array);
 }
