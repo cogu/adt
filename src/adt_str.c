@@ -596,6 +596,7 @@ int32_t adt_str_length(const adt_str_t *self)
             int32_t size = adt_utf8_readCodePoint(p, remain, &codePoint);
             retval++;
             remain-=size;
+            p+=size;
             if (remain < 0)
             {
                retval = -1;

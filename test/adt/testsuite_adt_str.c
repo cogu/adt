@@ -69,6 +69,7 @@ static void test_adt_utf8_checkEncoding_ascii(CuTest* tc);
 static void test_adt_utf8_checkEncoding_utf8(CuTest* tc);
 static void test_adt_utf8_checkEncodingAndSize(CuTest* tc);
 static void test_adt_str_equal_cstr(CuTest* tc);
+static void test_adt_str_lt_utf8(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -107,6 +108,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_utf8_checkEncoding_utf8);
    SUITE_ADD_TEST(suite, test_adt_utf8_checkEncodingAndSize);
    SUITE_ADD_TEST(suite, test_adt_str_equal_cstr);
+   SUITE_ADD_TEST(suite, test_adt_str_lt_utf8);
 
 
    return suite;
@@ -613,3 +615,21 @@ static void test_adt_str_equal_cstr(CuTest* tc)
 
 }
 
+static void test_adt_str_lt_utf8(CuTest* tc)
+{
+   const char *left_cstr = "\113\303\266\160\145\156\150\141\155\156"; //Köpenhamn
+   const char *right_cstr = "\113\303\266\160\151\156\147"; //Köping
+   adt_str_t *left = adt_str_new_cstr(left_cstr);
+   adt_str_t *right = adt_str_new_cstr(right_cstr);
+   CuAssertPtrNotNull(tc, left);
+   CuAssertPtrNotNull(tc, right);
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(left));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(right));
+   CuAssertIntEquals(tc, 9, adt_str_length(left));
+   CuAssertIntEquals(tc, 6, adt_str_length(right));
+   CuAssertTrue(tc, adt_str_lt(left, right)); //letter e is less than letter i in fourth code point
+
+   adt_str_delete(left);
+   adt_str_delete(right);
+
+}
