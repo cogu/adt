@@ -62,7 +62,8 @@ static int32_t adt_str_calcSize(int32_t s32CurSize, int32_t s32NewSize);
 DYN_STATIC adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen);
 DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strLen);
 DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint);
-
+static int adt_str_lt_ascii(const adt_str_t *self, const adt_str_t *other);
+static int adt_str_lt_utf8(const adt_str_t *self, const adt_str_t *other);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -707,6 +708,35 @@ bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr)
    return false;
 }
 
+/*
+ * Returns 1 if left string is lexicographically less than than right string.
+ * Returns 0 otherwise.
+ * Retuns -1 in error.
+ */
+int adt_str_lt(const adt_str_t *self, const adt_str_t *other)
+{
+   if ( (self != 0) && (other != 0) )
+   {
+      if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (other->encoding == ADT_STR_ENCODING_ASCII) )
+      {
+         return adt_str_lt_ascii(self, other);
+      }
+      else
+      {
+         assert( (self->encoding == ADT_STR_ENCODING_ASCII) || (self->encoding == ADT_STR_ENCODING_UTF8) );
+         assert( (other->encoding == ADT_STR_ENCODING_ASCII) || (other->encoding == ADT_STR_ENCODING_UTF8) );
+         return adt_str_lt_utf8(self, other);
+      }
+   }
+   return -1;
+}
+
+
+int adt_str_vlt(const void *a, const void *b)
+{
+   return adt_str_lt ((const adt_str_t*) a, (const adt_str_t*) b);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
@@ -886,4 +916,88 @@ DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen,
       *codePoint = tmp;
    }
    return retval;
+}
+
+static int adt_str_lt_ascii(const adt_str_t *self, const adt_str_t *other)
+{
+   const uint8_t *strLeft = self->pStr;
+   const uint8_t *strRight = other->pStr;
+   int32_t remainLeft = self->s32Cur;
+   int32_t remainRight = other->s32Cur;
+
+   while( remainLeft > 0 )
+   {
+      if ( remainRight == 0 )
+      {
+         return 1;
+      }
+      else
+      {
+         uint8_t leftChr = *strLeft;
+         uint8_t rightChr = *strRight;
+         if ( leftChr < rightChr )
+         {
+            return 1;
+         }
+         else if ( leftChr > rightChr )
+         {
+            return 0;
+         }
+         else
+         {
+            strLeft++;
+            strRight++;
+            remainLeft--;
+            remainRight--;
+         }
+      }
+   }
+   return 0;
+}
+
+static int adt_str_lt_utf8(const adt_str_t *self, const adt_str_t *other)
+{
+   const uint8_t *strLeft = self->pStr;
+   const uint8_t *strRight = other->pStr;
+   int32_t remainLeft = self->s32Cur;
+   int32_t remainRight = other->s32Cur;
+
+   while( remainLeft > 0 )
+   {
+      if ( remainRight == 0 )
+      {
+         return 1;
+      }
+      else
+      {
+         int32_t leftSize;
+         int32_t rightSize;
+         int leftCodePoint;
+         int rightCodePoint;
+         leftSize = adt_utf8_readCodePoint(strLeft, remainLeft, &leftCodePoint);
+         rightSize = adt_utf8_readCodePoint(strRight, remainRight, &rightCodePoint);
+         if ( (leftSize <= 0) || (rightSize <= 0) )
+         {
+            return -1; //failed to read a code point
+         }
+         if ( leftCodePoint < rightCodePoint )
+         {
+            return 1;
+         }
+         else if ( leftCodePoint > rightCodePoint )
+         {
+            return 0;
+         }
+         else
+         {
+            assert(leftSize <= remainLeft);
+            assert(rightSize <= remainRight);
+            strLeft += leftSize;
+            strRight += rightSize;
+            remainLeft -= leftSize;
+            remainRight -= rightSize;
+         }
+      }
+   }
+   return 0;
 }

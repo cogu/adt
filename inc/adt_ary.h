@@ -39,7 +39,7 @@ typedef uint8_t bool;
 #endif
 #include "adt_error.h"
 
-#define ADT_ARRAY_VERSION 0.1.2
+#define ADT_ARRAY_VERSION 0.1.3
 
 typedef struct adt_ary_tag{
 	void **ppAlloc;		//array of (void*)
@@ -50,6 +50,8 @@ typedef struct adt_ary_tag{
 	void *pFillElem;            //optional fill element for new elements (defaults to NULL)
 	bool destructorEnable;      //Temporarily disables use of element pDestructor
 } adt_ary_t;
+
+typedef int (adt_vlt_func_t)(const void *a, const void *b); //lt = less-than
 
 /***************** Public Function Declarations *******************/
 //Constructor/Destructor
@@ -79,9 +81,14 @@ adt_error_t	adt_ary_fill(adt_ary_t *self, int32_t s32Len);
 adt_error_t adt_ary_resize(adt_ary_t *self, int32_t s32Len);
 void	      adt_ary_clear(adt_ary_t *self);
 int32_t     adt_ary_length(const adt_ary_t *self);
-void 	      adt_ary_set_fill_elem(adt_ary_t *self,void* pFillElem);
+void 	      adt_ary_set_fill_elem(adt_ary_t *self, void* pFillElem);
 void* 	   adt_ary_get_fill_elem(const adt_ary_t *self);
-adt_error_t adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len);
+adt_error_t adt_ary_splice(adt_ary_t *self, int32_t s32Index, int32_t s32Len);
 int32_t	   adt_ary_exists(const adt_ary_t *self, int32_t s32Index);
+adt_error_t adt_ary_sort(adt_ary_t *self, adt_vlt_func_t *key, bool reverse);
+
+//built-in lt functions (for sorting)
+int adt_i32_vlt(const void *a, const void *b);
+int adt_u32_vlt(const void *a, const void *b);
 
 #endif //ADT_ARY_H

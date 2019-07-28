@@ -4,7 +4,7 @@
 * \brief:      array data structure
 * \details     https://github.com/cogu/adt
 *
-* Copyright (c) 2013-2016 Conny Gustafsson
+* Copyright (c) 2013-2019 Conny Gustafsson
 *
 ******************************************************************************/
 #include "adt_ary.h"
@@ -20,9 +20,11 @@
 								      //use define to control how many bytes shall be copied
 
 #define ELEM_LEN (sizeof(void*))
+#define ELEM_VALUE_IS_LESS(T) ( *((T*) a) < *((T*) b) )
 
 /**************** Private Function Declarations *******************/
 static void adt_block_memmove(void *pDest, void *pSrc, uint32_t u32Remain);
+static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, bool reverse);
 /**************** Private Variable Declarations *******************/
 
 
@@ -455,6 +457,39 @@ adt_error_t adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
 
 }
 
+/**
+ * sorts the array using the given key function.
+ * If reverse is true it will be sorted in descending order, otherwise it will
+ * be sorted in ascending order
+ */
+adt_error_t adt_ary_sort(adt_ary_t *self, adt_vlt_func_t *key, bool reverse)
+{
+   if ( (self == 0) || (key == 0) )
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
+   ///TODO: For now we simply use insertion sort. Will need to implement Timsort later on.
+   return adt_ary_insertion_sort(self, key, reverse);
+}
+
+int adt_i32_vlt(const void *a, const void *b)
+{
+   if ( (a != 0) && (b != 0) )
+   {
+      return ELEM_VALUE_IS_LESS(int32_t);
+   }
+   return -1;
+}
+
+int adt_u32_vlt(const void *a, const void *b)
+{
+   if ( (a != 0) && (b != 0) )
+   {
+      return ELEM_VALUE_IS_LESS(uint32_t);
+   }
+   return -1;
+}
+
 /***************** Private Function Definitions *******************/
 /**
  * CG: I had some serious issues with some Microsoft compilers not handling large memmoves.
@@ -469,3 +504,74 @@ static void adt_block_memmove(void *pDest, void *pSrc, uint32_t u32Remain){
       pSrc+=u32Size;
    }
 }
+
+static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, bool reverse)
+{
+   int32_t arrayLen = self->s32CurLen;
+   if (arrayLen > 1)
+   {
+      int32_t unsortedStart = 1;
+
+      while(unsortedStart < arrayLen)
+      {
+         int result;
+         void *rhs = self->pFirst[unsortedStart];
+         void *lhs = self->pFirst[unsortedStart-1];
+         result = vlt(lhs, rhs);
+         if (result < 0)
+         {
+            return ADT_OBJECT_COMPARE_ERROR;
+         }
+         else
+         {
+            if (reverse)
+            {
+               result = !result;
+            }
+            if (result == 0)
+            {
+               int32_t i;
+               bool isHandled = false;
+               self->pFirst[unsortedStart] = lhs;
+               for(i=unsortedStart-1; i>0; i--)
+               {
+                  lhs = self->pFirst[i-1];
+                  result = vlt(lhs, rhs);
+                  if (result < 0)
+                  {
+                     return ADT_OBJECT_COMPARE_ERROR;
+                  }
+                  if (reverse)
+                  {
+                     result = !result;
+                  }
+                  if (result == 0)
+                  {
+                     self->pFirst[i] = lhs;
+                  }
+                  else
+                  {
+                     isHandled = true;
+                     self->pFirst[i] = rhs;
+                     unsortedStart++;
+                     break;
+                  }
+               }
+               if (!isHandled)
+               {
+                  assert(i == 0);
+                  self->pFirst[0] = rhs;
+                  unsortedStart++;
+               }
+            }
+            else
+            {
+               unsortedStart++; //items are already sorted
+            }
+         }
+      }
+   }
+   return ADT_NO_ERROR;
+}
+
+

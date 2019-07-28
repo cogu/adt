@@ -34,14 +34,15 @@
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
-#define ADT_NO_ERROR                  0
-#define ADT_INVALID_ARGUMENT_ERROR    1
-#define ADT_MEM_ERROR                 2
-#define ADT_INDEX_OUT_OF_BOUNDS_ERROR 3 //Used instead of invalid argument error where applicable
-#define ADT_LENGTH_ERROR              4 //Used instead of invalid argument error where applicable
-#define ADT_ARRAY_TOO_LARGE_ERROR     5
-#define ADT_NOT_IMPLEMENTED_ERROR     6
-#define ADT_UNKNOWN_ENCODING_ERROR    7
+#define ADT_NO_ERROR                   0
+#define ADT_INVALID_ARGUMENT_ERROR     1
+#define ADT_MEM_ERROR                  2
+#define ADT_INDEX_OUT_OF_BOUNDS_ERROR  3 //Used instead of invalid argument error where applicable
+#define ADT_LENGTH_ERROR               4 //Used instead of invalid argument error where applicable
+#define ADT_ARRAY_TOO_LARGE_ERROR      5
+#define ADT_NOT_IMPLEMENTED_ERROR      6
+#define ADT_UNKNOWN_ENCODING_ERROR     7
+#define ADT_OBJECT_COMPARE_ERROR       8
 
 typedef int8_t adt_error_t;
 //////////////////////////////////////////////////////////////////////////////

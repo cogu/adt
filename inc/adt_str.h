@@ -26,7 +26,7 @@
 #ifndef ADT_STR_H__
 #define ADT_STR_H__
 
-#define ADT_STR_VERSION 0.1.2
+#define ADT_STR_VERSION 0.1.3
 
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
@@ -110,6 +110,8 @@ adt_error_t adt_str_getLastError(adt_str_t *self);
 bool adt_str_equal(const adt_str_t *self, const adt_str_t* other);
 bool adt_str_equal_bstr(const adt_str_t *self, const char *pBegin, const char *pEnd);
 bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr);
+int adt_str_lt(const adt_str_t *self, const adt_str_t *other);
+int adt_str_vlt(const void *a, const void *b); //Used for sorting strings
 
 
 /* function aliases */
