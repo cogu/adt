@@ -30,12 +30,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 #include "CuTest.h"
 #include "adt_ary.h"
 #include "adt_str.h"
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
-
 void vfree(void* p);
+#else
+#define vfree free
+#endif
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES

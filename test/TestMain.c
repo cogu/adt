@@ -18,9 +18,12 @@ CuSuite* testsuite_adt_priorityHeap(void);
 CuSuite* testsuite_adt_u32Set(void);
 CuSuite* testsuite_adt_ringbuf(void);
 
-void vfree(void* p){
+#ifdef MEM_LEAK_CHECK
+void vfree(void* p)
+{
    free(p);
 }
+#endif
 
 void RunAllTests(void)
 {
