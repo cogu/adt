@@ -5,9 +5,12 @@
 #include <string.h>
 #include "CuTest.h"
 #include "adt_stack.h"
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
-
 void vfree(void* p);
+#else
+#define vfree free
+#endif
 
 void test_adt_stack_new(CuTest* tc)
 {
