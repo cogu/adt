@@ -47,9 +47,6 @@ adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize)
    if(self != 0){
       adt_bytearray_create(self,u32GrowSize);
    }
-   else{
-      adt_setError(ADT_MEM_ERROR);
-   }
    return self;
 }
 
@@ -63,7 +60,6 @@ adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, u
          adt_error_t errorCode = adt_bytearray_append(self, pData, u32DataLen);
          if (errorCode != ADT_NO_ERROR)
          {
-            adt_setError(errorCode);
             adt_bytearray_delete(self);
             self = (adt_bytearray_t*) 0;
          }
