@@ -32,6 +32,7 @@
 #include <string.h>
 #include "CuTest.h"
 #include "adt_bytearray.h"
+#include "adt_bytes.h"
 #include "CMemLeak.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,7 @@ static void test_adt_bytearray_make_cstr(CuTest* tc);
 static void test_adt_bytearray_equals(CuTest* tc);
 static void test_adt_bytearray_manual_grow(CuTest* tc);
 static void test_adt_bytearray_manual_shrink(CuTest* tc);
+static void test_adt_bytearray_bytes(CuTest* tc);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -69,7 +71,7 @@ CuSuite* testsuite_adt_bytearray(void)
    SUITE_ADD_TEST(suite, test_adt_bytearray_equals);
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_grow);
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_shrink);
-
+   SUITE_ADD_TEST(suite, test_adt_bytearray_bytes);
 
    return suite;
 }
@@ -171,4 +173,26 @@ static void test_adt_bytearray_manual_shrink(CuTest* tc)
    CuAssertIntEquals(tc, 2u, pArray->u32AllocLen);
    CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytearray_data(pArray), 2u));
    adt_bytearray_delete(pArray);
+}
+
+static void test_adt_bytearray_bytes(CuTest* tc)
+{
+   adt_bytearray_t *array = adt_bytearray_new(128u);
+   adt_bytearray_push(array, 17);
+   adt_bytearray_push(array, 255);
+   adt_bytearray_push(array, 93);
+   adt_bytearray_push(array, 0);
+   adt_bytes_t *bytes = adt_bytearray_bytes(array);
+   CuAssertPtrNotNull(tc, bytes);
+   CuAssertUIntEquals(tc, 4, adt_bytes_length(bytes));
+   const uint8_t *data = adt_bytes_data(bytes);
+   CuAssertIntEquals(tc, 17, data[0]);
+   CuAssertIntEquals(tc, 255, data[1]);
+   CuAssertIntEquals(tc, 93, data[2]);
+   CuAssertIntEquals(tc, 0, data[3]);
+   CuAssertPtrNotNull(tc, data);
+
+   adt_bytes_delete(bytes);
+   adt_bytearray_delete(array);
+
 }

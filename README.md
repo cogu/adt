@@ -38,6 +38,7 @@ They are used when access takes place at either end of the list.
 |-----------------|-----------------|---------------------|----------------------|
 | adt_ary_t       | adt_ary.h       | Objects (void*)     | yes                  |
 | adt_bytearray_t | adt_bytearray.h | Bytes (uint8_t)     | yes                  |
+| adt_bytes_t     | adt_bytes.h     | Bytes (uint8_t)     | yes                  |
 
 ## Examples
 
