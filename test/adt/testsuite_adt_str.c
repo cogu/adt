@@ -70,6 +70,8 @@ static void test_adt_utf8_checkEncoding_utf8(CuTest* tc);
 static void test_adt_utf8_checkEncodingAndSize(CuTest* tc);
 static void test_adt_str_equal_cstr(CuTest* tc);
 static void test_adt_str_lt_utf8(CuTest* tc);
+static void test_adt_str_new_byterray(CuTest* tc);
+static void test_adt_str_bytearray(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -109,6 +111,8 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_utf8_checkEncodingAndSize);
    SUITE_ADD_TEST(suite, test_adt_str_equal_cstr);
    SUITE_ADD_TEST(suite, test_adt_str_lt_utf8);
+   SUITE_ADD_TEST(suite, test_adt_str_new_byterray);
+   SUITE_ADD_TEST(suite, test_adt_str_bytearray);
 
 
    return suite;
@@ -631,5 +635,40 @@ static void test_adt_str_lt_utf8(CuTest* tc)
 
    adt_str_delete(left);
    adt_str_delete(right);
+}
 
+static void test_adt_str_new_byterray(CuTest* tc)
+{
+   const char *cstr = "\113\303\266\160\145\156\150\141\155\156"; //Köpenhamn
+   adt_bytearray_t *tmpArray;
+   adt_str_t *str;
+
+   tmpArray = adt_bytearray_make_cstr(cstr, ADT_BYTE_ARRAY_NO_GROWTH);
+
+   CuAssertPtrNotNull(tc, tmpArray);
+
+   str = adt_str_new_bytearray(tmpArray);
+   CuAssertPtrNotNull(tc, str);
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+   CuAssertIntEquals(tc, 9, adt_str_length(str));
+
+
+   adt_str_delete(str);
+   adt_bytearray_delete(tmpArray);
+}
+
+static void test_adt_str_bytearray(CuTest* tc)
+{
+   const char *cstr = "Test";
+   adt_str_t *str;
+   adt_bytearray_t *data;
+   str = adt_str_new_cstr(cstr);
+   CuAssertPtrNotNull(tc, str);
+
+   data = adt_str_bytearray(str);
+   CuAssertPtrNotNull(tc, data);
+   CuAssertUIntEquals(tc, 4, adt_bytearray_length(data));
+   CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytearray_data(data), 4));
+   adt_bytearray_delete(data);
+   adt_str_delete(str);
 }

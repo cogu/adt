@@ -162,10 +162,29 @@ adt_str_t *adt_str_new_cstr(const char * other)
    return self;
 }
 
-adt_str_t *adt_str_new_byterray(adt_bytearray_t *bytearray)
+adt_str_t *adt_str_new_bytearray(adt_bytearray_t *bytearray)
 {
-   //NOT YET IMPLEMENTED
-   (void) bytearray;
+   if (bytearray != 0)
+   {
+      adt_str_t *self = (adt_str_t*) 0;
+      const uint8_t *pBegin, *pEnd;
+      pBegin = adt_bytearray_data(bytearray);
+      pEnd = pBegin + adt_bytearray_length(bytearray);
+      if( (pBegin != 0) && (pEnd != 0) && (pEnd >= pBegin) )
+      {
+         self = adt_str_new();
+         if (self != 0)
+         {
+            adt_error_t result = adt_str_set_bstr(self, pBegin, pEnd);
+            if (result != ADT_NO_ERROR)
+            {
+               adt_str_delete(self);
+               self = (adt_str_t*) 0;
+            }
+         }
+      }
+      return self;
+   }
    return (adt_str_t*) 0;
 }
 
@@ -554,7 +573,32 @@ const char* adt_str_cstr(adt_str_t *self)
    return retval;
 }
 
-adt_bytearray_t *adt_str_bytearray(adt_str_t *self);
+adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
+{
+   adt_bytearray_t *retval = (adt_bytearray_t*) 0;
+   if (self != 0)
+   {
+      retval = adt_bytearray_new(ADT_BYTE_ARRAY_NO_GROWTH);
+      if (retval != 0)
+      {
+         adt_error_t result;
+         uint32_t u32Size = (uint32_t) self->s32Cur;
+         result = adt_bytearray_resize(retval, u32Size);
+         if (result == ADT_NO_ERROR)
+         {
+            assert(adt_bytearray_length(retval) == u32Size);
+            memcpy(adt_bytearray_data(retval), self->pStr, (size_t) self->s32Cur);
+         }
+         else
+         {
+            adt_bytearray_delete(retval);
+            retval = (adt_bytearray_t*) 0;
+         }
+      }
+   }
+   return retval;
+}
+
 adt_error_t adt_str_bstr(adt_str_t *self, const char **ppBegin, const char **ppEnd);
 
 /* utility */

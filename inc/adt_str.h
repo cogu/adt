@@ -64,10 +64,10 @@ typedef struct adt_str_tag {
 void adt_str_create(adt_str_t *self);
 adt_str_t *adt_str_new(void);
 adt_str_t *adt_str_clone(const adt_str_t* other);
+adt_str_t *adt_str_concat(const adt_str_t *lhs, const adt_str_t *rhs);
 adt_str_t *adt_str_new_bstr(const uint8_t *pBegin, const uint8_t *pEnd);
 adt_str_t *adt_str_new_cstr(const char * other);
-adt_str_t *adt_str_new_byterray(adt_bytearray_t *bytearray);
-adt_str_t *adt_str_concat(const adt_str_t *lhs, const adt_str_t *rhs);
+adt_str_t *adt_str_new_bytearray(adt_bytearray_t *bytearray);
 adt_str_t *adt_str_new_utf8(void);
 
 

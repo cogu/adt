@@ -28,11 +28,7 @@ void adt_bytearray_create(adt_bytearray_t *self,uint32_t u32GrowSize){
       self->pData = 0;
       self->u32AllocLen = 0;
       self->u32CurLen = 0;
-      if ( u32GrowSize > ADT_BYTE_ARRAY_MAX_GROW_SIZE )
-      {
-         u32GrowSize = ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE;
-      }
-      self->u32GrowSize = u32GrowSize;
+      adt_bytearray_setGrowthSize(self, u32GrowSize);
    }
 }
 
@@ -59,18 +55,32 @@ adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize)
 
 adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, uint32_t u32GrowSize)
 {
-   adt_bytearray_t *self = adt_bytearray_new(u32GrowSize);
-   if (self != 0)
+   if (pData != 0)
    {
-      adt_error_t errorCode = adt_bytearray_append(self, pData, u32DataLen);
-      if (errorCode != ADT_NO_ERROR)
+      adt_bytearray_t *self = adt_bytearray_new(u32GrowSize);
+      if (self != 0)
       {
-         adt_setError(errorCode);
-         adt_bytearray_delete(self);
-         self = (adt_bytearray_t*) 0;
+         adt_error_t errorCode = adt_bytearray_append(self, pData, u32DataLen);
+         if (errorCode != ADT_NO_ERROR)
+         {
+            adt_setError(errorCode);
+            adt_bytearray_delete(self);
+            self = (adt_bytearray_t*) 0;
+         }
       }
+      return self;
    }
-   return self;
+   return (adt_bytearray_t*) 0;
+}
+
+adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr, uint32_t u32GrowSize)
+{
+   if (cstr != 0)
+   {
+      size_t len = strlen(cstr);
+      return adt_bytearray_make((const uint8_t*) cstr, (uint32_t) len, u32GrowSize);
+   }
+   return (adt_bytearray_t*) 0;
 }
 
 void adt_bytearray_delete(adt_bytearray_t *self)
@@ -87,6 +97,17 @@ void adt_bytearray_vdelete(void *arg)
    adt_bytearray_delete((adt_bytearray_t*) arg);
 }
 
+void adt_bytearray_setGrowthSize(adt_bytearray_t *self,uint32_t u32GrowSize)
+{
+   if (self != 0)
+   {
+      if ( u32GrowSize > ADT_BYTE_ARRAY_MAX_GROW_SIZE )
+      {
+         u32GrowSize = ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE;
+      }
+      self->u32GrowSize = u32GrowSize;
+   }
+}
 
 adt_error_t adt_bytearray_reserve(adt_bytearray_t *self, uint32_t u32NewLen){
    if(self){
