@@ -45,9 +45,11 @@
 static void test_adt_bytearray_new(CuTest* tc);
 static void test_adt_bytearray_resize(CuTest* tc);
 static void test_adt_bytearray_make(CuTest* tc);
+static void test_adt_bytearray_make_cstr(CuTest* tc);
 static void test_adt_bytearray_equals(CuTest* tc);
 static void test_adt_bytearray_manual_grow(CuTest* tc);
 static void test_adt_bytearray_manual_shrink(CuTest* tc);
+
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -63,9 +65,11 @@ CuSuite* testsuite_adt_bytearray(void)
    SUITE_ADD_TEST(suite, test_adt_bytearray_new);
    SUITE_ADD_TEST(suite, test_adt_bytearray_resize);
    SUITE_ADD_TEST(suite, test_adt_bytearray_make);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_make_cstr);
    SUITE_ADD_TEST(suite, test_adt_bytearray_equals);
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_grow);
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_shrink);
+
 
    return suite;
 }
@@ -101,7 +105,17 @@ static void test_adt_bytearray_make(CuTest* tc)
    pArray = adt_bytearray_make(data, 5, ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE);
    CuAssertPtrNotNull(tc, pArray);
    adt_bytearray_delete(pArray);
+}
 
+static void test_adt_bytearray_make_cstr(CuTest* tc)
+{
+   adt_bytearray_t *pArray;
+   const char* cstr= "Test1";
+   pArray = adt_bytearray_make_cstr(cstr, ADT_BYTE_ARRAY_NO_GROWTH);
+   CuAssertPtrNotNull(tc, pArray);
+   CuAssertIntEquals(tc, 5, pArray->u32CurLen);
+   CuAssertIntEquals(tc, 0, memcmp(cstr, pArray->pData, 5));
+   adt_bytearray_delete(pArray);
 }
 
 static void test_adt_bytearray_equals(CuTest* tc)
