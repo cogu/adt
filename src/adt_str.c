@@ -27,6 +27,7 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include "adt_str.h"
+#include "adt_bytes.h"
 #include <string.h>
 #include <limits.h>
 #include <malloc.h>
@@ -573,6 +574,14 @@ const char* adt_str_cstr(adt_str_t *self)
    return retval;
 }
 
+adt_error_t adt_str_bstr(adt_str_t *self, const char **ppBegin, const char **ppEnd)
+{
+   (void) self;
+   (void) ppBegin;
+   (void) ppEnd;
+   return ADT_NOT_IMPLEMENTED_ERROR;
+}
+
 adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
 {
    adt_bytearray_t *retval = (adt_bytearray_t*) 0;
@@ -599,7 +608,17 @@ adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
    return retval;
 }
 
-adt_error_t adt_str_bstr(adt_str_t *self, const char **ppBegin, const char **ppEnd);
+struct adt_bytes_tag *adt_str_bytes(adt_str_t *self)
+{
+   adt_bytes_t *retval = (adt_bytes_t*) 0;
+   if (self != 0)
+   {
+      retval = adt_bytes_new(self->pStr, (uint32_t) self->s32Cur);
+   }
+   return retval;
+}
+
+
 
 /* utility */
 

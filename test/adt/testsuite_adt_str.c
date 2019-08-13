@@ -33,6 +33,7 @@
 #include <string.h>
 #include "CuTest.h"
 #include "adt_str.h"
+#include "adt_bytes.h"
 #include "CMemLeak.h"
 
 
@@ -72,6 +73,7 @@ static void test_adt_str_equal_cstr(CuTest* tc);
 static void test_adt_str_lt_utf8(CuTest* tc);
 static void test_adt_str_new_byterray(CuTest* tc);
 static void test_adt_str_bytearray(CuTest* tc);
+static void test_adt_str_bytes(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -113,6 +115,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_lt_utf8);
    SUITE_ADD_TEST(suite, test_adt_str_new_byterray);
    SUITE_ADD_TEST(suite, test_adt_str_bytearray);
+   SUITE_ADD_TEST(suite, test_adt_str_bytes);
 
 
    return suite;
@@ -670,5 +673,21 @@ static void test_adt_str_bytearray(CuTest* tc)
    CuAssertUIntEquals(tc, 4, adt_bytearray_length(data));
    CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytearray_data(data), 4));
    adt_bytearray_delete(data);
+   adt_str_delete(str);
+}
+
+static void test_adt_str_bytes(CuTest* tc)
+{
+   const char *cstr = "Test";
+   adt_str_t *str;
+   adt_bytes_t *bytes;
+   str = adt_str_new_cstr(cstr);
+   CuAssertPtrNotNull(tc, str);
+
+   bytes = adt_str_bytes(str);
+   CuAssertPtrNotNull(tc, bytes);
+   CuAssertUIntEquals(tc, 4, adt_bytes_length(bytes));
+   CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytes_data(bytes), 4));
+   adt_bytes_delete(bytes);
    adt_str_delete(str);
 }

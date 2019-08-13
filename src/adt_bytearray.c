@@ -1,13 +1,33 @@
 /*****************************************************************************
-* \file:    bytearray.c
-* \author:  Conny Gustafsson
-* \date:    2015-02-05
-* \brief:   general purpose data container
+* \file      adt_bytearray.c
+* \author    Conny Gustafsson
+* \date      2015-02-05
+* \brief     A mutable byte array
 *
 * Copyright (c) 2015-2019 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
 ******************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #include "adt_bytearray.h"
+#include "adt_bytes.h"
 #include <string.h>
 #include <malloc.h>
 #include <assert.h>
@@ -15,14 +35,23 @@
 #include "CMemLeak.h"
 #endif
 
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
 
-/**************** Private Function Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
 static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewLen);
 
-/**************** Private Variable Declarations *******************/
 
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE VARIABLES
+//////////////////////////////////////////////////////////////////////////////
 
-/****************** Public Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 void adt_bytearray_create(adt_bytearray_t *self,uint32_t u32GrowSize){
    if(self){
       self->pData = 0;
@@ -108,9 +137,9 @@ void adt_bytearray_setGrowthSize(adt_bytearray_t *self,uint32_t u32GrowSize)
 adt_error_t adt_bytearray_reserve(adt_bytearray_t *self, uint32_t u32NewLen){
    if(self){
       if(u32NewLen > self->u32AllocLen){
-         adt_error_t erorCode = adt_bytearray_grow(self,u32NewLen);
-         if(erorCode != ADT_NO_ERROR){
-            return erorCode;
+         adt_error_t errorCode = adt_bytearray_grow(self,u32NewLen);
+         if(errorCode != ADT_NO_ERROR){
+            return errorCode;
          }
       }
       return ADT_NO_ERROR;
@@ -220,6 +249,28 @@ adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
    return ADT_INVALID_ARGUMENT_ERROR;
 }
 
+/**
+ * Appends a single uint8_t value to the bytearray
+ */
+adt_error_t adt_bytearray_push(adt_bytearray_t *self, uint8_t value)
+{
+   if(self != 0)
+   {
+      adt_error_t errorCode = adt_bytearray_reserve(self, self->u32CurLen + 1);
+      if(errorCode == ADT_NO_ERROR)
+      {
+         uint8_t *pNext, *pEnd;
+         pNext = self->pData + self->u32CurLen;
+         pEnd = self->pData + self->u32AllocLen;
+         assert(pNext + 1 <= pEnd);
+         *pNext = value;
+         self->u32CurLen++;
+      }
+      return errorCode;
+   }
+   return ADT_INVALID_ARGUMENT_ERROR;
+}
+
 uint8_t *adt_bytearray_data(const adt_bytearray_t *self){
    if(self != 0){
       return self->pData;
@@ -264,7 +315,19 @@ bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs
    return false;
 }
 
-/***************** Private Function Definitions *******************/
+struct adt_bytes_tag* adt_bytearray_bytes(const adt_bytearray_t *self)
+{
+   if (self != 0)
+   {
+      return adt_bytes_new(self->pData, self->u32CurLen);
+   }
+   return (adt_bytes_t*) 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
+
 static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewLen) {
    if (self != 0) {
       uint8_t *pNewData = (uint8_t*) malloc(u32NewLen);

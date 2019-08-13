@@ -60,6 +60,9 @@ typedef struct adt_str_tag {
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
+//forward declarations
+struct adt_bytes_tag;
+
 /* constructors */
 void adt_str_create(adt_str_t *self);
 adt_str_t *adt_str_new(void);
@@ -97,6 +100,7 @@ int adt_str_charAt(adt_str_t *self, int index);
 const char* adt_str_cstr(adt_str_t *self);
 adt_error_t adt_str_bstr(adt_str_t *self, const char **ppBegin, const char **ppEnd);
 adt_bytearray_t *adt_str_bytearray(adt_str_t *self);
+struct adt_bytes_tag *adt_str_bytes(adt_str_t *self);
 
 /* utility */
 void adt_str_setEncoding(adt_str_t *self, adt_str_encoding_t newEncoding);

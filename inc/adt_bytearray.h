@@ -1,41 +1,60 @@
 /*****************************************************************************
-* \file:    adt_bytearray.h
-* \author:  Conny Gustafsson
-* \date:    2015-02-05
-* \brief:   general purpose data container
+* \file      adt_bytearray.h
+* \author    Conny Gustafsson
+* \date      2015-02-05
+* \brief     A mutable byte array
 *
-* Copyright (c) 2015-2016 Conny Gustafsson
+* Copyright (c) 2015-2019 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
 ******************************************************************************/
 #ifndef ADT_BYTE_ARRAY_H
 #define ADT_BYTE_ARRAY_H
+
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
-#include "adt_error.h"
-#if defined(_MSC_PLATFORM_TOOLSET) && (_MSC_PLATFORM_TOOLSET<=110)
-#ifndef _MSC_BOOL_DEFINED
-#define _MSC_BOOL_DEFINED
-#define false 0
-#define true 1
-typedef uint8_t bool;
-#endif
-#else
 #include <stdbool.h>
-#endif
+#include "adt_error.h"
 
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
+//forward declarations
+struct adt_bytes_tag;
 
-typedef struct bytearray_t{
+typedef struct adt_bytearray_tag
+{
    uint8_t *pData;
    uint32_t u32CurLen;
    uint32_t u32AllocLen;
    uint32_t u32GrowSize;
 } adt_bytearray_t;
 
-#define ADT_BYTE_ARRAY_VERSION 0.1.2
+#define ADT_BYTE_ARRAY_VERSION 0.1.3
 #define ADT_BYTE_ARRAY_NO_GROWTH 0u //will malloc exactly the number of bytes it currently needs
 #define ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
 #define ADT_BYTE_ARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
 
-/***************** Public Function Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC VARIABLES
+//////////////////////////////////////////////////////////////////////////////
 void adt_bytearray_create(adt_bytearray_t *self,uint32_t u32GrowSize);
 void adt_bytearray_destroy(adt_bytearray_t *self);
 adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize);
@@ -49,10 +68,17 @@ adt_error_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen);
 adt_error_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, uint32_t u32DataLen);
 adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc);
 adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen);
+adt_error_t adt_bytearray_push(adt_bytearray_t *self, uint8_t value);
 uint8_t *adt_bytearray_data(const adt_bytearray_t *self);
 uint32_t adt_bytearray_length(const adt_bytearray_t *self);
 void adt_bytearray_clear(adt_bytearray_t *self);
 bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs);
+struct adt_bytes_tag* adt_bytearray_bytes(const adt_bytearray_t *self);
+
+
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
 
 
 #endif //ADT_BYTE_ARRAY_H
