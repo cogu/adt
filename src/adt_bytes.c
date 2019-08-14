@@ -30,6 +30,10 @@
 #include <string.h>
 #include "adt_bytes.h"
 #include "adt_bytearray.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
@@ -99,6 +103,15 @@ adt_bytes_t *adt_bytes_new_cstr(const char *cstr)
    return (adt_bytes_t*) 0;
 }
 
+adt_bytes_t *adt_bytes_clone(const adt_bytes_t* other)
+{
+   if (other != 0)
+   {
+      return adt_bytes_new(other->dataBuf, other->dataLen);
+   }
+   return (adt_bytes_t*) 0;
+}
+
 void adt_bytes_delete(adt_bytes_t *self)
 {
    if (self != 0)
@@ -138,6 +151,19 @@ struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self, uint32_t 
       return adt_bytearray_make(self->dataBuf, self->dataLen, u32GrowSize);
    }
    return (adt_bytearray_t*) 0;
+}
+
+bool adt_bytes_equals(const adt_bytes_t *self, const adt_bytes_t *other)
+{
+   bool retval = false;
+   if ( (self != 0) && (other != 0) && (self->dataLen == other->dataLen) )
+   {
+      if ( memcmp(self->dataBuf, other->dataBuf, self->dataLen) == 0)
+      {
+         retval = true;
+      }
+   }
+   return retval;
 }
 
 

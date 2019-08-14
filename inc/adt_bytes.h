@@ -30,6 +30,7 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
+#include <stdbool.h>
 #include "adt_error.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -54,11 +55,13 @@ adt_error_t adt_bytes_create(adt_bytes_t *self, const uint8_t *dataBuf, uint32_t
 void adt_bytes_destroy(adt_bytes_t *self);
 adt_bytes_t *adt_bytes_new(const uint8_t *dataBuf, uint32_t dataLen);
 adt_bytes_t *adt_bytes_new_cstr(const char *cstr);
+adt_bytes_t *adt_bytes_clone(const adt_bytes_t* other);
 void adt_bytes_delete(adt_bytes_t *self);
 void adt_bytes_vdelete(void *arg);
 
 uint32_t adt_bytes_length(const adt_bytes_t *self);
 const uint8_t* adt_bytes_data(const adt_bytes_t *self);
 struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self, uint32_t u32GrowSize);
+bool adt_bytes_equals(const adt_bytes_t *self, const adt_bytes_t *other);
 
 #endif //ADT_BYTES_H
