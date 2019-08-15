@@ -2,7 +2,7 @@
 * \file      testsuite_adt_bytearray.c
 * \author    Conny Gustafsson
 * \date      2017-01-27
-* \brief     Description
+* \brief     Unit Tests for adt_bytearray_t
 *
 * Copyright (c) 2017-2019 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -51,6 +51,7 @@ static void test_adt_bytearray_equals(CuTest* tc);
 static void test_adt_bytearray_manual_grow(CuTest* tc);
 static void test_adt_bytearray_manual_shrink(CuTest* tc);
 static void test_adt_bytearray_bytes(CuTest* tc);
+static void test_adt_bytearray_bytearray_clone(CuTest* tc);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,7 @@ CuSuite* testsuite_adt_bytearray(void)
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_grow);
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_shrink);
    SUITE_ADD_TEST(suite, test_adt_bytearray_bytes);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_bytearray_clone);
 
    return suite;
 }
@@ -196,3 +198,22 @@ static void test_adt_bytearray_bytes(CuTest* tc)
    adt_bytearray_delete(array);
 
 }
+
+static void test_adt_bytearray_bytearray_clone(CuTest* tc)
+{
+   adt_bytearray_t *array1 = adt_bytearray_new(16u);
+   adt_bytearray_push(array1, 1);
+   adt_bytearray_push(array1, 2);
+   adt_bytearray_push(array1, 3);
+   adt_bytearray_push(array1, 4);
+   adt_bytearray_push(array1, 5);
+   adt_bytearray_t *array2 = adt_bytearray_clone(array1, ADT_BYTEARRAY_NO_GROWTH);
+   CuAssertPtrNotNull(tc, array2);
+   CuAssertUIntEquals(tc, 5, adt_bytearray_length(array2));
+   CuAssertTrue(tc, adt_bytearray_equals(array1, array2));
+
+   adt_bytearray_delete(array1);
+   adt_bytearray_delete(array2);
+
+}
+
