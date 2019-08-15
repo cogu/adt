@@ -108,6 +108,15 @@ adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr, uint32_t u32GrowSize)
    return (adt_bytearray_t*) 0;
 }
 
+adt_bytearray_t *adt_bytearray_clone(const adt_bytearray_t *other, uint32_t u32GrowSize)
+{
+   if (other != 0)
+   {
+      return adt_bytearray_make(other->pData, other->u32CurLen, u32GrowSize);
+   }
+   return (adt_bytearray_t*) 0;
+}
+
 void adt_bytearray_delete(adt_bytearray_t *self)
 {
    if (self != 0)

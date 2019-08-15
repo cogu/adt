@@ -47,10 +47,18 @@ typedef struct adt_bytearray_tag
    uint32_t u32GrowSize;
 } adt_bytearray_t;
 
-#define ADT_BYTE_ARRAY_VERSION 0.1.3
-#define ADT_BYTE_ARRAY_NO_GROWTH 0u //will malloc exactly the number of bytes it currently needs
-#define ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
-#define ADT_BYTE_ARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
+//Corrected names
+#define ADT_BYTEARRAY_VERSION 0.1.4
+#define ADT_BYTEARRAY_NO_GROWTH 0u  //will malloc exactly the number of bytes it currently needs
+#define ADT_BYTEARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
+#define ADT_BYTEARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
+
+//Deprecated names
+#define ADT_BYTE_ARRAY_VERSION ADT_BYTEARRAY_NO_GROWTH
+#define ADT_BYTE_ARRAY_NO_GROWTH ADT_BYTEARRAY_NO_GROWTH
+#define ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE ADT_BYTEARRAY_DEFAULT_GROW_SIZE
+#define ADT_BYTE_ARRAY_MAX_GROW_SIZE ADT_BYTEARRAY_MAX_GROW_SIZE
+
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC VARIABLES
@@ -60,6 +68,7 @@ void adt_bytearray_destroy(adt_bytearray_t *self);
 adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize);
 adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, uint32_t u32GrowSize);
 adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr, uint32_t u32GrowSize);
+adt_bytearray_t *adt_bytearray_clone(const adt_bytearray_t *other, uint32_t u32GrowSize);
 void adt_bytearray_delete(adt_bytearray_t *self);
 void adt_bytearray_vdelete(void *arg);
 void adt_bytearray_setGrowthSize(adt_bytearray_t *self,uint32_t u32GrowSize);
