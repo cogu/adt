@@ -734,6 +734,7 @@ void adt_str_clear(adt_str_t *self)
    {
       self->s32Cur = 0;
       self->lastError = ADT_NO_ERROR;
+      self->encoding = ADT_STR_ENCODING_ASCII;
    }
 }
 

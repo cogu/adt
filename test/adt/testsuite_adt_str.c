@@ -74,6 +74,7 @@ static void test_adt_str_lt_utf8(CuTest* tc);
 static void test_adt_str_new_byterray(CuTest* tc);
 static void test_adt_str_bytearray(CuTest* tc);
 static void test_adt_str_bytes(CuTest* tc);
+static void test_adt_str_clear(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -116,6 +117,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_new_byterray);
    SUITE_ADD_TEST(suite, test_adt_str_bytearray);
    SUITE_ADD_TEST(suite, test_adt_str_bytes);
+   SUITE_ADD_TEST(suite, test_adt_str_clear);
 
 
    return suite;
@@ -689,5 +691,25 @@ static void test_adt_str_bytes(CuTest* tc)
    CuAssertUIntEquals(tc, 4, adt_bytes_length(bytes));
    CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytes_data(bytes), 4));
    adt_bytes_delete(bytes);
+   adt_str_delete(str);
+}
+
+static void test_adt_str_clear(CuTest* tc)
+{
+   const char *test1 = "\327\220\327\206\327\252"; //\xD7\x90 \xD7\x86 \xD7\xAA
+   const char *test2 = "Hello";
+   adt_str_t *str = adt_str_new();
+
+   adt_str_append_cstr(str, test1);
+   CuAssertIntEquals(tc, 6, adt_str_size(str));
+   CuAssertIntEquals(tc, 3, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_str_getEncoding(str));
+   adt_str_clear(str);
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
+   adt_str_append_cstr(str, test2);
+   CuAssertIntEquals(tc, 5, adt_str_size(str));
+   CuAssertIntEquals(tc, 5, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
+
    adt_str_delete(str);
 }
