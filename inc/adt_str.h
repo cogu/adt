@@ -50,9 +50,9 @@ typedef uint8_t adt_str_encoding_t;
 #define ADT_UTF8_INVALID_ENCODING -2
 
 typedef struct adt_str_tag {
-     int32_t s32Cur;   //Current size of the string
+     int32_t s32Cur;   //Current size of the string (s32Cur<=s32Size)
      int32_t s32Size;  //Size of the allocated array
-     uint8_t *pStr;    //Array of bytes
+     uint8_t *pAlloc;  //Allocated array
      adt_error_t lastError;
      adt_str_encoding_t encoding;
 } adt_str_t;
@@ -125,8 +125,7 @@ int adt_str_vlt(const void *a, const void *b); //Used for sorting strings
 #define adt_str_reset adt_str_destroy
 
 #ifdef UNIT_TEST
-adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen);
-adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strLen);
+adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t maxBufLen, int32_t *strLen);
 int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint);
 #endif
 

@@ -75,6 +75,7 @@ static void test_adt_str_new_byterray(CuTest* tc);
 static void test_adt_str_bytearray(CuTest* tc);
 static void test_adt_str_bytes(CuTest* tc);
 static void test_adt_str_clear(CuTest* tc);
+static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -118,6 +119,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_bytearray);
    SUITE_ADD_TEST(suite, test_adt_str_bytes);
    SUITE_ADD_TEST(suite, test_adt_str_clear);
+   SUITE_ADD_TEST(suite, test_adt_adding_nulls_at_end_shall_not_be_part_of_length);
 
 
    return suite;
@@ -130,7 +132,7 @@ static void test_adt_str_create(CuTest *tc)
 {
    adt_str_t str;
    adt_str_create(&str);
-   CuAssertPtrEquals(tc, 0, str.pStr);
+   CuAssertPtrEquals(tc, 0, str.pAlloc);
    CuAssertIntEquals(tc, 0, str.s32Cur);
    CuAssertIntEquals(tc, 0, str.s32Size);
 }
@@ -177,11 +179,11 @@ static void test_adt_str_set_cstr(CuTest *tc)
 
    adt_str_set_cstr(str, cstr1);
    CuAssertIntEquals(tc, 5, adt_str_size(str));
-   CuAssertIntEquals(tc, 0, memcmp(str->pStr, cstr1, str->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str->pAlloc, cstr1, str->s32Cur));
 
    adt_str_set_cstr(str, cstr2);
    CuAssertIntEquals(tc, 6, adt_str_size(str));
-   CuAssertIntEquals(tc, 0, memcmp(str->pStr, cstr2, str->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str->pAlloc, cstr2, str->s32Cur));
 
    adt_str_delete(str);
 }
@@ -196,7 +198,7 @@ static void test_adt_str_new_cstr(CuTest *tc)
 
 
    CuAssertIntEquals(tc, 5, adt_str_size(str1));
-   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, cstr1, str1->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str1->pAlloc, cstr1, str1->s32Cur));
 
    adt_str_delete(str1);
 }
@@ -218,8 +220,8 @@ static void test_adt_str_set_bstr(CuTest *tc)
    adt_str_set_bstr(str2, (const uint8_t*) c, (const uint8_t*) d);
    CuAssertIntEquals(tc, 5, str1->s32Cur);
    CuAssertIntEquals(tc, 6, str2->s32Cur);
-   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, a, 5));
-   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, c, 6));
+   CuAssertIntEquals(tc, 0, memcmp(str1->pAlloc, a, 5));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pAlloc, c, 6));
    adt_str_delete(str1);
    adt_str_delete(str2);
 }
@@ -240,8 +242,8 @@ static void test_adt_str_new_bstr(CuTest *tc)
    CuAssertPtrNotNull(tc, str2);
    CuAssertIntEquals(tc, 5, str1->s32Cur);
    CuAssertIntEquals(tc, 6, str2->s32Cur);
-   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, a, 5));
-   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, c, 6));
+   CuAssertIntEquals(tc, 0, memcmp(str1->pAlloc, a, 5));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pAlloc, c, 6));
    adt_str_delete(str1);
    adt_str_delete(str2);
 }
@@ -262,9 +264,9 @@ static void test_adt_str_set(CuTest *tc)
    adt_str_set(str2, str1);
    CuAssertIntEquals(tc, 12, str1->s32Cur);
    CuAssertIntEquals(tc, 12, str2->s32Cur);
-   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, &buf[0], str1->s32Cur));
-   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, &buf[0], str2->s32Cur));
-   CuAssertTrue(tc, str1->pStr != str2->pStr);
+   CuAssertIntEquals(tc, 0, memcmp(str1->pAlloc, &buf[0], str1->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pAlloc, &buf[0], str2->s32Cur));
+   CuAssertTrue(tc, str1->pAlloc != str2->pAlloc);
    adt_str_delete(str1);
    adt_str_delete(str2);
 }
@@ -338,9 +340,9 @@ static void test_adt_str_clone(CuTest *tc)
    CuAssertPtrNotNull(tc, str2);
    CuAssertIntEquals(tc, 12, str1->s32Cur);
    CuAssertIntEquals(tc, 12, str2->s32Cur);
-   CuAssertIntEquals(tc, 0, memcmp(str1->pStr, &buf[0], str1->s32Cur));
-   CuAssertIntEquals(tc, 0, memcmp(str2->pStr, &buf[0], str2->s32Cur));
-   CuAssertTrue(tc, str1->pStr != str2->pStr);
+   CuAssertIntEquals(tc, 0, memcmp(str1->pAlloc, &buf[0], str1->s32Cur));
+   CuAssertIntEquals(tc, 0, memcmp(str2->pAlloc, &buf[0], str2->s32Cur));
+   CuAssertTrue(tc, str1->pAlloc != str2->pAlloc);
    adt_str_delete(str1);
    adt_str_delete(str2);
 }
@@ -568,34 +570,39 @@ static void test_adt_utf8_checkEncoding_ascii(CuTest* tc)
    const char *test1 = "abc123";
    const char *test2 = "Hello World";
    const char *test3 = "Hello\r\nWorld\b";
+   int32_t size;
    const uint8_t *test;
    int32_t strLen;
 
    test = (const uint8_t*) test1, strLen = (int32_t) strlen( (const char*) test);
    CuAssertIntEquals(tc, 6, strLen);
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncoding(test, strLen));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncodingAndSize(test, strLen, &size));
+   CuAssertIntEquals(tc, strLen, size);
 
    test = (const uint8_t*) test2, strLen = (int32_t) strlen( (const char*) test);
    CuAssertIntEquals(tc, 11, strLen);
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncoding(test, strLen));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncodingAndSize(test, strLen, &size));
+   CuAssertIntEquals(tc, strLen, size);
 
    test = (const uint8_t*) test3, strLen = (int32_t) strlen( (const char*) test);
    CuAssertIntEquals(tc, 13, strLen);
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncoding(test, strLen));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncodingAndSize(test, strLen, &size));
+   CuAssertIntEquals(tc, strLen, size);
 
 }
 
 static void test_adt_utf8_checkEncoding_utf8(CuTest* tc)
 {
+   int32_t size;
    const uint8_t test1[2] = {0302, 0241};
    const uint8_t test2[3] = {0343, 0202, 0206};
    const uint8_t test3[4] = {0360, 0237, 0245, 0214};
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncoding(test1, sizeof(test1)));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize(test1, sizeof(test1), &size));
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncoding(test2, sizeof(test2)));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize(test2, sizeof(test2), &size));
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncoding(test3, sizeof(test3)));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize(test3, sizeof(test3), &size));
 }
 
 static void test_adt_utf8_checkEncodingAndSize(CuTest* tc)
@@ -603,10 +610,10 @@ static void test_adt_utf8_checkEncodingAndSize(CuTest* tc)
    const char *test1 = "Hello World";
    const char *test2 = "Test \343\202\206";
    int32_t size;
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncodingAndSize( (const uint8_t*) test1, &size));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_utf8_checkEncodingAndSize( (const uint8_t*) test1, 0, &size));
    CuAssertIntEquals(tc, 11, size);
 
-   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize( (const uint8_t*) test2, &size));
+   CuAssertIntEquals(tc, ADT_STR_ENCODING_UTF8, adt_utf8_checkEncodingAndSize( (const uint8_t*) test2,  0, &size));
    CuAssertIntEquals(tc, 8, size);
 
 }
@@ -711,5 +718,20 @@ static void test_adt_str_clear(CuTest* tc)
    CuAssertIntEquals(tc, 5, adt_str_length(str));
    CuAssertIntEquals(tc, ADT_STR_ENCODING_ASCII, adt_str_getEncoding(str));
 
+   adt_str_delete(str);
+}
+
+static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc)
+{
+   const uint8_t test1[6] = {'a', 'b', 'c', 0, 0, 0};
+   const uint8_t test2[3] = {0, 0, 0};
+   const uint8_t test3[3] = {'a', 0, 0};
+   adt_str_t *str = adt_str_new();
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test1, test1+sizeof(test1)));
+   CuAssertIntEquals(tc, 3, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test2, test1+sizeof(test2)));
+   CuAssertIntEquals(tc, 0, adt_str_length(str));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test3, test1+sizeof(test3)));
+   CuAssertIntEquals(tc, 1, adt_str_length(str));
    adt_str_delete(str);
 }

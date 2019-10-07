@@ -60,8 +60,7 @@
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 static int32_t adt_str_calcSize(int32_t s32CurSize, int32_t s32NewSize);
-DYN_STATIC adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen);
-DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strLen);
+DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t maxBufLen, int32_t *strLen);
 DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint);
 static int adt_str_lt_ascii(const adt_str_t *self, const adt_str_t *other);
 static int adt_str_lt_utf8(const adt_str_t *self, const adt_str_t *other);
@@ -83,7 +82,7 @@ void adt_str_create(adt_str_t *self)
    {
       self->s32Cur = 0;
       self->s32Size = 0;
-      self->pStr = (uint8_t*) 0;
+      self->pAlloc = (uint8_t*) 0;
       self->lastError = ADT_NO_ERROR;
       self->encoding = ADT_STR_ENCODING_ASCII;
    }
@@ -217,14 +216,13 @@ void adt_str_destroy(adt_str_t *self)
 {
    if(self != 0)
    {
-      if(self->pStr != 0)
+      if(self->pAlloc != 0)
       {
-         free(self->pStr);
-         self->pStr = 0;
+         free(self->pAlloc);
+         self->pAlloc = 0;
       }
-      self->s32Cur = 0;
       self->s32Size = 0;
-      self->lastError = ADT_NO_ERROR;
+      adt_str_clear(self);
    }
 }
 
@@ -266,9 +264,9 @@ adt_error_t adt_str_set(adt_str_t *self, const adt_str_t* other)
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
          {
-            assert(self->pStr != 0);
+            assert(self->pAlloc != 0);
             assert(self->s32Size > s32Size);
-            memcpy(self->pStr, other->pStr, s32Size);
+            memcpy(self->pAlloc, other->pAlloc, s32Size);
             self->s32Cur = s32Size;
             self->encoding = other->encoding;
          }
@@ -290,20 +288,24 @@ adt_error_t adt_str_set_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8
    }
    else
    {
-      int32_t s32Size = (int32_t) (pEnd-pBegin);
-      if (s32Size > 0)
+      int32_t bufLen = (int32_t) (pEnd-pBegin);
+      if (bufLen > 0)
       {
          adt_error_t result;
-         adt_str_encoding_t encoding = adt_utf8_checkEncoding(pBegin, s32Size);
+         int32_t strSize = 0;
+         adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize(pBegin, bufLen, &strSize);
          adt_str_reset(self);
-         result = adt_str_reserve(self, s32Size);
-         if (result == ADT_NO_ERROR)
+         if (strSize > 0)
          {
-            assert(self->pStr != 0);
-            assert(self->s32Size > s32Size);
-            memcpy(self->pStr, pBegin, s32Size);
-            self->s32Cur = s32Size;
-            self->encoding = encoding;
+            result = adt_str_reserve(self, strSize);
+            if (result == ADT_NO_ERROR)
+            {
+               assert(self->pAlloc != 0);
+               assert(self->s32Size >= strSize);
+               memcpy(self->pAlloc, pBegin, strSize);
+               self->s32Cur = strSize;
+               self->encoding = encoding;
+            }
          }
       }
    }
@@ -323,7 +325,7 @@ adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr)
    else
    {
       int32_t s32Size = 0;
-      adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize((const uint8_t*) cstr, &s32Size);
+      adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize((const uint8_t*) cstr, 0, &s32Size);
       if ( (encoding != ADT_STR_ENCODING_UNKNOWN) && (s32Size > 0) )
       {
          adt_error_t result;
@@ -331,9 +333,9 @@ adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr)
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
          {
-            assert(self->pStr != 0);
+            assert(self->pAlloc != 0);
             assert(self->s32Size > s32Size);
-            memcpy(self->pStr, cstr, s32Size);
+            memcpy(self->pAlloc, cstr, s32Size);
             self->s32Cur = s32Size;
             self->encoding = encoding;
          }
@@ -362,9 +364,9 @@ adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other)
          if (result == ADT_NO_ERROR)
          {
             assert(self->s32Size > newLen);
-            assert(self->pStr != 0);
-            assert(other->pStr != 0);
-            memcpy(self->pStr+self->s32Cur, other->pStr, other->s32Cur);
+            assert(self->pAlloc != 0);
+            assert(other->pAlloc != 0);
+            memcpy(self->pAlloc+self->s32Cur, other->pAlloc, other->s32Cur);
             self->s32Cur = newLen;
             if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (other->encoding == ADT_STR_ENCODING_UTF8) )
             {
@@ -392,20 +394,22 @@ adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const ui
    }
    else
    {
-      int32_t s32Size = (int32_t) (pEnd-pBegin);
-      if (s32Size > 0)
+      int32_t bufLen = (int32_t) (pEnd-pBegin);
+      if (bufLen > 0)
       {
-         adt_str_encoding_t encoding = adt_utf8_checkEncoding(pBegin, s32Size);
-         if ( (encoding == ADT_STR_ENCODING_ASCII) || (encoding == ADT_STR_ENCODING_UTF8) )
+         int32_t strSize = 0;
+         adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize(pBegin, bufLen, &strSize);
+         if ( (strSize > 0) && ( (encoding == ADT_STR_ENCODING_ASCII) || (encoding == ADT_STR_ENCODING_UTF8) ) )
          {
             adt_error_t result;
-            int32_t newLen = self->s32Cur + s32Size;
+            int32_t newLen;
+            newLen = self->s32Cur + strSize;
             result = adt_str_reserve(self, newLen);
             if (result == ADT_NO_ERROR)
             {
-               assert(self->pStr != 0);
+               assert(self->pAlloc != 0);
                assert(self->s32Size > newLen);
-               memcpy(self->pStr + self->s32Cur, pBegin, s32Size);
+               memcpy(self->pAlloc + self->s32Cur, pBegin, strSize);
                self->s32Cur = newLen;
                if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (encoding == ADT_STR_ENCODING_UTF8) )
                {
@@ -439,7 +443,7 @@ adt_error_t adt_str_append_cstr(adt_str_t *self, const char *cstr)
    else
    {
       int32_t s32Size = 0;
-      adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize((const uint8_t*) cstr, &s32Size);
+      adt_str_encoding_t encoding = adt_utf8_checkEncodingAndSize((const uint8_t*) cstr, 0, &s32Size);
       if ( (encoding != ADT_STR_ENCODING_UNKNOWN) && (s32Size > 0) )
       {
          adt_error_t result;
@@ -448,7 +452,7 @@ adt_error_t adt_str_append_cstr(adt_str_t *self, const char *cstr)
          if (result == ADT_NO_ERROR)
          {
             assert(self->s32Size > newSize);
-            memcpy(self->pStr+self->s32Cur, cstr, s32Size);
+            memcpy(self->pAlloc+self->s32Cur, cstr, s32Size);
             self->s32Cur = newSize;
             if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (encoding == ADT_STR_ENCODING_UTF8) )
             {
@@ -487,7 +491,7 @@ adt_error_t adt_str_push(adt_str_t *self, const int c)
          if (result == ADT_NO_ERROR)
          {
             assert(self->s32Cur < self->s32Size);
-            self->pStr[self->s32Cur++] = (uint8_t) c;
+            self->pAlloc[self->s32Cur++] = (uint8_t) c;
             assert(self->s32Cur < self->s32Size);
          }
       }
@@ -502,7 +506,7 @@ int adt_str_pop(adt_str_t *self)
    {
       if(self->s32Cur>0)
       {
-         retval = (int) self->pStr[--self->s32Cur];
+         retval = (int) self->pAlloc[--self->s32Cur];
       }
    }
    return retval;
@@ -539,7 +543,7 @@ int adt_str_charAt(adt_str_t *self, int index)
       }
       if (errorCode == ADT_NO_ERROR)
       {
-         retval = (int) self->pStr[s32Index];
+         retval = (int) self->pAlloc[s32Index];
       }
       else
       {
@@ -556,15 +560,15 @@ const char* adt_str_cstr(adt_str_t *self)
    if(self != 0)
    {
       adt_error_t result = ADT_NO_ERROR;
-      if(self->pStr == 0)
+      if(self->pAlloc == 0)
       {
          result = adt_str_reserve(self, 0);
       }
       if (result == ADT_NO_ERROR)
       {
          assert(self->s32Cur < self->s32Size);
-         self->pStr[self->s32Cur] = 0u;
-         retval = (const char*) self->pStr;
+         self->pAlloc[self->s32Cur] = 0u;
+         retval = (const char*) self->pAlloc;
       }
       else
       {
@@ -596,7 +600,7 @@ adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
          if (result == ADT_NO_ERROR)
          {
             assert(adt_bytearray_length(retval) == u32Size);
-            memcpy(adt_bytearray_data(retval), self->pStr, (size_t) self->s32Cur);
+            memcpy(adt_bytearray_data(retval), self->pAlloc, (size_t) self->s32Cur);
          }
          else
          {
@@ -613,7 +617,7 @@ struct adt_bytes_tag *adt_str_bytes(adt_str_t *self)
    adt_bytes_t *retval = (adt_bytes_t*) 0;
    if (self != 0)
    {
-      retval = adt_bytes_new(self->pStr, (uint32_t) self->s32Cur);
+      retval = adt_bytes_new(self->pAlloc, (uint32_t) self->s32Cur);
    }
    return retval;
 }
@@ -650,7 +654,7 @@ int32_t adt_str_length(const adt_str_t *self)
       }
       else if (self->encoding == ADT_STR_ENCODING_UTF8)
       {
-         const uint8_t *p = self->pStr;
+         const uint8_t *p = self->pAlloc;
          int32_t remain = self->s32Cur;
          retval = 0;
          while(remain > 0)
@@ -711,12 +715,12 @@ adt_error_t adt_str_reserve(adt_str_t *self, int32_t s32NewLen)
          }
          else
          {
-            if(self->pStr != 0)
+            if(self->pAlloc != 0)
             {
-               memcpy(pStr,self->pStr, self->s32Cur);
-               free(self->pStr);
+               memcpy(pStr,self->pAlloc, self->s32Cur);
+               free(self->pAlloc);
             }
-            self->pStr = pStr;
+            self->pAlloc = pStr;
             self->s32Size = s32Size;
          }
       }
@@ -748,11 +752,11 @@ bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr)
       {
          return true;
       }
-      else if (self->s32Cur > 0 && self->pStr != 0)
+      else if (self->s32Cur > 0 && self->pAlloc != 0)
       {
          const uint8_t *pStr = (const uint8_t*) cstr;
-         const uint8_t *pNext = self->pStr;
-         const uint8_t *pEnd = self->pStr + self->s32Cur;
+         const uint8_t *pNext = self->pAlloc;
+         const uint8_t *pEnd = self->pAlloc + self->s32Cur;
          while(pNext < pEnd)
          {
             uint8_t c = *pNext;
@@ -879,11 +883,13 @@ DYN_STATIC adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int3
 }
 
 /**
- * Returns both encoding and size of the string. The input string must be null-terminated.
+ * Returns both encoding and size of the string.
+ * If parameter maxBufLen is 0 the function will stop on first occurence of a NULL character.
+ * If maxBufLen is greater than zero the function will stop on first occurnce of a NULL character or when string size equals to maxBufLen
  */
-DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t *strSize)
+DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t maxBufLen, int32_t *strSize)
 {
-   if ( (strBuf == 0) || (strSize == 0) )
+   if ( (strBuf == 0) || (maxBufLen < 0) || (strSize == 0) )
    {
       return ADT_STR_ENCODING_UNKNOWN;
    }
@@ -891,7 +897,7 @@ DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBu
    uint8_t c = 0;
    adt_str_encoding_t retval = ADT_STR_ENCODING_ASCII;
    int32_t size = 0;
-   while(1)
+   while( (maxBufLen == 0) || (size < maxBufLen))
    {
       c = *p++;
       if (c == 0)
@@ -985,8 +991,8 @@ DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen,
 
 static int adt_str_lt_ascii(const adt_str_t *self, const adt_str_t *other)
 {
-   const uint8_t *strLeft = self->pStr;
-   const uint8_t *strRight = other->pStr;
+   const uint8_t *strLeft = self->pAlloc;
+   const uint8_t *strRight = other->pAlloc;
    int32_t remainLeft = self->s32Cur;
    int32_t remainRight = other->s32Cur;
 
@@ -1022,8 +1028,8 @@ static int adt_str_lt_ascii(const adt_str_t *self, const adt_str_t *other)
 
 static int adt_str_lt_utf8(const adt_str_t *self, const adt_str_t *other)
 {
-   const uint8_t *strLeft = self->pStr;
-   const uint8_t *strRight = other->pStr;
+   const uint8_t *strLeft = self->pAlloc;
+   const uint8_t *strRight = other->pAlloc;
    int32_t remainLeft = self->s32Cur;
    int32_t remainRight = other->s32Cur;
 
