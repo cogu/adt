@@ -861,28 +861,6 @@ static int32_t adt_str_calcSize(int32_t s32CurSize, int32_t s32NewSize)
 }
 
 /**
- * Goes through characters in string buffer and attempts to determine its encoding
- *
- */
-DYN_STATIC adt_str_encoding_t adt_utf8_checkEncoding(const uint8_t *strBuf, int32_t bufLen)
-{
-   int32_t i;
-   for(i=0; i<bufLen; i++)
-   {
-      if ( strBuf[i] > 127)
-      {
-         uint8_t c = strBuf[i] & 0xf8;
-         if ( (c == 0xf0) || ( (c & 0xf0) == 0xe0) || ( (c & 0xe0) == 0xc0) )
-         {
-            return ADT_STR_ENCODING_UTF8;
-         }
-         return ADT_STR_ENCODING_UTF16; //this is a guess
-      }
-   }
-   return ADT_STR_ENCODING_ASCII;
-}
-
-/**
  * Returns both encoding and size of the string.
  * If parameter maxBufLen is 0 the function will stop on first occurence of a NULL character.
  * If maxBufLen is greater than zero the function will stop on first occurnce of a NULL character or when string size equals to maxBufLen
