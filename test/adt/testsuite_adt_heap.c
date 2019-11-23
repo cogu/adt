@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stddef.h>
 #include "adt_heap.h"
-#include "cutest.h"
+#include "CuTest.h"
 #ifdef MEM_LEAK_CHECK
 # include "CMemLeak.h"
 #endif

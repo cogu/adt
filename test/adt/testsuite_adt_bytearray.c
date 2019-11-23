@@ -187,7 +187,7 @@ static void test_adt_bytearray_bytes(CuTest* tc)
    adt_bytes_t *bytes = adt_bytearray_bytes(array);
    CuAssertPtrNotNull(tc, bytes);
    CuAssertUIntEquals(tc, 4, adt_bytes_length(bytes));
-   const uint8_t *data = adt_bytes_data(bytes);
+   const uint8_t *data = adt_bytes_constData(bytes);
    CuAssertIntEquals(tc, 17, data[0]);
    CuAssertIntEquals(tc, 255, data[1]);
    CuAssertIntEquals(tc, 93, data[2]);

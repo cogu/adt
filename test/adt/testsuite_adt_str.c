@@ -633,8 +633,8 @@ static void test_adt_str_equal_cstr(CuTest* tc)
 
 static void test_adt_str_lt_utf8(CuTest* tc)
 {
-   const char *left_cstr = "\113\303\266\160\145\156\150\141\155\156"; //Köpenhamn
-   const char *right_cstr = "\113\303\266\160\151\156\147"; //Köping
+   const char *left_cstr = "\113\303\266\160\145\156\150\141\155\156"; //KÃ¶penhamn
+   const char *right_cstr = "\113\303\266\160\151\156\147"; //KÃ¶ping
    adt_str_t *left = adt_str_new_cstr(left_cstr);
    adt_str_t *right = adt_str_new_cstr(right_cstr);
    CuAssertPtrNotNull(tc, left);
@@ -651,7 +651,7 @@ static void test_adt_str_lt_utf8(CuTest* tc)
 
 static void test_adt_str_new_byterray(CuTest* tc)
 {
-   const char *cstr = "\113\303\266\160\145\156\150\141\155\156"; //Köpenhamn
+   const char *cstr = "\113\303\266\160\145\156\150\141\155\156"; //KÃ¶penhamn
    adt_bytearray_t *tmpArray;
    adt_str_t *str;
 
@@ -696,7 +696,7 @@ static void test_adt_str_bytes(CuTest* tc)
    bytes = adt_str_bytes(str);
    CuAssertPtrNotNull(tc, bytes);
    CuAssertUIntEquals(tc, 4, adt_bytes_length(bytes));
-   CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytes_data(bytes), 4));
+   CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytes_constData(bytes), 4));
    adt_bytes_delete(bytes);
    adt_str_delete(str);
 }

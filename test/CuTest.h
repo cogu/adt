@@ -7,6 +7,7 @@
 #ifndef CU_TEST_H
 #define CU_TEST_H
 
+#include <stdlib.h>
 #include <setjmp.h>
 #include <stdarg.h>
 

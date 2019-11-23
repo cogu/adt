@@ -40,7 +40,7 @@
 //////////////////////////////////////////////////////////////////////////////
 static void test_adt_bytes_new(CuTest* tc);
 static void test_adt_bytes_length(CuTest* tc);
-static void test_adt_bytes_data(CuTest* tc);
+static void test_adt_bytes_constData(CuTest* tc);
 static void test_adt_bytes_bytearray(CuTest* tc);
 static void test_adt_bytes_clone(CuTest* tc);
 
@@ -54,7 +54,7 @@ CuSuite* testsuite_adt_bytes(void)
 
    SUITE_ADD_TEST(suite, test_adt_bytes_new);
    SUITE_ADD_TEST(suite, test_adt_bytes_length);
-   SUITE_ADD_TEST(suite, test_adt_bytes_data);
+   SUITE_ADD_TEST(suite, test_adt_bytes_constData);
    SUITE_ADD_TEST(suite, test_adt_bytes_bytearray);
    SUITE_ADD_TEST(suite, test_adt_bytes_clone);
 
@@ -94,16 +94,21 @@ static void test_adt_bytes_length(CuTest* tc)
    adt_bytes_delete(bytes);
 }
 
-static void test_adt_bytes_data(CuTest* tc)
+
+
+static void test_adt_bytes_constData(CuTest* tc)
 {
    uint8_t data[5] = {1, 2, 3, 4, 5};
 
    adt_bytes_t *bytes = adt_bytes_new(&data[0], sizeof(data));
+   const uint8_t *p;
    CuAssertPtrNotNull(tc, bytes);
-   CuAssertConstPtrEquals(tc, (const uint8_t*) bytes->dataBuf, adt_bytes_data(bytes));
-
+   p = adt_bytes_constData(bytes);
+   CuAssertPtrNotNull(tc, p);
+   CuAssertIntEquals(tc, 0, memcmp(p, &data[0], sizeof(data)));
    adt_bytes_delete(bytes);
 }
+
 
 static void test_adt_bytes_bytearray(CuTest* tc)
 {
@@ -127,7 +132,7 @@ static void test_adt_bytes_clone(CuTest* tc)
    adt_bytes_t *bytes2 = adt_bytes_clone(bytes1);
    CuAssertPtrNotNull(tc, bytes2);
    CuAssertUIntEquals(tc, 5, adt_bytes_length(bytes2));
-   CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytes_data(bytes2), 5));
+   CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytes_constData(bytes2), 5));
    CuAssertTrue(tc, adt_bytes_equals(bytes1, bytes2));
 
    adt_bytes_delete(bytes1);

@@ -135,7 +135,7 @@ uint32_t adt_bytes_length(const adt_bytes_t *self)
    return 0;
 }
 
-const uint8_t* adt_bytes_data(const adt_bytes_t *self)
+const uint8_t* adt_bytes_constData(const adt_bytes_t *self)
 {
    if (self != 0)
    {
