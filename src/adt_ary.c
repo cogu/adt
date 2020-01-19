@@ -47,12 +47,17 @@ adt_ary_t*	adt_ary_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*)
 		return (adt_ary_t*) 0;
 	}
 
+	if(ppElem == 0){
+		return (adt_ary_t*) 0;
+	}
+
 	self = adt_ary_new(pDestructor);
 	if(self==(adt_ary_t*)0){
 		return (adt_ary_t*)0;
 	}
 	adt_ary_extend(self,s32Len);
 	ppDest=self->pFirst;
+	assert(ppDest != 0);
 	ppSrc=ppElem;
 	for(s32i=0;s32i<s32Len;s32i++){
 		*(ppDest++) = *(ppSrc++);
