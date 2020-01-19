@@ -567,6 +567,7 @@ const char* adt_str_cstr(adt_str_t *self)
       if (result == ADT_NO_ERROR)
       {
          assert(self->s32Cur < self->s32Size);
+         assert(self->pAlloc != 0);
          self->pAlloc[self->s32Cur] = 0u;
          retval = (const char*) self->pAlloc;
       }
