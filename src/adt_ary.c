@@ -495,6 +495,24 @@ int adt_u32_vlt(const void *a, const void *b)
    return -1;
 }
 
+/**
+ * Returns the array index of the element pElem. In the event that pElem is not in the array the function returns -1
+ */
+int32_t adt_ary_indexOf(adt_ary_t *self, void *pElem)
+{
+   if (self != 0)
+   {
+      int32_t s32Index;
+      for(s32Index = 0; s32Index < self->s32CurLen; s32Index++ )
+      {
+         if (self->pFirst[s32Index] == pElem) {
+            return s32Index;
+         }
+      }
+   }
+   return -1;
+}
+
 /***************** Private Function Definitions *******************/
 /**
  * CG: I had some serious issues with some Microsoft compilers not handling large memmoves.

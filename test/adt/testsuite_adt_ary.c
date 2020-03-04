@@ -4,7 +4,7 @@
 * \date      2016-11-20
 * \brief     Unit tests for adt_ary_t
 *
-* Copyright (c) 2019 Conny Gustafsson
+* Copyright (c) 2016-2020 Conny Gustafsson
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the "Software"), to deal in
 * the Software without restriction, including without limitation the rights to
@@ -66,6 +66,7 @@ static void test_adt_ary_sort_array_with_one_item(CuTest* tc);
 static void test_adt_ary_sort_array_with_seven_items(CuTest* tc);
 static void test_adt_ary_reverse_sort_array_with_seven_items(CuTest* tc);
 static void test_adt_ary_sort_strings_array_with_four_items(CuTest* tc);
+static void test_adt_ary_indexOf(CuTest* tc);
 
 
 
@@ -96,6 +97,7 @@ CuSuite* testsuite_adt_ary(void)
    SUITE_ADD_TEST(suite, test_adt_ary_sort_array_with_seven_items);
    SUITE_ADD_TEST(suite, test_adt_ary_reverse_sort_array_with_seven_items);
    SUITE_ADD_TEST(suite, test_adt_ary_sort_strings_array_with_four_items);
+   SUITE_ADD_TEST(suite, test_adt_ary_indexOf);
 
    return suite;
 }
@@ -486,5 +488,27 @@ static void test_adt_ary_sort_strings_array_with_four_items(CuTest* tc)
    CuAssertStrEquals(tc, "blue", adt_str_cstr((adt_str_t*) adt_ary_value(array, 1)));
    CuAssertStrEquals(tc, "green", adt_str_cstr((adt_str_t*) adt_ary_value(array, 2)));
    CuAssertStrEquals(tc, "purple", adt_str_cstr((adt_str_t*) adt_ary_value(array, 3)));
+   adt_ary_delete(array);
+}
+
+static void test_adt_ary_indexOf(CuTest* tc)
+{
+   adt_ary_t *array = adt_ary_new(NULL);
+   CuAssertPtrNotNull(tc, array);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[0])); //index 0
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[1])); //index 1
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[2])); //index 2
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[3])); //index 3
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[4])); //index 4
+   CuAssertIntEquals(tc, 5, adt_ary_length(array));
+
+   CuAssertIntEquals(tc, 0, adt_ary_indexOf(array, &m_numbers[0]));
+   CuAssertIntEquals(tc, 1, adt_ary_indexOf(array, &m_numbers[1]));
+   CuAssertIntEquals(tc, 2, adt_ary_indexOf(array, &m_numbers[2]));
+   CuAssertIntEquals(tc, 3, adt_ary_indexOf(array, &m_numbers[3]));
+   CuAssertIntEquals(tc, 4, adt_ary_indexOf(array, &m_numbers[4]));
+   CuAssertIntEquals(tc, -1, adt_ary_indexOf(array, &m_numbers[5]));
+   CuAssertIntEquals(tc, -1, adt_ary_indexOf(array, &m_numbers[6]));
+
    adt_ary_delete(array);
 }

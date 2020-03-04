@@ -86,6 +86,7 @@ void* 	   adt_ary_get_fill_elem(const adt_ary_t *self);
 adt_error_t adt_ary_splice(adt_ary_t *self, int32_t s32Index, int32_t s32Len);
 int32_t	   adt_ary_exists(const adt_ary_t *self, int32_t s32Index);
 adt_error_t adt_ary_sort(adt_ary_t *self, adt_vlt_func_t *key, bool reverse);
+int32_t     adt_ary_indexOf(adt_ary_t *self, void *pElem);
 
 //built-in lt functions (for sorting)
 int adt_i32_vlt(const void *a, const void *b);
