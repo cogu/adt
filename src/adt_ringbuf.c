@@ -501,14 +501,20 @@ static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_
    {
       uint8_t *mark;
       uint32_t copyLen;
-      uint8_t *u8EndPtr = self->u8AllocBuf + (self->u16AllocLen * ((uint32_t)self->u8ElemSize));
+      uint8_t *u8EndPtr;
+      uint32_t allocSize = ((uint32_t) self->u16AllocLen) * ((uint32_t) self->u8ElemSize);
+      assert(self->u8AllocBuf != 0);
+      assert(allocSize > 0);
+      u8EndPtr = self->u8AllocBuf + allocSize;
       //Step 1.
       copyLen = (uint32_t) (u8EndPtr-self->u8ReadPtr);
+      assert(copyLen <= allocSize);
       memcpy(newAllocBuf, self->u8ReadPtr, copyLen);
       mark = newAllocBuf+copyLen;
 
       //Step 2.
-      copyLen =  (uint32_t) (self->u8AllocBuf - self->u8ReadPtr);
+      copyLen =  (uint32_t) (self->u8ReadPtr - self->u8AllocBuf);
+      assert(copyLen <= allocSize);
       if (copyLen > 0)
       {
          memcpy(mark, self->u8AllocBuf, copyLen);
@@ -516,10 +522,7 @@ static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_
       }
 
       //Update pointers and free memory
-      if (self->u8AllocBuf != 0)
-      {
-         free(self->u8AllocBuf);
-      }
+      free(self->u8AllocBuf);
       self->u8AllocBuf = newAllocBuf;
       self->u16AllocLen = newAllocLen;
       self->u8ReadPtr = newAllocBuf;

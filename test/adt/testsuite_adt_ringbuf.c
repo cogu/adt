@@ -42,6 +42,7 @@
 #if (ADT_RBFH_ENABLE)
 static void test_adt_rbfh_nextLen(CuTest* tc);
 static void test_adt_rbfh_insert_then_grow(CuTest* tc);
+static void test_adt_rbfh_insert_then_grow2(CuTest* tc);
 static void test_adt_rbfh_insert_then_remove(CuTest* tc);
 static void test_adt_rbfh_peek(CuTest* tc);
 static void test_adt_rbfh_limits(CuTest* tc);
@@ -61,6 +62,7 @@ CuSuite* testsuite_adt_ringbuf(void)
 #if (ADT_RBFH_ENABLE)
    SUITE_ADD_TEST(suite, test_adt_rbfh_nextLen);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_grow);
+   SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_grow2);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_remove);
    SUITE_ADD_TEST(suite, test_adt_rbfh_peek);
    SUITE_ADD_TEST(suite, test_adt_rbfh_limits);
@@ -113,6 +115,47 @@ static void test_adt_rbfh_insert_then_grow(CuTest* tc)
    CuAssertUIntEquals(tc, 5, adt_rbfh_length(&buf));
    //grow the buffer
    value = 6;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   CuAssertUIntEquals(tc, 10, buf.u16AllocLen);
+   CuAssertUIntEquals(tc, 6, adt_rbfh_length(&buf));
+
+   adt_rbfh_destroy(&buf);
+}
+
+static void test_adt_rbfh_insert_then_grow2(CuTest* tc)
+{
+   adt_rbfh_t buf;
+   uint32_t value;
+   adt_rbfh_createEx(&buf, sizeof(uint32_t), 5, 0);
+   CuAssertPtrNotNull(tc, buf.u8AllocBuf);
+   CuAssertUIntEquals(tc, 5, buf.u16AllocLen);
+   CuAssertUIntEquals(tc, 0, adt_rbfh_length(&buf));
+   value = 1;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   value = 2;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   value = 3;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   value = 4;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   value = 5;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   CuAssertUIntEquals(tc, 5, adt_rbfh_length(&buf));
+   //Remove two items
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_remove(&buf, (uint8_t*) &value));
+   CuAssertUIntEquals(tc, 1, value);
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_remove(&buf, (uint8_t*) &value));
+   CuAssertUIntEquals(tc, 2, value);
+   CuAssertUIntEquals(tc, 3, adt_rbfh_length(&buf));
+   //Add two new items
+   value = 6;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   value = 7;
+   CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
+   CuAssertUIntEquals(tc, 5, adt_rbfh_length(&buf));
+   CuAssertUIntEquals(tc, 5, buf.u16AllocLen);
+   //Adding another item should grow the buffer
+   value = 8;
    CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &value));
    CuAssertUIntEquals(tc, 10, buf.u16AllocLen);
    CuAssertUIntEquals(tc, 6, adt_rbfh_length(&buf));
