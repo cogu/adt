@@ -76,6 +76,7 @@ static void test_adt_str_bytearray(CuTest* tc);
 static void test_adt_str_bytes(CuTest* tc);
 static void test_adt_str_clear(CuTest* tc);
 static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc);
+static void test_adt_str_append_bstr_containing_nulls_at_end(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -120,6 +121,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_bytes);
    SUITE_ADD_TEST(suite, test_adt_str_clear);
    SUITE_ADD_TEST(suite, test_adt_adding_nulls_at_end_shall_not_be_part_of_length);
+   SUITE_ADD_TEST(suite, test_adt_str_append_bstr_containing_nulls_at_end);
 
 
    return suite;
@@ -732,6 +734,24 @@ static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc)
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test2, test1+sizeof(test2)));
    CuAssertIntEquals(tc, 0, adt_str_length(str));
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test3, test1+sizeof(test3)));
+   CuAssertIntEquals(tc, 1, adt_str_length(str));
+   adt_str_delete(str);
+}
+
+static void test_adt_str_append_bstr_containing_nulls_at_end(CuTest* tc)
+{
+   const uint8_t test1[6] = {'a', 'b', 'c', 0, 0, 0};
+   const uint8_t test2[3] = {0, 0, 0};
+   const uint8_t test3[3] = {'a', 0, 0};
+   adt_str_t *str = adt_str_new();
+   CuAssertPtrNotNull(tc, str);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test1, test1+sizeof(test1)));
+   CuAssertIntEquals(tc, 3, adt_str_length(str));
+   adt_str_clear(str);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test2, test1+sizeof(test2)));
+   CuAssertIntEquals(tc, 0, adt_str_length(str));
+   adt_str_clear(str);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test3, test1+sizeof(test3)));
    CuAssertIntEquals(tc, 1, adt_str_length(str));
    adt_str_delete(str);
 }
