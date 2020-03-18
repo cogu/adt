@@ -79,6 +79,8 @@
                                     								
                                 </option>
                                 								
+                                <option id="gnu.c.compiler.option.warnings.extrawarn.1704947820" superClass="gnu.c.compiler.option.warnings.extrawarn" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                								
                                 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1420075053" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
                                 							
                             </tool>

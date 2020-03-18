@@ -421,6 +421,10 @@ adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const ui
                retval = result;
             }
          }
+         else if (strSize == 0)
+         {
+            retval = ADT_NO_ERROR;
+         }
          else
          {
             retval = ADT_UNKNOWN_ENCODING_ERROR;
