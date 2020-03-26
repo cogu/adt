@@ -6,3 +6,8 @@
 
 **/CMemLeak.txt
 projects/eclipse/adt_test/.settings/*
+
+#Build directories
+/Debug/
+/Release/
+/UnitTest/
