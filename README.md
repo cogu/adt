@@ -1,26 +1,56 @@
 # ADT
 
-Abstract data types for the C language.
+Abstract data types for the C programming language.
 
-# General Information
+## What is it?
 
-## Virtual destructors
+Platform-independent and compiler-independent data structures for the C programming language.
 
-Most ADT structures manages objects (pointers to void). Generally you would want to delete all objects contained in a data structure when the data structure itself is destroyed.
-This is accomplished in ADT by using what I call virtual destructor functions. Even though they are not the same as virtual destructors from C++, they sort of serve the same purpose.
+* Array
+* ByteArray (Mutable array)
+* Bytes (Immutable array)
+* HashTable
+* Heap
+* List
+* RingBuffer
+* Set
+* Stack
+* String
+* U16Map (Deprecated)
 
-In ADT (and projects using ADT) you will note that most objects has both a _delete-function and a _vdelete-function. 
-The _vdelete-functions are virtual destructor and can generally be handed over as a function pointer to allow any ADT data structure to automatically delete its children when the data structure itself is destroyed.
-In case you just want to maintain weak references in your ADT data structure, just hand it a NULL-pointer for the destructor argument in the ADT constructor.
+### ADT in embedded projects
 
-In special situations, some ADT structures allow temporarily enabling/disabling of automatic object destruction. Look for _destructor_enable-functions on ADT data stuctures that support this mechanism.
+Some data structures in ADT are used in embedded development and does not require heap memory. Look for the column labeled "Requires malloc/free" to find out which ones you can use in your embedded projects.
 
-## ADT in embedded projects
+## Where is it used?
 
-Some data structures in ADT are used in embedded development and does not require heap memory. Look for the column labeled "Requires malloc/free" to find out which ones you can use in your project.
+* [cogu/amber](https://github.com/cogu/amber)
+* [cogu/bstr](https://github.com/cogu/bstr)
+* [cogu/c-apx](https://github.com/cogu/c-apx)
+* [cogu/cutil](https://github.com/cogu/cutil)
+* [cogu/dtl_json](https://github.com/cogu/dtl_json)
+* [cogu/dtl_type](https://github.com/cogu/dtl_type)
+* [cogu/msocket](https://github.com/cogu/msocket)
+
+## Dependencies
+
+None, except for a C compiler (C89 works fine, C90 for unit tests).
 
 
-# Arrays
+## Building with CMake
+
+CMake files exist but has so far only been tested on Linux.
+
+### Running unit tests (Linux)
+
+```bash
+$ mkdir UnitTest && cd UnitTest
+$ cmake -DCMAKE_BUILD_TYPE=UnitTest ..
+$ cmake --build .
+$ ./adt_unit
+```
+
+## Arrays
 
 Arrays are lists with C-compatible memory layout. They allow both index-based access and the four traditional list operations (push, pop, shift, unshift).
 They are used when access takes place at either end of the list.
@@ -32,7 +62,7 @@ They are used when access takes place at either end of the list.
 | shift           | Removes the first element from the list         |
 | unshift         | Appends an element to the beginning of the list |
 
-## Available data structures
+### Available data structures
 
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
@@ -40,9 +70,9 @@ They are used when access takes place at either end of the list.
 | adt_bytearray_t | adt_bytearray.h | Bytes (uint8_t)     | yes                  |
 | adt_bytes_t     | adt_bytes.h     | Bytes (uint8_t)     | yes                  |
 
-## Examples
+### Examples
 
-### ADT Array
+#### ADT Array
 
 ``` c
 adt_ary_t *pArray = adt_ary_new(free);
@@ -52,19 +82,20 @@ adt_ary_delete(pArray);
 free(pElem);
 ```
 
-# Strings
+## Strings
 
 ADT provides a string type which manages the memory of the string data. You can access the raw data as a C-string (pointer) at any time.
+The ADT string class supports ASCII encoding and UTF-8 encoding.
 
-## Avaliable data structures
+### Avaliable data structures
 
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
 | adt_str_t       | adt_str.h       | Characters (char*)  | yes                  |
 
-## Examples
+### Examples
 
-### ADT String
+#### ADT String
 
 ``` C
 adt_str_t *str = adt_str_new();
@@ -75,7 +106,7 @@ const char *result = adt_str_cstr(str); //returns "abc"
 adt_str_delete(str);
 ```
 
-# Maps
+## Maps
 
 Maps are key-value pair containers. The key is usually a string which is converted to an integer using a hashing algorithm.
 
@@ -84,43 +115,42 @@ Maps are key-value pair containers. The key is usually a string which is convert
 | adt_hash_t      | adt_hash.h      | String        | Objects (void*)     | yes                  |
 | adt_u16Map_t    | adt_u16Map.h    | uint16_t      | Objects (void*)     | no                   |
 
-## Examples
+### Examples
 
-### ADT Hash
+#### ADT Hash
 ``` C
 adt_hash_t *pHash = adt_hash_new(free);
-adt_hash_set(pHash,"first",0,"The");
-adt_hash_set(pHash,"second",0,"quick");
-adt_hash_set(pHash,"third",0,"brown");
-adt_hash_set(pHash,"fourth",0,"fox");
-const char *pVal = adt_hash_get(pHash,"third",0);
+adt_hash_set(pHash, "first", 0, "The");
+adt_hash_set(pHash, "second", 0, "quick");
+adt_hash_set(pHash, "third", 0, "brown");
+adt_hash_set(pHash, "fourth", 0, "fox");
+const char *pVal = adt_hash_get(pHash, "third" ,0);
 ```
 
-# Linked Lists
+## Linked Lists
 
 Linked lists are used when insertions/deletions of elements occur in the middle of the list.
 
-## Available data structures
+### Available data structures
 
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
 | adt_list_t      | adt_list.h      | Objects (void*)     | yes                  |
 | adt_u32List_t   | adt_list.h      | Values (uint32_t)   | yes                  |
 
-
-# Stacks
+## Stacks
 
 Stacks provides a first in, first out (FIFO) queue. It supports the traditional operations push, pop (and top).
 
-## Avaliable data structures
+### Avaliable data structures
 
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
 | adt_stack_t     | adt_stack.h     | Objects (void*)     | yes                  |
 
-##Examples
+### Examples
 
-### ADT Stack
+#### ADT Stack
 
 ``` C
 adt_stack_t *pStack = adt_stack_new(free);
@@ -132,38 +162,50 @@ const char *pVal = adt_stack_top(pStack);
 adt_stack_delete(pStack);
 ```
 
-# Sets
+## Sets
 
 Sets are unordered containers of values. Each value can only exist once in the set.
 Note that ADT sets are severly under-developed and lacks general set-theory operations at the moment.
 
-## Avaliable data structures
+### Avaliable data structures
 
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
 | adt_u32Set_t    | adt_set.h       | Values (uint32_t)   | yes                  |
 
-
-# Heaps
+## Heaps
 
 Heaps are tree-based data structures. ADT supports them for the sole purpose of allowing implementation of priority queues.
 
-## Avaible data structures
+### Avaible data structures
 
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
 | adt_heap_t      | adt_heap.h      | Objects (void*)     | yes                  |
 
-
-# Ring Buffers
+## Ring Buffers
 
 Ring buffers (or circular buffers) are FIFO-queues (First In First Out). They store elements (usually struct containers) inside its internal buffer.
 Each element must be of the same size (an argument given in the ringbuffer constructor). Note that ADT ring buffers copies entire data blocks (elements) instead of just pointers to objects.
-Ring buffer are especially suitable for use in embedded projects where (memory is a concern).
+Ring buffer are especially suitable for use in embedded projects where (memory is usually a limiting factor).
 
-## Avaliable data structures
+### Avaliable data structures
+
 | Name            | Header          | Storage type        | Requires malloc/free |
 |-----------------|-----------------|---------------------|----------------------|
 | adt_rbfh_t      | adt_ringbuf.h   | Elements (uint8_t*) | yes                  |
 | adt_rbfs_t      | adt_ringbuf.h   | Elelemts (uint8_t*) | no                   |
 | adt_rbfu16_t    | adt_ringbuf.h   | Values (uint16_t)   | no                   |
+
+## Virtual destructors
+
+Most ADT structures manages objects (pointers to void). Generally you would want to delete all objects contained in a data structure when the data structure itself is destroyed.
+This is accomplished in ADT by using what I call virtual destructor functions. Even though they are not the same as virtual destructors from C++, they sort of serve the same purpose.
+
+In ADT (and projects using ADT) you will note that most (C-based) classes has both a *delete* function and a *vdelete* function.
+The *vdelete* functions are virtual destructor and can generally be handed over as a function pointer to allow any ADT data structure to automatically delete child objects when the data structure itself is destroyed.
+In case you just want to maintain weak references in your ADT data structure, just hand it a NULL-pointer for the destructor argument in the ADT constructor.
+
+Note that the standard function *free* (as in malloc/free) is itself a perfectly valid virtual destructor and can be used as the destructor argument for objects which has been created using a single malloc (Normal C-strings for example).
+
+In special situations, some ADT structures allow temporarily enabling/disabling of automatic object destruction. Look for _destructor_enable-functions on ADT data stuctures that support this mechanism.
