@@ -1,0 +1,7 @@
+if (NOT UNIT_TEST AND CMAKE_BUILD_TYPE STREQUAL "UnitTest")    
+    set(UNIT_TEST ON)
+endif()
+
+if (NOT DEFINED UNIT_TEST)
+    set (UNIT_TEST OFF)
+endif()
