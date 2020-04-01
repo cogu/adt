@@ -49,6 +49,9 @@ $ cmake -DCMAKE_BUILD_TYPE=UnitTest ..
 $ cmake --build .
 $ ./adt_unit
 ```
+## Related projects
+
+If you are looking for a more sophisticated data type system in C you can check out the [cogu/dtl_type](https://github.com/cogu/dtl_type) project. It offers reference-counted variables with an easy to use API. Internally it uses ADT for managing storage of the reference-counted variables.
 
 ## Arrays
 
@@ -124,7 +127,7 @@ adt_hash_set(pHash, "first", 0, "The");
 adt_hash_set(pHash, "second", 0, "quick");
 adt_hash_set(pHash, "third", 0, "brown");
 adt_hash_set(pHash, "fourth", 0, "fox");
-const char *pVal = adt_hash_get(pHash, "third" ,0);
+const char *pVal = adt_hash_value(pHash, "third");
 ```
 
 ## Linked Lists
@@ -197,7 +200,7 @@ Ring buffer are especially suitable for use in embedded projects where (memory i
 | adt_rbfs_t      | adt_ringbuf.h   | Elelemts (uint8_t*) | no                   |
 | adt_rbfu16_t    | adt_ringbuf.h   | Values (uint16_t)   | no                   |
 
-## Virtual destructors
+## ADT and virtual destructors
 
 Most ADT structures manages objects (pointers to void). Generally you would want to delete all objects contained in a data structure when the data structure itself is destroyed.
 This is accomplished in ADT by using what I call virtual destructor functions. Even though they are not the same as virtual destructors from C++, they sort of serve the same purpose.
@@ -209,3 +212,4 @@ In case you just want to maintain weak references in your ADT data structure, ju
 Note that the standard function *free* (as in malloc/free) is itself a perfectly valid virtual destructor and can be used as the destructor argument for objects which has been created using a single malloc (Normal C-strings for example).
 
 In special situations, some ADT structures allow temporarily enabling/disabling of automatic object destruction. Look for _destructor_enable-functions on ADT data stuctures that support this mechanism.
+
