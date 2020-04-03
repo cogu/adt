@@ -26,8 +26,6 @@
 #ifndef ADT_RINGBUF_H__
 #define ADT_RINGBUF_H__
 
-#define ADT_RINGBUF_VERSION 0.1.1
-
 #include <stdint.h>
 
 #ifdef ADT_RBF_CFG
