@@ -7,10 +7,12 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(cmake/LeakCheck.cmake)
     include(cmake/UnitTest.cmake)
 endif()
+include(CMakeDependentOption)
 
 option(ADT_RBFU16_ENABLE "ADT U16 Ringbuffer" OFF)
 option(ADT_RBFS_ENABLE "ADT Statically allocated Ringbuffer" OFF)
 option(ADT_RBFH_ENABLE "ADT Heap-managed Ringbuffer" OFF)
+CMAKE_DEPENDENT_OPTION(ADT_TEST_ADT_HASH_FULL "Activate entire adt_hash test suite" OFF "UNIT_TEST" OFF)
 
 if (LEAK_CHECK)
     message(STATUS "LEAK_CHECK=${LEAK_CHECK} (ADT)")
@@ -79,37 +81,46 @@ endif()
 
 ###Executable adt_unit
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set (ADT_TEST_SUITE_LIST
-            test/adt/testsuite_adt_ary.c
-            test/adt/testsuite_adt_bytearray.c
-            test/adt/testsuite_adt_bytes.c
-            test/adt/testsuite_adt_hash.c
-            test/adt/testsuite_adt_heap.c
-            test/adt/testsuite_adt_list.c
-            test/adt/testsuite_adt_ringbuf.c
-            test/adt/testsuite_adt_stack.c
-            test/adt/testsuite_adt_str.c
-            test/adt/testsuite_adt_u32List.c
-            test/adt/testsuite_adt_u32Set.c
-    )
 
-    set(ADT_UNIT_EXTRA)
-    if (LEAK_CHECK)
-        list (APPEND ADT_UNIT_EXTRA test/CMemLeak.h)
-        list (APPEND ADT_UNIT_EXTRA test/CMemLeak.c)
-    endif()
+    if (UNIT_TEST)
+        set(TEST_ADT_HASH_FULL 0)
+        if (ADT_TEST_ADT_HASH_FULL)
+            set(TEST_ADT_HASH_FULL 1)
+            message(STATUS "TEST_ADT_HASH_FULL=${TEST_ADT_HASH_FULL}")
+        endif()
+
+        set (ADT_TEST_SUITE_LIST
+                test/adt/testsuite_adt_ary.c
+                test/adt/testsuite_adt_bytearray.c
+                test/adt/testsuite_adt_bytes.c
+                test/adt/testsuite_adt_hash.c
+                test/adt/testsuite_adt_heap.c
+                test/adt/testsuite_adt_list.c
+                test/adt/testsuite_adt_ringbuf.c
+                test/adt/testsuite_adt_stack.c
+                test/adt/testsuite_adt_str.c
+                test/adt/testsuite_adt_u32List.c
+                test/adt/testsuite_adt_u32Set.c
+        )
+
+        set(ADT_UNIT_EXTRA)
+        if (LEAK_CHECK)
+            list (APPEND ADT_UNIT_EXTRA test/CMemLeak.h)
+            list (APPEND ADT_UNIT_EXTRA test/CMemLeak.c)
+        endif()
 
 
-    add_executable(adt_unit test/TestMain.c test/CuTest.c ${ADT_UNIT_EXTRA} ${ADT_TEST_SUITE_LIST})
-    target_link_libraries(adt_unit PUBLIC adt)
-    target_include_directories(adt_unit PUBLIC
-                              "${PROJECT_BINARY_DIR}"
-                              "${CMAKE_CURRENT_SOURCE_DIR}/inc"
-                              "${CMAKE_CURRENT_SOURCE_DIR}/test"
-                              )
-    target_compile_definitions(adt_unit PUBLIC UNIT_TEST TEST_ADT_HASH_FULL=0)
-    if (LEAK_CHECK)
-        target_compile_definitions(adt_unit PRIVATE MEM_LEAK_CHECK)
+        add_executable(adt_unit test/TestMain.c test/CuTest.c ${ADT_UNIT_EXTRA} ${ADT_TEST_SUITE_LIST})
+        target_link_libraries(adt_unit PUBLIC adt)
+        target_include_directories(adt_unit PUBLIC
+                                "${PROJECT_BINARY_DIR}"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/test"
+                                )
+        target_compile_definitions(adt_unit PUBLIC UNIT_TEST TEST_ADT_HASH_FULL=${TEST_ADT_HASH_FULL})
+        if (LEAK_CHECK)
+            target_compile_definitions(adt_unit PRIVATE MEM_LEAK_CHECK)
+        endif()
     endif()
 endif()
 ###

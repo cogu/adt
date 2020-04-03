@@ -56,6 +56,26 @@ $ ./adt_unit
 
 CMake options can be set from command line or using a CMake GUI tool (such as ccmake for Linux).
 
+#### Generic Options
+
+| CMake Option      | Usage            | Description                             |
+|-------------------|------------------|-----------------------------------------|
+| LEAK_CHECK        | -DLEAK_CHECK=ON  | Enables memory leak check detection     |
+| UNIT_TEST         | -DUNIT_TEST=ON   | Activates UNIT_TEST preprocessor define |
+
+When unit testing you normally don't have to activate these options. Instead you should set the
+build target to *UnitTest* which is a shorthand form of activating both flags.
+In case you need full control you can always activate these options individually using CMake.
+
+#### ADT Hash
+
+When -DUNIT_TEST is set to ON you get an extra option which you can use to enable additional
+unit tests for adt_hash. These takes several seconds to run so they are not enabled by default.
+
+| CMake Option          | Usage                        | Description                                     |
+|-----------------------|------------------------------|-------------------------------------------------|
+| ADT_TEST_ADT_HASH_FULL| -DADT_TEST_ADT_HASH_FULL=ON  | Enables additional (slow) tests for adt_hash_t    |
+
 #### ADT Ringbuffer
 
 By default, adt_ringbuf.c will not compile anything unless you explicitly enable it using CMake options.
@@ -65,6 +85,8 @@ By default, adt_ringbuf.c will not compile anything unless you explicitly enable
 | ADT_RBFH_ENABLE   | -DADT_RBFH_ENABLE=ON  | Enables adt_rbfh_t and its API   |
 | ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfs_t and its API   |
 | ADT_RBFU16_ENABLE | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfu16_t and its API |
+
+
 
 # ADT Data Types
 
@@ -227,4 +249,3 @@ In case you just want to maintain weak references in your ADT data structure, ju
 Note that the standard function *free* (as in malloc/free) is itself a perfectly valid virtual destructor and can be used as the destructor argument for objects which has been created using a single malloc (Normal C-strings for example).
 
 In special situations, some ADT structures allow temporarily enabling/disabling of automatic object destruction. Look for _destructor_enable-functions on ADT data stuctures that support this mechanism.
-

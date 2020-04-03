@@ -6,7 +6,7 @@
 **/CMemLeak.txt
 
 #Eclipse files
-projects/eclipse/adt_test/.settings/*
+**/language.settings.xml
 
 #Build directories
 **/Debug/
