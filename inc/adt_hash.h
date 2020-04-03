@@ -24,8 +24,6 @@ typedef uint8_t bool;
 #include "adt_stack.h"
 #include "adt_ary.h"
 
-#define ADT_HASH_VERSION 0.1.2
-
 /*
  * ADT-hash is implemented as a tree of nodes containing items. Each item contains a (unique) hash value+linked
  * list of key/value pairs (for keys that have the same hash value).

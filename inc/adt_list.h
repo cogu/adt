@@ -12,8 +12,6 @@ typedef uint8_t bool;
 #include <stdbool.h>
 #endif
 
-#define ADT_LIST_VERSION 0.2.0
-
 #define ADT_LIST_ELEM_HEAD(struct_name, item_type_name) \
       struct struct_name *pNext;\
       struct struct_name *pPrev;\

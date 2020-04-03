@@ -48,7 +48,6 @@ typedef struct adt_bytearray_tag
 } adt_bytearray_t;
 
 //Corrected names
-#define ADT_BYTEARRAY_VERSION 0.1.4
 #define ADT_BYTEARRAY_NO_GROWTH 0u  //will malloc exactly the number of bytes it currently needs
 #define ADT_BYTEARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
 #define ADT_BYTEARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)

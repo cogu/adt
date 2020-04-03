@@ -39,8 +39,6 @@ typedef uint8_t bool;
 #endif
 #include "adt_error.h"
 
-#define ADT_ARRAY_VERSION 0.1.3
-
 typedef struct adt_ary_tag{
 	void **ppAlloc;		//array of (void*)
 	void **pFirst;		   //pointer to first array element

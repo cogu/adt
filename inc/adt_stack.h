@@ -11,8 +11,6 @@
 #define ADT_STACK_H__
 #include <stdint.h>
 
-#define ADT_STACK_VERSION 0.1.1
-
 typedef struct adt_stack_tag{
 	void **ppAlloc;		//array of (void*)
 	uint32_t u32AllocLen; //number of elements allocated
