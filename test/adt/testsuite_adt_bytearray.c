@@ -33,7 +33,9 @@
 #include "CuTest.h"
 #include "adt_bytearray.h"
 #include "adt_bytes.h"
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES

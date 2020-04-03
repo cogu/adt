@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "CuTest.h"
-#include "CMemLeak.h"
+#ifdef MEM_LEAK_CHECK
+# include "CMemLeak.h"
+#endif
 
 #ifndef TEST_ADT_HASH_ENABLE
 #define TEST_ADT_HASH_ENABLE 0

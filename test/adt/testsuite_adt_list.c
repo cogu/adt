@@ -4,7 +4,9 @@
 #include <string.h>
 #include "CuTest.h"
 #include "adt_list.h"
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
+#endif
 
 /**************** Private Function Declarations *******************/
 static void test_adt_list_new(CuTest* tc);
