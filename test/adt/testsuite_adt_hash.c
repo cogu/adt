@@ -7,7 +7,9 @@
 #include "CuTest.h"
 #include "adt_hash.h"
 #include "adt_ary.h"
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
+#endif
 
 static void vfree(void *arg)
 {

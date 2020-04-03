@@ -34,7 +34,9 @@
 #include "CuTest.h"
 #include "adt_str.h"
 #include "adt_bytes.h"
+#ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////

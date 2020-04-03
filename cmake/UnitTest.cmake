@@ -1,7 +1,4 @@
+option(UNIT_TEST "Unit Test Build" OFF)
 if (NOT UNIT_TEST AND CMAKE_BUILD_TYPE STREQUAL "UnitTest")    
-    set(UNIT_TEST ON)
-endif()
-
-if (NOT DEFINED UNIT_TEST)
-    set (UNIT_TEST OFF)
+    set(UNIT_TEST ON CACHE BOOL "Always on for UnitTest" FORCE)
 endif()
