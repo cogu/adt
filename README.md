@@ -36,6 +36,9 @@ Some data structures in ADT are used in embedded development and does not requir
 
 None, except for a C compiler (C89 works fine, C90 for unit tests).
 
+## Related projects
+
+If you are looking for higher level data types in C you can check out the [cogu/dtl_type](https://github.com/cogu/dtl_type) project. It offers reference-counted variables with an easy to use API. It internally uses ADT for data storage.
 
 ## Building with CMake
 
@@ -49,9 +52,21 @@ $ cmake -DCMAKE_BUILD_TYPE=UnitTest ..
 $ cmake --build .
 $ ./adt_unit
 ```
-## Related projects
+### ADT CMake Options
 
-If you are looking for a more sophisticated data type system in C you can check out the [cogu/dtl_type](https://github.com/cogu/dtl_type) project. It offers reference-counted variables with an easy to use API. Internally it uses ADT for managing storage of the reference-counted variables.
+CMake options can be set from command line or using a CMake GUI tool (such as ccmake for Linux).
+
+#### ADT Ringbuffer
+
+By default, adt_ringbuf.c will not compile anything unless you explicitly enable it using CMake options.
+
+| CMake Option      | Usage                 | Description                      |
+|-------------------|-----------------------|----------------------------------|
+| ADT_RBFH_ENABLE   | -DADT_RBFH_ENABLE=ON  | Enables adt_rbfh_t and its API   |
+| ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfs_t and its API   |
+| ADT_RBFU16_ENABLE | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfu16_t and its API |
+
+# ADT Data Types
 
 ## Arrays
 
