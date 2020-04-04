@@ -54,6 +54,15 @@ $ cmake --build .
 $ ./adt_unit
 ```
 
+An alternative way of achieving the same result is to manually activate both UNIT_TEST and LEAK_CHECK.
+
+```bash
+$ mkdir Debug && cd Debug
+$ cmake -DUNIT_TEST=ON -DLEAK_CHECK=ON ..
+$ cmake --build .
+$ ./adt_unit
+```
+
 ### Running unit tests (Windows + Visual Studio)
 
 From the Windows start menu launch a Visual Studio command prompt.
