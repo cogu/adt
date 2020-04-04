@@ -456,8 +456,8 @@ static void test_adt_str_push(CuTest* tc){
 	for(i = 'A'; i <= 'Z'; i++){
 		len++;
 		adt_str_push(str,i);
-		CuAssertIntEquals(tc,len,strlen(adt_str_cstr(str)));
-		CuAssertIntEquals(tc,len,adt_str_length(str));
+		CuAssertIntEquals(tc, len, (int) strlen(adt_str_cstr(str)));
+		CuAssertIntEquals(tc, len, adt_str_length(str));
 	}
 
 	CuAssertStrEquals(tc,"ABCDEFGHIJKLMNOPQRSTUVWXYZ",adt_str_cstr(str));
@@ -476,9 +476,9 @@ static void test_adt_str_pop(CuTest* tc){
 		len--;
 		c = (char) adt_str_pop(str);
 		CuAssertTrue(tc,len>=0);
-		CuAssertIntEquals(tc,len,strlen(adt_str_cstr(str)));
-		CuAssertIntEquals(tc,len,adt_str_length(str));
-		CuAssertIntEquals(tc,i,c);
+		CuAssertIntEquals(tc, len, (int) strlen(adt_str_cstr(str)));
+		CuAssertIntEquals(tc, len, adt_str_length(str));
+		CuAssertIntEquals(tc, i, c);
 	}
 	CuAssertTrue(tc,len==0);
 	CuAssertStrEquals(tc,"",adt_str_cstr(str));
@@ -733,9 +733,9 @@ static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc)
    adt_str_t *str = adt_str_new();
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test1, test1+sizeof(test1)));
    CuAssertIntEquals(tc, 3, adt_str_length(str));
-   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test2, test1+sizeof(test2)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test2, test2+sizeof(test2)));
    CuAssertIntEquals(tc, 0, adt_str_length(str));
-   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test3, test1+sizeof(test3)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_set_bstr(str, test3, test3+sizeof(test3)));
    CuAssertIntEquals(tc, 1, adt_str_length(str));
    adt_str_delete(str);
 }
@@ -750,10 +750,10 @@ static void test_adt_str_append_bstr_containing_nulls_at_end(CuTest* tc)
    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test1, test1+sizeof(test1)));
    CuAssertIntEquals(tc, 3, adt_str_length(str));
    adt_str_clear(str);
-   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test2, test1+sizeof(test2)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test2, test2+sizeof(test2)));
    CuAssertIntEquals(tc, 0, adt_str_length(str));
    adt_str_clear(str);
-   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test3, test1+sizeof(test3)));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_append_bstr(str, test3, test3+sizeof(test3)));
    CuAssertIntEquals(tc, 1, adt_str_length(str));
    adt_str_delete(str);
 }

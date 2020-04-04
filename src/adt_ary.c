@@ -19,11 +19,11 @@
 #define DATA_BLOCK_MAX 65536 	//maximum amount of bytes that can be copied in memmmove is implementation specific,
 								      //use define to control how many bytes shall be copied
 
-#define ELEM_LEN (sizeof(void*))
+#define ELEM_SIZE (sizeof(void*))
 #define ELEM_VALUE_IS_LESS(T) ( *((T*) a) < *((T*) b) )
 
 /**************** Private Function Declarations *******************/
-static void adt_block_memmove(void *pDest, void *pSrc, uint32_t u32Remain);
+static void adt_block_memmove(uint8_t*pDest, uint8_t*pSrc, uint32_t u32Remain);
 static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, bool reverse);
 /**************** Private Variable Declarations *******************/
 
@@ -254,7 +254,7 @@ adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem){
             pBegin = (uint8_t*) self->pFirst+u32ElemSize;
             pEnd = ((uint8_t*) &self->pFirst[self->s32CurLen]);
             u32Remain = (uint32_t) (pEnd-pBegin);
-            adt_block_memmove(pBegin, self->pFirst, u32Remain);
+            adt_block_memmove(pBegin, (uint8_t*) self->pFirst, u32Remain);
             self->pFirst[0]=pElem;
          }
          return result;
@@ -283,15 +283,15 @@ adt_error_t	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
          if(s32Len>= INT32_MAX){
             return ADT_LENGTH_ERROR;
          }
-         ppAlloc = (void**) malloc(ELEM_LEN*((unsigned int)s32Len));
+         ppAlloc = (void**) malloc(ELEM_SIZE*((unsigned int)s32Len));
          if (ppAlloc == 0)
          {
             return ADT_MEM_ERROR;
          }
          if(self->ppAlloc){
             size_t numNewElems = (size_t) (s32Len - self->s32CurLen);
-            memset(ppAlloc+self->s32CurLen, 0,  numNewElems * ELEM_LEN);
-            memcpy(ppAlloc,self->pFirst, ((unsigned int)self->s32CurLen) * ELEM_LEN);
+            memset(ppAlloc+self->s32CurLen, 0,  numNewElems * ELEM_SIZE);
+            memcpy(ppAlloc,self->pFirst, ((unsigned int)self->s32CurLen) * ELEM_SIZE);
             free(self->ppAlloc);
          }
          self->ppAlloc = self->pFirst = ppAlloc;
@@ -452,8 +452,12 @@ adt_error_t adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
       s32ElemsRemain = self->s32CurLen-s32Source;
       if (s32ElemsRemain > 0) {
          uint32_t u32BytesRemain;
-         u32BytesRemain = ((uint32_t)s32ElemsRemain)*((uint32_t) sizeof(void*));
-         adt_block_memmove(&self->pFirst[s32Destination], &self->pFirst[s32Source], u32BytesRemain);
+         uint8_t* pDest;
+         uint8_t* pSrc;
+         pDest = (uint8_t*) &self->pFirst[s32Destination];
+         pSrc = (uint8_t*) &self->pFirst[s32Source];
+         u32BytesRemain = ((uint32_t)s32ElemsRemain) * ((uint32_t) ELEM_SIZE);
+         adt_block_memmove(pDest, pSrc, u32BytesRemain);
       }
       self->s32CurLen-=s32Len;
       return ADT_NO_ERROR;
@@ -518,7 +522,7 @@ int32_t adt_ary_indexOf(adt_ary_t *self, void *pElem)
  * CG: I had some serious issues with some Microsoft compilers not handling large memmoves.
  * To mitigate this potential problem I use this function to transform one large memmoves into a series of smaller memmoves.
  */
-static void adt_block_memmove(void *pDest, void *pSrc, uint32_t u32Remain){
+static void adt_block_memmove(uint8_t *pDest, uint8_t*pSrc, uint32_t u32Remain){
    while(u32Remain>0){
       uint32_t u32Size = (u32Remain>DATA_BLOCK_MAX)? DATA_BLOCK_MAX : u32Remain;
       memmove(pDest, pSrc, u32Size);

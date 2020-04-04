@@ -41,6 +41,11 @@ void vfree(void* p);
 #define vfree free
 #endif
 
+#ifdef _MSC_VER
+#define STRDUP _strdup
+#else
+#define STRDUP strdup
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,10 +126,10 @@ static void test_adt_ary_push_pop(CuTest* tc)
 	char *pVal;
 	adt_ary_t *pArray = adt_ary_new(vfree);
 	CuAssertPtrNotNull(tc, pArray);
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("The")));
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("quick")));
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("brown")));
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,strdup("fox")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,STRDUP("The")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,STRDUP("quick")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,STRDUP("brown")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray,STRDUP("fox")));
 	CuAssertPtrNotNull(tc,pArray->ppAlloc);
 	CuAssertPtrEquals(tc, vfree,pArray->pDestructor);
 	CuAssertIntEquals(tc,4,pArray->s32AllocLen);
@@ -159,28 +164,28 @@ static void test_adt_ary_unshift(CuTest* tc)
 	CuAssertIntEquals(tc,0,adt_ary_length(pArray));
 	CuAssertPtrEquals(tc, vfree,pArray->pDestructor);
 
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("The")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=STRDUP("The")));
 	CuAssertIntEquals(tc,1,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
 	CuAssertPtrNotNull(tc, pVal);
 	CuAssertStrEquals(tc, "The",pVal);
 
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("quick")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=STRDUP("quick")));
 	CuAssertIntEquals(tc,2,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
 	CuAssertPtrNotNull(tc, pVal);
 	CuAssertStrEquals(tc, "quick",pVal);
 
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("brown")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=STRDUP("brown")));
 	CuAssertIntEquals(tc,3,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
 	CuAssertPtrNotNull(tc, pVal);
 	CuAssertStrEquals(tc, "brown",pVal);
 
-	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=strdup("fox")));
+	CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(pArray,tmp=STRDUP("fox")));
 	CuAssertIntEquals(tc,4,adt_ary_length(pArray));
 	CuAssertPtrNotNull(tc, (ppVal = adt_ary_get(pArray,0)));
 	pVal = (char*) *ppVal;
