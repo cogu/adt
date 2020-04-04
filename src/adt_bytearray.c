@@ -192,7 +192,7 @@ adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc){
        *       start = self->u32CurLen
        *       remain = 0
        */
-      start = pSrc - self->pData;
+      start = (uint32_t) (pSrc - self->pData);
       remain = self->u32CurLen - start;
       if(pSrc == self->pData){
          //no action

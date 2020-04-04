@@ -8,6 +8,12 @@
 #include "CMemLeak.h"
 #endif
 
+#ifdef _MSC_VER
+#define STRDUP _strdup
+#else
+#define STRDUP strdup
+#endif
+
 /**************** Private Function Declarations *******************/
 static void test_adt_list_new(CuTest* tc);
 static void test_adt_list_insert_remove(CuTest* tc);
@@ -48,8 +54,8 @@ static void test_adt_list_insert_remove(CuTest* tc)
 {
    adt_list_t *list;
    list = adt_list_new(NULL);
-   char *hello=strdup("hello");
-   char *world=strdup("world");
+   char *hello=STRDUP("hello");
+   char *world=STRDUP("world");
    CuAssertPtrNotNull(tc,list);
    adt_list_insert(list, hello);
    adt_list_insert(list, world);
@@ -69,8 +75,8 @@ static void test_adt_list_insert_unique(CuTest* tc)
 {
    adt_list_t *list;
    list = adt_list_new(vfree);
-   char *hello=strdup("hello");
-   char *world=strdup("world");
+   char *hello=STRDUP("hello");
+   char *world=STRDUP("world");
    CuAssertPtrNotNull(tc,list);
    adt_list_insert_unique(list, hello);
    adt_list_insert_unique(list, world);
@@ -87,8 +93,8 @@ static void test_adt_list_insert_erase(CuTest* tc)
    adt_list_t *list;
    adt_list_elem_t *iter;
    list = adt_list_new(NULL);
-   char *hello=strdup("hello");
-   char *world=strdup("world");
+   char *hello=STRDUP("hello");
+   char *world=STRDUP("world");
    CuAssertPtrNotNull(tc,list);
    adt_list_insert(list, hello);
    adt_list_insert(list, world);
@@ -113,9 +119,9 @@ static void test_adt_list_clear(CuTest* tc)
 {
    adt_list_t *list;
    list = adt_list_new(vfree);
-   char *hello=strdup("hello");
-   char *world=strdup("world");
-   char *foo=strdup("foo");
+   char *hello=STRDUP("hello");
+   char *world=STRDUP("world");
+   char *foo=STRDUP("foo");
    CuAssertPtrNotNull(tc,list);
    adt_list_insert(list, hello);
    adt_list_insert(list, world);

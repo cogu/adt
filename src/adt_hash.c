@@ -296,8 +296,8 @@ void adt_hnode_destroy(adt_hnode_t *node,void (*pDestructor)(void*)){
 		free(node->child.match);
 	}
 	else{
-      uint8_t i; 
-      assert(node->u8Width==16);		
+      uint8_t i;
+      assert(node->u8Width==16);
 		for(i=0;i<16;i++){
 			adt_hnode_destroy(&node->child.node[i],pDestructor);
 		}
@@ -311,7 +311,7 @@ void adt_hnode_destroy_shallow(adt_hnode_t *node){
 	}
 	else{
       uint8_t i;
-		assert(node->u8Width==16);		
+		assert(node->u8Width==16);
 		for(i=0;i<16;i++){
 			adt_hnode_destroy_shallow(&node->child.node[i]);
 		}

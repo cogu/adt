@@ -64,7 +64,7 @@ void test_adt_hash_iterator(CuTest* tc){
 	CuAssertIntEquals(tc,4,adt_hash_length(pHash));
 	adt_hash_delete(pHash);
 }
-
+#ifndef _MSC_VER //MSCV doesn't have the getline function so we disable this test.
 void test_adt_hash_iterator2(CuTest* tc){
 	adt_hash_t *pHash = adt_hash_new(NULL);
 	CuAssertPtrNotNull(tc, pHash);
@@ -125,6 +125,7 @@ void test_adt_hash_iterator2(CuTest* tc){
 	adt_hash_delete(pHash);
 	free(line);
 }
+#endif
 
 void test_adt_hash_keys(CuTest* tc)
 {
@@ -241,7 +242,7 @@ CuSuite* testsuite_adt_hash(void)
 
 	SUITE_ADD_TEST(suite, test_adt_hash_constructor);
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator);
-#if TEST_ADT_HASH_FULL //Note that this test takes several seconds to run, normally disabled
+#if (!defined(_MSC_VER) && defined(TEST_ADT_HASH_FULL)) //Note that this test takes several seconds to run, normally disabled
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator2);
 #endif
 	SUITE_ADD_TEST(suite, test_adt_hash_keys);
