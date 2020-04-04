@@ -92,6 +92,10 @@ unit tests for adt_hash. These takes several seconds to run so they are not enab
 |-----------------------|------------------------------|-------------------------------------------------|
 | ADT_TEST_ADT_HASH_FULL| -DADT_TEST_ADT_HASH_FULL=ON  | Enables additional (slow) tests for adt_hash_t    |
 
+Note that above flag has no effect when building with Visual Studio (due to
+lack of support for the *getline* function). A custom implementation for
+Visual Studio might be implemented at a later time.
+
 #### ADT Ringbuffer
 
 By default, adt_ringbuf.c will not compile anything unless you explicitly enable it using CMake options.
