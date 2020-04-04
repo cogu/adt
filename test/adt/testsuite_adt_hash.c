@@ -242,7 +242,7 @@ CuSuite* testsuite_adt_hash(void)
 
 	SUITE_ADD_TEST(suite, test_adt_hash_constructor);
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator);
-#if (!defined(_MSC_VER) && defined(TEST_ADT_HASH_FULL)) //Note that this test takes several seconds to run, normally disabled
+#if (!defined(_MSC_VER) && defined(TEST_ADT_HASH_FULL) && (TEST_ADT_HASH_FULL != 0) ) //Note that this test takes several seconds to run, normally disabled
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator2);
 #endif
 	SUITE_ADD_TEST(suite, test_adt_hash_keys);
