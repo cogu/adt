@@ -77,6 +77,11 @@ if(ADT_RBFH_ENABLE)
     message(STATUS "ADT_RBFH_ENABLE=1")
     target_compile_definitions(adt PUBLIC ADT_RBFH_ENABLE=1)
 endif()
+
+if(MSVC)
+    target_compile_definitions(adt PUBLIC _CRT_SECURE_NO_WARNINGS)
+endif()
+
 ###
 
 ###Executable adt_unit

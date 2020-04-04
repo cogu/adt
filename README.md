@@ -42,9 +42,10 @@ If you are looking for higher level data types in C you can check out the [cogu/
 
 ## Building with CMake
 
-CMake files exist but has so far only been tested on Linux.
+CMake build have been tested on Linux and Windows.
+Building on Windows works but there is room for improvement in the CMake file (adding folders etc. for Visual Studio)
 
-### Running unit tests (Linux)
+### Running unit tests (Linux + GCC)
 
 ```bash
 $ mkdir UnitTest && cd UnitTest
@@ -52,6 +53,21 @@ $ cmake -DCMAKE_BUILD_TYPE=UnitTest ..
 $ cmake --build .
 $ ./adt_unit
 ```
+
+### Running unit tests (Windows + Visual Studio)
+
+From the Windows start menu launch a Visual Studio command prompt.
+
+For example, I use Visual Studio 2019 which mean I launch the "x64 Native Tools Command Prompt for VS2019". It conveniently has CMake for windows pre-installed and it generates Visual Studio projects without the need of giving extra options to CMake.
+
+```cmd
+$ mkdir VisualStudio && cd VisualStudio
+$ cmake -DUNIT_TEST=ON -DLEAK_CHECK=ON ..
+$ cmake --build . --config Debug
+$ Debug\adt_unit.exe
+```
+
+
 ### ADT CMake Options
 
 CMake options can be set from command line or using a CMake GUI tool (such as ccmake for Linux).
