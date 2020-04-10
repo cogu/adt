@@ -83,10 +83,14 @@ void test_adt_hash_iterator2(CuTest* tc){
 	{
 	   fh = fopen("../../../../test/3esl.txt","r");
 	}
-   if (fh == 0)
-   {
+    if (fh == 0)
+    {
       fh = fopen("../test/3esl.txt","r");
-   }
+    }
+    if (fh == 0)
+    {
+      fh = fopen("test/3esl.txt","r");
+    }
 	assert(fh != 0);
 	do{
 	   read = getline(&line,&len,fh);

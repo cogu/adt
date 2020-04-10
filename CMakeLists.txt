@@ -12,7 +12,7 @@ include(CMakeDependentOption)
 option(ADT_RBFU16_ENABLE "ADT U16 Ringbuffer" OFF)
 option(ADT_RBFS_ENABLE "ADT Statically allocated Ringbuffer" OFF)
 option(ADT_RBFH_ENABLE "ADT Heap-managed Ringbuffer" OFF)
-CMAKE_DEPENDENT_OPTION(ADT_TEST_ADT_HASH_FULL "Activate entire adt_hash test suite" OFF "UNIT_TEST" OFF)
+CMAKE_DEPENDENT_OPTION(TEST_ADT_HASH_FULL "Activate entire adt_hash test suite" OFF "UNIT_TEST" OFF)
 
 if (LEAK_CHECK)
     message(STATUS "LEAK_CHECK=${LEAK_CHECK} (ADT)")
@@ -88,10 +88,10 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     if (UNIT_TEST)
-        set(TEST_ADT_HASH_FULL 0)
-        if (ADT_TEST_ADT_HASH_FULL)
-            set(TEST_ADT_HASH_FULL 1)
-            message(STATUS "TEST_ADT_HASH_FULL=${TEST_ADT_HASH_FULL}")
+        set(TEST_ADT_HASH_FULL_VAL 0)
+        if (TEST_ADT_HASH_FULL)
+            set(TEST_ADT_HASH_FULL_VAL 1)
+            message(STATUS "TEST_ADT_HASH_FULL_VAL=${TEST_ADT_HASH_FULL_VAL}")
         endif()
 
         set (ADT_TEST_SUITE_LIST
@@ -122,10 +122,15 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                                 "${CMAKE_CURRENT_SOURCE_DIR}/inc"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/test"
                                 )
-        target_compile_definitions(adt_unit PUBLIC UNIT_TEST TEST_ADT_HASH_FULL=${TEST_ADT_HASH_FULL})
+        target_compile_definitions(adt_unit PUBLIC UNIT_TEST TEST_ADT_HASH_FULL=${TEST_ADT_HASH_FULL_VAL})
         if (LEAK_CHECK)
             target_compile_definitions(adt_unit PRIVATE MEM_LEAK_CHECK)
         endif()
+
+        enable_testing()
+        add_test(adt_test ${CMAKE_CURRENT_BINARY_DIR}/adt_unit)
+        set_tests_properties(adt_test PROPERTIES PASS_REGULAR_EXPRESSION "OK \\([0-9]+ tests\\)")
+
     endif()
 endif()
 ###

@@ -42,40 +42,66 @@ If you are looking for higher level data types in C you can check out the [cogu/
 
 ## Building with CMake
 
-CMake build have been tested on Linux and Windows.
-Building on Windows works but there is room for improvement in the CMake file (adding folders etc. for Visual Studio)
+### Running unit tests (Linux)
 
-### Running unit tests (Linux + GCC)
+Configure:
 
-```bash
-$ mkdir UnitTest && cd UnitTest
-$ cmake -DCMAKE_BUILD_TYPE=UnitTest ..
-$ cmake --build .
-$ ./adt_unit
+```sh
+cmake -S . -B build -DUNIT_TEST=ON
 ```
 
-An alternative way of achieving the same result is to manually activate both UNIT_TEST and LEAK_CHECK.
+Build:
 
-```bash
-$ mkdir Debug && cd Debug
-$ cmake -DUNIT_TEST=ON -DLEAK_CHECK=ON ..
-$ cmake --build .
-$ ./adt_unit
+```sh
+cmake --build build --target adt_unit
 ```
 
-### Running unit tests (Windows + Visual Studio)
-
-From the Windows start menu launch a Visual Studio command prompt.
-
-For example, I use Visual Studio 2019 which mean I launch the "x64 Native Tools Command Prompt for VS2019". It conveniently has CMake for windows pre-installed and it generates Visual Studio projects without the need of giving extra options to CMake.
+Run test cases:
 
 ```cmd
-$ mkdir VisualStudio && cd VisualStudio
-$ cmake -DUNIT_TEST=ON -DLEAK_CHECK=ON ..
-$ cmake --build . --config Debug
-$ Debug\adt_unit.exe
+cd build
+ctest
 ```
 
+
+### Running unit tests (Windows and Visual Studio)
+
+Use a command prompt provided by your Visual Studio installation.
+For example, I use "x64 Native Tools Command Prompt for VS2019" which is found on the start menu.
+It conveniently comes with CMake pre-installed which generates Visual Studio projects by default.
+
+Configure:
+
+```cmd
+cmake -S . -B VisualStudio -DUNIT_TEST=ON
+```
+
+Build:
+
+```cmd
+cmake --build VisualStudio --config Debug --target adt_unit
+```
+
+Run test cases:
+
+```cmd
+cd VisualStudio
+ctest
+```
+
+### Building a release version of the ADT library (Linux)
+
+Configure:
+
+```sh
+cmake -S . -B Release -DCMAKE_BUILD_TYPE=Release
+```
+
+Build:
+
+```sh
+cmake --build Release --target adt
+```
 
 ### ADT CMake Options
 
@@ -88,18 +114,14 @@ CMake options can be set from command line or using a CMake GUI tool (such as cc
 | LEAK_CHECK        | -DLEAK_CHECK=ON  | Enables memory leak check detection     |
 | UNIT_TEST         | -DUNIT_TEST=ON   | Activates UNIT_TEST preprocessor define |
 
-When unit testing you normally don't have to activate these options. Instead you should set the
-build target to *UnitTest* which is a shorthand form of activating both flags.
-In case you need full control you can always activate these options individually using CMake.
-
 #### ADT Hash
 
 When -DUNIT_TEST is set to ON you get an extra option which you can use to enable additional
 unit tests for adt_hash. These takes several seconds to run so they are not enabled by default.
 
-| CMake Option          | Usage                        | Description                                     |
-|-----------------------|------------------------------|-------------------------------------------------|
-| ADT_TEST_ADT_HASH_FULL| -DADT_TEST_ADT_HASH_FULL=ON  | Enables additional (slow) tests for adt_hash_t    |
+| CMake Option          | Usage                    | Description                                     |
+|-----------------------|--------------------------|-------------------------------------------------|
+| TEST_ADT_HASH_FULL    | -DTEST_ADT_HASH_FULL=ON  | Enables additional (slow) tests for adt_hash_t  |
 
 Note that above flag has no effect when building with Visual Studio (due to
 lack of support for the *getline* function). A custom implementation for
@@ -115,9 +137,7 @@ By default, adt_ringbuf.c will not compile anything unless you explicitly enable
 | ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfs_t and its API   |
 | ADT_RBFU16_ENABLE | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfu16_t and its API |
 
-
-
-# ADT Data Types
+# ADT data types
 
 ## Arrays
 
