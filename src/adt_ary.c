@@ -166,7 +166,6 @@ adt_error_t	adt_ary_push(adt_ary_t *self, void *pElem){
    if (self != 0) {
       int32_t s32Index;
       adt_error_t result;
-      assert( (self != 0) && (pElem != 0));
       s32Index = self->s32CurLen;
       assert(self->s32CurLen < INT32_MAX);
       result = adt_ary_extend(self,((int32_t) s32Index+1));
