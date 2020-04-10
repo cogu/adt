@@ -63,7 +63,6 @@ cd build
 ctest
 ```
 
-
 ### Running unit tests (Windows and Visual Studio)
 
 Use a command prompt provided by your Visual Studio installation.

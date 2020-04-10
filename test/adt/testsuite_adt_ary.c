@@ -57,6 +57,7 @@ void vfree(void* p);
 //////////////////////////////////////////////////////////////////////////////
 static void test_adt_ary_new(CuTest* tc);
 static void test_adt_ary_push_pop(CuTest* tc);
+static void test_adt_ary_push_nullptr(CuTest* tc);
 static void test_adt_ary_unshift(CuTest* tc);
 static void test_adt_ary_shift(CuTest* tc);
 static void test_adt_ary_resize(CuTest* tc);
@@ -88,6 +89,7 @@ CuSuite* testsuite_adt_ary(void)
 
    SUITE_ADD_TEST(suite, test_adt_ary_new);
    SUITE_ADD_TEST(suite, test_adt_ary_push_pop);
+   SUITE_ADD_TEST(suite, test_adt_ary_push_nullptr);
    SUITE_ADD_TEST(suite, test_adt_ary_splice_to_empty);
    SUITE_ADD_TEST(suite, test_adt_ary_splice_at_begin);
    SUITE_ADD_TEST(suite, test_adt_ary_splice_at_end);
@@ -151,6 +153,15 @@ static void test_adt_ary_push_pop(CuTest* tc)
 	free(pVal);
 	CuAssertIntEquals(tc,0,adt_ary_length(pArray));
 	adt_ary_delete(pArray);
+}
+
+static void test_adt_ary_push_nullptr(CuTest* tc)
+{
+   adt_ary_t *array = adt_ary_new(NULL);
+   CuAssertPtrNotNull(tc, array);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, NULL));
+   CuAssertIntEquals(tc, 1, adt_ary_length(array));
+   adt_ary_delete(array);
 }
 
 static void test_adt_ary_unshift(CuTest* tc)
