@@ -25,30 +25,30 @@ endif()
 ### Library adt
 file(GLOB ADT_HEADER_LIST CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
 set (ADT_HEADER_LIST
-            inc/adt_ary.h
-            inc/adt_bytearray.h
-            inc/adt_bytes.h
-            inc/adt_error.h
-            inc/adt_hash.h
-            inc/adt_heap.h
-            inc/adt_list.h
-            inc/adt_ringbuf.h
-            inc/adt_set.h
-            inc/adt_stack.h
-            inc/adt_str.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_ary.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_bytearray.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_bytes.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_error.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_hash.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_heap.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_list.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_ringbuf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_set.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_stack.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_str.h
 )
 
 set (ADT_SOURCE_LIST
-            src/adt_ary.c
-            src/adt_bytearray.c
-            src/adt_bytes.c
-            src/adt_hash.c
-            src/adt_heap.c
-            src/adt_list.c
-            src/adt_ringbuf.c
-            src/adt_set.c
-            src/adt_stack.c
-            src/adt_str.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_ary.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_bytearray.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_bytes.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_hash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_heap.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_list.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_ringbuf.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_set.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_stack.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_str.c
 )
 
 add_library(adt ${ADT_SOURCE_LIST} ${ADT_HEADER_LIST})
