@@ -1,3 +1,5 @@
+![unit tests](https://github.com/cogu/adt/workflows/unit%20tests/badge.svg)
+
 # ADT
 
 Abstract data types for the C programming language.
