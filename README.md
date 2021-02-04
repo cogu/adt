@@ -32,7 +32,6 @@ Some data structures in ADT are used in embedded development and does not requir
 * [cogu/cutil](https://github.com/cogu/cutil)
 * [cogu/dtl_json](https://github.com/cogu/dtl_json)
 * [cogu/dtl_type](https://github.com/cogu/dtl_type)
-* [cogu/msocket](https://github.com/cogu/msocket)
 
 ## Dependencies
 
@@ -44,7 +43,10 @@ If you are looking for higher level data types in C you can check out the [cogu/
 
 ## Building with CMake
 
-### Running unit tests (Linux)
+For Windows, use a "Native tools command prompt" from your Visual Studio installation. It comes with a cmake binary that
+by default chooses the appropriate compiler version.
+
+### Running unit tests (Linux and Windows)
 
 Configure:
 
@@ -61,47 +63,21 @@ cmake --build build --target adt_unit
 Run test cases:
 
 ```cmd
-cd build
-ctest
+cd build && ctest
 ```
 
-### Running unit tests (Windows and Visual Studio)
-
-Use a command prompt provided by your Visual Studio installation.
-For example, I use "x64 Native Tools Command Prompt for VS2019" which is found on the start menu.
-It conveniently comes with CMake pre-installed which generates Visual Studio projects by default.
-
-Configure:
-
-```cmd
-cmake -S . -B VisualStudio -DUNIT_TEST=ON
-```
-
-Build:
-
-```cmd
-cmake --build VisualStudio --config Debug --target adt_unit
-```
-
-Run test cases:
-
-```cmd
-cd VisualStudio
-ctest
-```
-
-### Building a release version of the ADT library (Linux)
+### Building a release version of the ADT library (Linux and Windows)
 
 Configure:
 
 ```sh
-cmake -S . -B Release -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
 Build:
 
 ```sh
-cmake --build Release --target adt
+cmake --build build --target adt
 ```
 
 ### ADT CMake Options
