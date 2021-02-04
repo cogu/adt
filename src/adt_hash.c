@@ -365,7 +365,6 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 				node->child.match[node->u8Cur++].u32Hash = u32Hash;
 			}
 			else{
-				adt_hmatch_t* old = node->child.match;
             uint32_t u32Bits;
             uint8_t u8Bucket;
 				assert(node->u8Width==16);
@@ -378,7 +377,7 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 				assert(node->u8Depth<=8);
             u32Bits = (node->u8Depth)*4;
 				for(i=0;i<node->u8Cur;i++){
-					uint8_t u8Bucket = (uint8_t) ( (old[i].u32Hash >> u32Bits) & 0xF);
+					u8Bucket = (uint8_t) ( (old[i].u32Hash >> u32Bits) & 0xF);
 					adt_hnode_insert(&node->child.node[u8Bucket],old[i].key,old[i].u32Hash);
 				}
 				free(old);

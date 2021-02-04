@@ -353,6 +353,13 @@ int32_t adt_ary_length(const adt_ary_t *self){
 	return -1;
 }
 
+bool adt_ary_is_empty(const adt_ary_t* self) {
+   if (self) {
+      return self->s32CurLen > 0? false : true;
+   }
+   return false;
+}
+
 //Returns nonzero if the element exists
 int32_t	adt_ary_exists(const adt_ary_t *self, int32_t s32Index){
 	if(self==0){

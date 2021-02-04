@@ -627,7 +627,14 @@ struct adt_bytes_tag *adt_str_bytes(adt_str_t *self)
    return retval;
 }
 
-
+uint8_t* adt_str_data(adt_str_t const* self)
+{
+   if (self != 0)
+   {
+      return self->pAlloc;
+   }
+   return 0;
+}
 
 /* utility */
 
@@ -646,6 +653,15 @@ adt_str_encoding_t adt_str_getEncoding(adt_str_t *self)
       return self->encoding;
    }
    return ADT_STR_ENCODING_UNKNOWN;
+}
+
+bool adt_str_is_empty(const adt_str_t* self)
+{
+   if (self != 0)
+   {
+      return self->s32Cur > 0? false : true;
+   }
+   return false;
 }
 
 int32_t adt_str_length(const adt_str_t *self)

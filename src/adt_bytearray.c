@@ -287,6 +287,15 @@ uint8_t *adt_bytearray_data(const adt_bytearray_t *self){
    return 0;
 }
 
+uint8_t const* adt_bytearray_const_data(adt_bytearray_t const* self)
+{
+   if (self != 0)
+   {
+      return (uint8_t const*) self->pData;
+   }
+   return 0;
+}
+
 uint32_t adt_bytearray_length(const adt_bytearray_t *self){
    if(self != 0){
       return self->u32CurLen;
@@ -303,22 +312,46 @@ void adt_bytearray_clear(adt_bytearray_t *self){
 /**
  * Returns true if both bytearrays are of equal length and equal content
  */
-bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs){
-   if ( (lhs != 0) && (rhs != 0) ) {
-      int32_t leftLen;
-      int32_t rightLen;
+bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs)
+{
+   if ( (lhs != 0) && (rhs != 0) )
+   {
+      uint32_t leftLen;
+      uint32_t rightLen;
       leftLen = adt_bytearray_length(lhs);
       rightLen = adt_bytearray_length(rhs);
-      if (leftLen == rightLen) {
-         int32_t i;
-         const uint8_t *pLeft;
-         const uint8_t *pRight;
-         for(i=0, pLeft=lhs->pData, pRight=rhs->pData; i<leftLen; i++){
-            if (*pLeft++ != *pRight++ ) {
-               return false;
-            }
+      if (leftLen == rightLen)
+      {
+         if (leftLen == true)
+         {
+            return true;
          }
-         return true;
+         else
+         {
+            return (memcmp(lhs->pData, rhs->pData, leftLen) == 0) ? true : false;
+         }
+      }
+   }
+   return false;
+}
+
+bool adt_bytearray_data_equals(const adt_bytearray_t* self, const uint8_t* data, uint32_t dataLen)
+{
+   if ( (self != 0) && (data != 0) )
+   {
+      uint32_t myLen;
+      myLen = adt_bytearray_length(self);
+      if (myLen == dataLen)
+      {
+         const uint8_t* myData = self->pData;
+         if (myLen == 0u)
+         {
+            return true;
+         }
+         else
+         {
+            return (memcmp(myData, data, myLen) == 0) ? true : false;
+         }
       }
    }
    return false;

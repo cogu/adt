@@ -79,6 +79,7 @@ adt_error_t	adt_ary_fill(adt_ary_t *self, int32_t s32Len);
 adt_error_t adt_ary_resize(adt_ary_t *self, int32_t s32Len);
 void	      adt_ary_clear(adt_ary_t *self);
 int32_t     adt_ary_length(const adt_ary_t *self);
+bool        adt_ary_is_empty(const adt_ary_t* self);
 void 	      adt_ary_set_fill_elem(adt_ary_t *self, void* pFillElem);
 void* 	   adt_ary_get_fill_elem(const adt_ary_t *self);
 adt_error_t adt_ary_splice(adt_ary_t *self, int32_t s32Index, int32_t s32Len);

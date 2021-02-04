@@ -99,15 +99,18 @@ const char* adt_str_cstr(adt_str_t *self);
 adt_error_t adt_str_bstr(adt_str_t *self, const char **ppBegin, const char **ppEnd);
 adt_bytearray_t *adt_str_bytearray(adt_str_t *self);
 struct adt_bytes_tag *adt_str_bytes(adt_str_t *self);
+uint8_t* adt_str_data(adt_str_t const* self);
 
 /* utility */
 void adt_str_setEncoding(adt_str_t *self, adt_str_encoding_t newEncoding);
 adt_str_encoding_t adt_str_getEncoding(adt_str_t *self);
+bool adt_str_is_empty(const adt_str_t* self);
 int32_t adt_str_length(const adt_str_t *self);
 int32_t adt_str_size(const adt_str_t *self);
 adt_error_t adt_str_reserve(adt_str_t *self, int32_t s32NewLen);
 void adt_str_clear(adt_str_t *self);
 adt_error_t adt_str_getLastError(adt_str_t *self);
+
 
 bool adt_str_equal(const adt_str_t *self, const adt_str_t* other);
 bool adt_str_equal_bstr(const adt_str_t *self, const char *pBegin, const char *pEnd);
