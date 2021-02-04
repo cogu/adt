@@ -78,9 +78,11 @@ adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc);
 adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen);
 adt_error_t adt_bytearray_push(adt_bytearray_t *self, uint8_t value);
 uint8_t *adt_bytearray_data(const adt_bytearray_t *self);
+uint8_t const* adt_bytearray_const_data(adt_bytearray_t const* self);
 uint32_t adt_bytearray_length(const adt_bytearray_t *self);
 void adt_bytearray_clear(adt_bytearray_t *self);
 bool adt_bytearray_equals(const adt_bytearray_t *lhs, const adt_bytearray_t *rhs);
+bool adt_bytearray_data_equals(const adt_bytearray_t* self, const uint8_t* data, uint32_t dataLen);
 struct adt_bytes_tag* adt_bytearray_bytes(const adt_bytearray_t *self);
 
 

@@ -243,7 +243,7 @@ void* adt_list_last(const adt_list_t *self)
    return 0;
 }
 
-adt_list_elem_t *adt_list_iter_first(adt_list_t *self)
+adt_list_elem_t *adt_list_iter_first(adt_list_t const* self)
 {
    if (self != 0)
    {
@@ -252,7 +252,7 @@ adt_list_elem_t *adt_list_iter_first(adt_list_t *self)
    return 0;
 }
 
-adt_list_elem_t *adt_list_iter_last(adt_list_t *self)
+adt_list_elem_t *adt_list_iter_last(adt_list_t const* self)
 {
    if (self != 0)
    {
