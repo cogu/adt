@@ -1,0 +1,110 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "clang-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-18",
+        "CMAKE_CXX_COMPILER": "clang++-18",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      }
+    },
+    {
+      "name": "clang-debug",
+      "displayName": "Clang 18 Debug",
+      "inherits": "clang-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Clang 18 Release",
+      "inherits": "clang-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "clang-test",
+      "displayName": "Clang 18 Unit Tests",
+      "inherits": "clang-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "UNIT_TEST": true
+      }
+    },
+    {
+      "name": "clang-asan",
+      "displayName": "Clang 18 Address and Undefined Behavior Sanitizers",
+      "inherits": "clang-test",
+      "cacheVariables": {
+        "ADT_SANITIZERS": "address,undefined"
+      }
+    },
+    {
+      "name": "clang-tidy",
+      "displayName": "Clang 18 Static Analysis",
+      "inherits": "clang-test",
+      "cacheVariables": {
+        "CMAKE_C_CLANG_TIDY": "clang-tidy-18",
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy-18"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "clang-debug",
+      "configurePreset": "clang-debug"
+    },
+    {
+      "name": "clang-release",
+      "configurePreset": "clang-release"
+    },
+    {
+      "name": "clang-test",
+      "configurePreset": "clang-test",
+      "targets": [
+        "adt_unit"
+      ]
+    },
+    {
+      "name": "clang-asan",
+      "configurePreset": "clang-asan",
+      "targets": [
+        "adt_unit"
+      ]
+    },
+    {
+      "name": "clang-tidy",
+      "configurePreset": "clang-tidy",
+      "targets": [
+        "adt_unit"
+      ]
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "clang-test",
+      "configurePreset": "clang-test",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "clang-asan",
+      "configurePreset": "clang-asan",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

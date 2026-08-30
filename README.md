@@ -35,7 +35,7 @@ Some data structures in ADT are used in embedded development and does not requir
 
 ## Dependencies
 
-None, except for a C compiler (C89 works fine, C90 for unit tests).
+None, except for a C compiler.
 
 ## Related projects
 
@@ -43,30 +43,50 @@ If you are looking for higher level data types in C you can check out the [cogu/
 
 ## Building with CMake
 
+### Using CMake Presets (Clang 18 + Ninja)
+
+```bash
+# Run unit tests
+cmake --preset clang-test
+cmake --build --preset clang-test
+ctest --preset clang-test
+
+# Address and Undefined Behavior Sanitizers (ASan + UBSan)
+cmake --preset clang-asan
+cmake --build --preset clang-asan
+ctest --preset clang-asan
+
+# Static Analysis
+cmake --preset clang-tidy
+cmake --build --preset clang-tidy
+```
+
+### Manual CMake Workflows (Linux and Windows)
+
 For Windows, use a "Native tools command prompt" from your Visual Studio installation. It comes with a cmake binary that
 by default chooses the appropriate compiler version.
 
-### Running unit tests (Linux and Windows)
+#### Running unit tests
 
 Configure:
 
 ```sh
-cmake -S . -B build -DUNIT_TEST=ON
+cmake -S . -B build-test -DUNIT_TEST=ON
 ```
 
 Build:
 
 ```sh
-cmake --build build --target adt_unit
+cmake --build build-test --target adt_unit
 ```
 
 Run test cases:
 
-```cmd
-cd build && ctest
+```sh
+ctest --test-dir build-test --output-on-failure
 ```
 
-### Building a release version of the ADT library (Linux and Windows)
+#### Building a release version of the ADT library
 
 Configure:
 
@@ -86,10 +106,11 @@ CMake options can be set from command line or using a CMake GUI tool (such as cc
 
 #### Generic Options
 
-| CMake Option      | Usage            | Description                             |
-|-------------------|------------------|-----------------------------------------|
-| LEAK_CHECK        | -DLEAK_CHECK=ON  | Enables memory leak check detection     |
-| UNIT_TEST         | -DUNIT_TEST=ON   | Activates UNIT_TEST preprocessor define |
+| CMake Option      | Usage                                  | Description                                      |
+|-------------------|----------------------------------------|--------------------------------------------------|
+| LEAK_CHECK        | -DLEAK_CHECK=ON                        | Enables memory leak check detection              |
+| UNIT_TEST         | -DUNIT_TEST=ON                         | Activates UNIT_TEST preprocessor define          |
+| ADT_SANITIZERS    | -DADT_SANITIZERS="address,undefined"   | Enables sanitizers for GCC or Clang              |
 
 #### ADT Hash
 
