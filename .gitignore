@@ -9,8 +9,5 @@
 **/language.settings.xml
 
 #Build directories
-**/Debug/
-**/Release/
-**/UnitTest/
-/build/
-/VisualStudio
+build/
+build-*/

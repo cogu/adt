@@ -104,6 +104,7 @@ void test_adt_hash_iterator2(CuTest* tc){
 	      adt_hash_set(pHash,line,&value);
 	   }
 	}while(read>=0);
+	(void)dup;
 	end = clock();
 	elapsed_time = (double)(end - start) / (double)CLOCKS_PER_SEC;
 	printf("added %d items in %.002fs\n",items,elapsed_time);

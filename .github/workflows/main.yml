@@ -1,31 +1,35 @@
-# This is a basic workflow to help you get started with Actions
-
 name: "unit tests"
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
+    name: build (${{ matrix.name }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC
+            cc: gcc
+            cxx: g++
+          - name: Clang
+            cc: clang
+            cxx: clang++
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-    # Build with CMake
+    - uses: actions/checkout@v4
+
     - name: configure
       run: cmake -S . -B build -DUNIT_TEST=ON    
+
     - name: build
       run: cmake --build build --target adt_unit
-    # Run unit test suite
+
     - name: test
-      run: cd build && ctest                
+      run: ctest --test-dir build --output-on-failure

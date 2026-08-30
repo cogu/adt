@@ -7,9 +7,17 @@
 * Copyright (c) 2013 Conny Gustafsson
 *
 ******************************************************************************/
+#if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
+# ifndef _DEFAULT_SOURCE
+#  define _DEFAULT_SOURCE
+# endif
+# ifndef _POSIX_C_SOURCE
+#  define _POSIX_C_SOURCE 200809L
+# endif
+#endif
 #include "adt_hash.h"
 #include "adt_str.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #ifdef MEM_LEAK_CHECK
