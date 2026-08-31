@@ -2,12 +2,8 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <stddef.h>
+#include "test_common.h"
 #include "adt_heap.h"
-#include "CuTest.h"
-#ifdef MEM_LEAK_CHECK
-# include "CMemLeak.h"
-#endif
-
 
 //////////////////////////////////////////////////////////////////////////////
 // CONSTANTS AND DATA TYPES
@@ -19,12 +15,12 @@
 static void test_heap_elem(CuTest* tc);
 static void test_min_heap_sortUp(CuTest* tc);
 static void test_min_heap_sortDown(CuTest* tc);
-
+static void test_max_heap_sortUp(CuTest* tc);
+static void test_max_heap_sortDown(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // LOCAL VARIABLES
 //////////////////////////////////////////////////////////////////////////////
-
 
 //////////////////////////////////////////////////////////////////////////////
 // GLOBAL FUNCTIONS
@@ -35,12 +31,11 @@ CuSuite* testsuite_adt_priorityHeap(void){
    SUITE_ADD_TEST(suite, test_heap_elem);
    SUITE_ADD_TEST(suite, test_min_heap_sortUp);
    SUITE_ADD_TEST(suite, test_min_heap_sortDown);
+   SUITE_ADD_TEST(suite, test_max_heap_sortUp);
+   SUITE_ADD_TEST(suite, test_max_heap_sortDown);
 
    return suite;
-
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 // LOCAL FUNCTIONS
@@ -198,6 +193,66 @@ static void test_min_heap_sortDown(CuTest* tc){
    CuAssertPtrEquals(tc, (void*) elem2, adt_ary_value(&heap, 1));
    CuAssertPtrEquals(tc, (void*) elem3, adt_ary_value(&heap, 2));
    CuAssertPtrEquals(tc, (void*) elem4, adt_ary_value(&heap, 3));
+
+   adt_ary_destroy(&heap);
+}
+
+static void test_max_heap_sortUp(CuTest* tc){
+   adt_ary_t heap;
+   adt_heap_elem_t *elem1;
+   adt_heap_elem_t *elem2;
+   adt_heap_elem_t *elem3;
+   adt_heap_elem_t *elem4;
+
+   adt_ary_create(&heap, adt_heap_elem_vdelete);
+
+   elem1 = adt_heap_elem_new(NULL, 10);
+   adt_ary_push(&heap, elem1);
+   adt_heap_sortUp(&heap, 0, ADT_MAX_HEAP);
+
+   elem2 = adt_heap_elem_new(NULL, 20);
+   adt_ary_push(&heap, elem2);
+   adt_heap_sortUp(&heap, 1, ADT_MAX_HEAP);
+   CuAssertPtrEquals(tc, (void*) elem2, adt_ary_value(&heap, 0));
+   CuAssertPtrEquals(tc, (void*) elem1, adt_ary_value(&heap, 1));
+
+   elem3 = adt_heap_elem_new(NULL, 30);
+   adt_ary_push(&heap, elem3);
+   adt_heap_sortUp(&heap, 2, ADT_MAX_HEAP);
+   CuAssertPtrEquals(tc, (void*) elem3, adt_ary_value(&heap, 0));
+
+   elem4 = adt_heap_elem_new(NULL, 40);
+   adt_ary_push(&heap, elem4);
+   adt_heap_sortUp(&heap, 3, ADT_MAX_HEAP);
+   CuAssertPtrEquals(tc, (void*) elem4, adt_ary_value(&heap, 0));
+
+   adt_ary_destroy(&heap);
+}
+
+static void test_max_heap_sortDown(CuTest* tc){
+   adt_ary_t heap;
+   adt_heap_elem_t *elem1;
+   adt_heap_elem_t *elem2;
+   adt_heap_elem_t *elem3;
+   adt_heap_elem_t *elem4;
+
+   adt_ary_create(&heap, adt_heap_elem_vdelete);
+
+   elem1 = adt_heap_elem_new(NULL, 10);
+   elem2 = adt_heap_elem_new(NULL, 20);
+   elem3 = adt_heap_elem_new(NULL, 30);
+   elem4 = adt_heap_elem_new(NULL, 40);
+
+   // Place small element at root, larger children
+   adt_ary_push(&heap, elem1); // root: 10
+   adt_ary_push(&heap, elem3); // left: 30
+   adt_ary_push(&heap, elem4); // right: 40
+   adt_ary_push(&heap, elem2); // left-left: 20
+
+   adt_heap_sortDown(&heap, 0, ADT_MAX_HEAP);
+
+   // Root must now be the largest (elem4 = 40)
+   CuAssertPtrEquals(tc, (void*) elem4, adt_ary_value(&heap, 0));
 
    adt_ary_destroy(&heap);
 }

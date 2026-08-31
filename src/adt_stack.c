@@ -148,7 +148,9 @@ void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
 	}
 	self->ppAlloc = ppAlloc;
 	self->u32AllocLen = u32Len;
-
+	if (self->u32CurLen > u32Len) {
+		self->u32CurLen = u32Len;
+	}
 }
 uint32_t adt_stack_size(const adt_stack_t *self){
 	if(self){

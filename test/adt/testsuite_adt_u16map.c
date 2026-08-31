@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-#include "CuTest.h"
+#include "test_common.h"
 #include "adt_u16Map.h"
 
 #define NUM_ELEM 20
@@ -243,6 +243,7 @@ void test_adt_u16Map_find_rand_set(CuTest* tc){
    CuAssertIntEquals(tc,82,elem->key);
    elem = adt_u16Map_find(&map,101);
    CuAssertPtrEquals(tc,NULL,elem);
+   free(data);
 }
 
 void test_adt_u16Map_move(CuTest* tc){

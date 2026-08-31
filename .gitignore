@@ -11,3 +11,6 @@
 #Build directories
 build/
 build-*/
+
+#Other
+TODO.md

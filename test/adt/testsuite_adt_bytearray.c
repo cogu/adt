@@ -30,12 +30,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "CuTest.h"
+#include "test_common.h"
 #include "adt_bytearray.h"
 #include "adt_bytes.h"
-#ifdef MEM_LEAK_CHECK
-#include "CMemLeak.h"
-#endif
+#include "adt_ary.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
@@ -54,6 +52,9 @@ static void test_adt_bytearray_manual_grow(CuTest* tc);
 static void test_adt_bytearray_manual_shrink(CuTest* tc);
 static void test_adt_bytearray_bytes(CuTest* tc);
 static void test_adt_bytearray_bytearray_clone(CuTest* tc);
+static void test_adt_bytearray_trimLeft(CuTest* tc);
+static void test_adt_bytearray_trimLeft_bounds(CuTest* tc);
+static void test_adt_bytearray_vdelete(CuTest* tc);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -76,6 +77,9 @@ CuSuite* testsuite_adt_bytearray(void)
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_shrink);
    SUITE_ADD_TEST(suite, test_adt_bytearray_bytes);
    SUITE_ADD_TEST(suite, test_adt_bytearray_bytearray_clone);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_trimLeft);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_trimLeft_bounds);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_vdelete);
 
    return suite;
 }
@@ -217,5 +221,70 @@ static void test_adt_bytearray_bytearray_clone(CuTest* tc)
    adt_bytearray_delete(array1);
    adt_bytearray_delete(array2);
 
+}
+
+static void test_adt_bytearray_trimLeft(CuTest* tc)
+{
+   const char *orig = "Hello, World!";
+   adt_bytearray_t *array = adt_bytearray_make_cstr(orig, ADT_BYTEARRAY_NO_GROWTH);
+   CuAssertPtrNotNull(tc, array);
+   CuAssertUIntEquals(tc, 13, adt_bytearray_length(array));
+
+   // Trim at start (no shift)
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_bytearray_trimLeft(array, adt_bytearray_data(array)));
+   CuAssertUIntEquals(tc, 13, adt_bytearray_length(array));
+
+   // Trim 7 bytes from the left ("World!")
+   uint8_t *pMid = adt_bytearray_data(array) + 7;
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_bytearray_trimLeft(array, pMid));
+   CuAssertUIntEquals(tc, 6, adt_bytearray_length(array));
+   CuAssertIntEquals(tc, 0, memcmp(adt_bytearray_data(array), "World!", 6));
+
+   // Trim all remaining bytes
+   uint8_t *pEnd = adt_bytearray_data(array) + 6;
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_bytearray_trimLeft(array, pEnd));
+   CuAssertUIntEquals(tc, 0, adt_bytearray_length(array));
+
+   adt_bytearray_delete(array);
+}
+
+static void test_adt_bytearray_trimLeft_bounds(CuTest* tc)
+{
+   const char *orig = "Hello, World!";
+   adt_bytearray_t *array = adt_bytearray_make_cstr(orig, ADT_BYTEARRAY_NO_GROWTH);
+   CuAssertPtrNotNull(tc, array);
+   CuAssertUIntEquals(tc, 13, adt_bytearray_length(array));
+
+   uint8_t *pData = adt_bytearray_data(array);
+
+   // Pointer before array start -> invalid argument error
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_bytearray_trimLeft(array, pData - 1));
+
+   // Pointer beyond valid length -> invalid argument error
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_bytearray_trimLeft(array, pData + 14));
+
+   // NULL pointers -> invalid argument error
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_bytearray_trimLeft(array, NULL));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_bytearray_trimLeft(NULL, pData));
+
+   // Verify array contents remain unmodified after failed boundary calls
+   CuAssertUIntEquals(tc, 13, adt_bytearray_length(array));
+   CuAssertIntEquals(tc, 0, memcmp(pData, orig, 13));
+
+   adt_bytearray_delete(array);
+}
+
+static void test_adt_bytearray_vdelete(CuTest* tc)
+{
+   adt_ary_t *outer = adt_ary_new(adt_bytearray_vdelete);
+   adt_bytearray_t *inner1 = adt_bytearray_make_cstr("inner1_bytes", ADT_BYTEARRAY_NO_GROWTH);
+   adt_bytearray_t *inner2 = adt_bytearray_make_cstr("inner2_bytes", ADT_BYTEARRAY_NO_GROWTH);
+
+   adt_ary_push(outer, inner1);
+   adt_ary_push(outer, inner2);
+   CuAssertIntEquals(tc, 2, adt_ary_length(outer));
+
+   // adt_ary_delete will invoke adt_bytearray_vdelete on inner1 and inner2
+   adt_ary_delete(outer);
 }
 

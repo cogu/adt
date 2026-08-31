@@ -86,6 +86,35 @@ Run test cases:
 ctest --test-dir build-test --output-on-failure
 ```
 
+#### Measuring Code Coverage (gcov)
+
+Configure with `--coverage` compiler and linker flags:
+
+```sh
+cmake -S . -B build-cov -DUNIT_TEST=ON -DADT_U16MAP_ENABLE=ON -DADT_RBFH_ENABLE=ON \
+  -DCMAKE_C_FLAGS="--coverage" \
+  -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+```
+
+Build and run tests:
+
+```sh
+cmake --build build-cov
+ctest --test-dir build-cov --output-on-failure
+```
+
+Analyze coverage with `gcov`:
+
+```sh
+# For a single file:
+gcov -o build-cov/CMakeFiles/adt.dir/src/adt_stack.c.o src/adt_stack.c
+
+# For all source files:
+for f in src/*.c; do gcov -o build-cov/CMakeFiles/adt.dir/src/$(basename $f).o $f; done
+```
+
+`gcov` prints the summary percentage to stdout and produces annotated `.gcov` files (e.g. `adt_stack.c.gcov`) in the current working directory. Untested lines are highlighted with `#####:`.
+
 #### Building a release version of the ADT library
 
 Configure:
@@ -112,18 +141,9 @@ CMake options can be set from command line or using a CMake GUI tool (such as cc
 | UNIT_TEST         | -DUNIT_TEST=ON                         | Activates UNIT_TEST preprocessor define          |
 | ADT_SANITIZERS    | -DADT_SANITIZERS="address,undefined"   | Enables sanitizers for GCC or Clang              |
 
-#### ADT Hash
+#### ADT Hash Performance Benchmark
 
-When -DUNIT_TEST is set to ON you get an extra option which you can use to enable additional
-unit tests for adt_hash. These takes several seconds to run so they are not enabled by default.
-
-| CMake Option          | Usage                    | Description                                     |
-|-----------------------|--------------------------|-------------------------------------------------|
-| TEST_ADT_HASH_FULL    | -DTEST_ADT_HASH_FULL=ON  | Enables additional (slow) tests for adt_hash_t  |
-
-Note that above flag has no effect when building with Visual Studio (due to
-lack of support for the *getline* function). A custom implementation for
-Visual Studio might be implemented at a later time.
+When `-DUNIT_TEST=ON` is set, a dedicated benchmark executable `adt_perf` is built. It benchmarks insertion and lookup performance across ~22,000 dictionary words using [test/3esl.txt](file:///home/cogu/repo/c-apx/adt/test/3esl.txt).
 
 #### ADT Ringbuffer
 
@@ -133,7 +153,8 @@ By default, adt_ringbuf.c will not compile anything unless you explicitly enable
 |-------------------|-----------------------|----------------------------------|
 | ADT_RBFH_ENABLE   | -DADT_RBFH_ENABLE=ON  | Enables adt_rbfh_t and its API   |
 | ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfs_t and its API   |
-| ADT_RBFU16_ENABLE | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfu16_t and its API |
+| ADT_RBFU16_ENABLE | -DADT_RBFU16_ENABLE=ON | Enables adt_rbfu16_t and its API |
+| ADT_U16MAP_ENABLE | -DADT_U16MAP_ENABLE=ON | Enables adt_u16Map_t and its API |
 
 # ADT data types
 

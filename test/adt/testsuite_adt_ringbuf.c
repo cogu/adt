@@ -26,13 +26,10 @@
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
-#include "adt_ringbuf.h"
 #include <stdint.h>
 #include <limits.h>
-#include "CuTest.h"
-#ifdef MEM_LEAK_CHECK
-#include "CMemLeak.h"
-#endif
+#include "test_common.h"
+#include "adt_ringbuf.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
@@ -48,6 +45,7 @@ static void test_adt_rbfh_insert_then_grow2(CuTest* tc);
 static void test_adt_rbfh_insert_then_remove(CuTest* tc);
 static void test_adt_rbfh_peek(CuTest* tc);
 static void test_adt_rbfh_limits(CuTest* tc);
+static void test_adt_rbfh_new_delete(CuTest* tc);
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -68,9 +66,8 @@ CuSuite* testsuite_adt_ringbuf(void)
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_remove);
    SUITE_ADD_TEST(suite, test_adt_rbfh_peek);
    SUITE_ADD_TEST(suite, test_adt_rbfh_limits);
+   SUITE_ADD_TEST(suite, test_adt_rbfh_new_delete);
 #endif
-
-
 
    return suite;
 }
@@ -259,5 +256,22 @@ static void test_adt_rbfh_limits(CuTest* tc)
    CuAssertUIntEquals(tc, USHRT_MAX, adt_rbfh_free(&buf));
 
    adt_rbfh_destroy(&buf);
+}
+
+static void test_adt_rbfh_new_delete(CuTest* tc)
+{
+   adt_rbfh_t *rbf = adt_rbfh_new(sizeof(uint32_t));
+   CuAssertPtrNotNull(tc, rbf);
+
+   uint32_t val = 42, out = 0;
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfh_insert(rbf, (const uint8_t*)&val));
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfh_remove(rbf, (uint8_t*)&out));
+   CuAssertUIntEquals(tc, 42, out);
+
+   adt_rbfh_delete(rbf);
+
+   adt_rbfh_t *rbfEx = adt_rbfh_newEx(sizeof(uint16_t), 10, 100);
+   CuAssertPtrNotNull(tc, rbfEx);
+   adt_rbfh_delete(rbfEx);
 }
 #endif
