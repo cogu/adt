@@ -2,11 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "CuTest.h"
+#include "test_common.h"
 #include "adt_list.h"
-#ifdef MEM_LEAK_CHECK
-#include "CMemLeak.h"
-#endif
 
 /**************** Private Function Declarations *******************/
 static void test_adt_u32List_create(CuTest* tc);
@@ -16,6 +13,8 @@ static void test_adt_u32List_erase(CuTest* tc);
 static void test_adt_u32List_insert_before(CuTest* tc);
 static void test_adt_u32List_insert_after(CuTest* tc);
 static void test_adt_u32List_find(CuTest* tc);
+static void test_adt_u32List_iter_prev(CuTest* tc);
+static void test_adt_u32List_vdelete(CuTest* tc);
 
 
 /**************** Private Variable Declarations *******************/
@@ -33,6 +32,8 @@ CuSuite* testsuite_adt_u32List(void)
    SUITE_ADD_TEST(suite, test_adt_u32List_insert_before);
    SUITE_ADD_TEST(suite, test_adt_u32List_insert_after);
    SUITE_ADD_TEST(suite, test_adt_u32List_find);
+   SUITE_ADD_TEST(suite, test_adt_u32List_iter_prev);
+   SUITE_ADD_TEST(suite, test_adt_u32List_vdelete);
 
    return suite;
 }
@@ -275,3 +276,48 @@ static void test_adt_u32List_find(CuTest* tc)
    CuAssertUIntEquals(tc, 1, iter->item);
    adt_u32List_delete(list);
 }
+
+static void test_adt_u32List_iter_prev(CuTest* tc)
+{
+   adt_u32List_t *list = adt_u32List_new();
+   adt_u32List_insert(list, 10);
+   adt_u32List_insert(list, 20);
+   adt_u32List_insert(list, 30);
+
+   adt_u32List_elem_t *it = adt_u32List_iter_last(list);
+   CuAssertPtrNotNull(tc, it);
+   CuAssertUIntEquals(tc, 30, it->item);
+   it = adt_u32List_iter_prev(it);
+   CuAssertPtrNotNull(tc, it);
+   CuAssertUIntEquals(tc, 20, it->item);
+   it = adt_u32List_iter_prev(it);
+   CuAssertPtrNotNull(tc, it);
+   CuAssertUIntEquals(tc, 10, it->item);
+   it = adt_u32List_iter_prev(it);
+   CuAssertPtrEquals(tc, NULL, it);
+
+   adt_u32List_delete(list);
+}
+
+static void test_adt_u32List_vdelete(CuTest* tc)
+{
+   adt_list_t *outer = adt_list_new(adt_u32List_vdelete);
+   adt_u32List_t *inner1 = adt_u32List_new();
+   adt_u32List_t *inner2 = adt_u32List_new();
+
+   adt_u32List_insert(inner1, 10);
+   adt_u32List_insert(inner1, 20);
+   adt_u32List_insert(inner1, 30);
+
+   adt_u32List_insert(inner2, 40);
+   adt_u32List_insert(inner2, 50);
+   adt_u32List_insert(inner2, 60);
+
+   adt_list_insert(outer, inner1);
+   adt_list_insert(outer, inner2);
+   CuAssertIntEquals(tc, 2, adt_list_length(outer));
+
+   // adt_list_delete will invoke adt_u32List_vdelete on both inner1 and inner2
+   adt_list_delete(outer);
+}
+

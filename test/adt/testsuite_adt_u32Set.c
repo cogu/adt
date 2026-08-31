@@ -1,14 +1,8 @@
-//////////////////////////////////////////////////////////////////////////////
-// INCLUDES
-//////////////////////////////////////////////////////////////////////////////
 #include <stdbool.h>
 #include <assert.h>
 #include <malloc.h>
-#include "CuTest.h"
+#include "test_common.h"
 #include "adt_set.h"
-#ifdef MEM_LEAK_CHECK
-# include "CMemLeak.h"
-#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -27,6 +21,7 @@ static void test_adt_u32Set_insert_duplicates(CuTest* tc);
 static void test_adt_u32Set_contains(CuTest* tc);
 static void test_adt_u32Set_remove(CuTest* tc);
 static void test_adt_u32Set_is_empty(CuTest* tc);
+static void test_adt_u32Set_vdelete(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // GLOBAL FUNCTIONS
@@ -43,6 +38,7 @@ CuSuite* testsuite_adt_u32Set(void)
    SUITE_ADD_TEST(suite, test_adt_u32Set_contains);
    SUITE_ADD_TEST(suite, test_adt_u32Set_remove);
    SUITE_ADD_TEST(suite, test_adt_u32Set_is_empty);
+   SUITE_ADD_TEST(suite, test_adt_u32Set_vdelete);
 
    return suite;
 }
@@ -277,3 +273,11 @@ static void test_adt_u32Set_is_empty(CuTest* tc)
    adt_u32Set_destroy(&set);
 
 }
+
+static void test_adt_u32Set_vdelete(CuTest* tc)
+{
+   adt_u32Set_t *set = adt_u32Set_new();
+   adt_u32Set_insert(set, 123);
+   adt_u32Set_vdelete((void*) set);
+}
+

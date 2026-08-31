@@ -24,19 +24,14 @@
 *
 ******************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
-// INCLUDES
-//////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
 #include <setjmp.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "CuTest.h"
+#include "test_common.h"
 #include "adt_str.h"
 #include "adt_bytes.h"
-#ifdef MEM_LEAK_CHECK
-#include "CMemLeak.h"
-#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -79,6 +74,7 @@ static void test_adt_str_bytes(CuTest* tc);
 static void test_adt_str_clear(CuTest* tc);
 static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc);
 static void test_adt_str_append_bstr_containing_nulls_at_end(CuTest* tc);
+static void test_adt_str_vdelete(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -124,6 +120,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_str_clear);
    SUITE_ADD_TEST(suite, test_adt_adding_nulls_at_end_shall_not_be_part_of_length);
    SUITE_ADD_TEST(suite, test_adt_str_append_bstr_containing_nulls_at_end);
+   SUITE_ADD_TEST(suite, test_adt_str_vdelete);
 
 
    return suite;
@@ -757,3 +754,11 @@ static void test_adt_str_append_bstr_containing_nulls_at_end(CuTest* tc)
    CuAssertIntEquals(tc, 1, adt_str_length(str));
    adt_str_delete(str);
 }
+
+static void test_adt_str_vdelete(CuTest* tc)
+{
+   adt_str_t *str = adt_str_new_cstr("testing vdelete");
+   CuAssertPtrNotNull(tc, str);
+   adt_str_vdelete((void*) str);
+}
+

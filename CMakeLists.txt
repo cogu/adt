@@ -27,7 +27,7 @@ include(CMakeDependentOption)
 option(ADT_RBFU16_ENABLE "ADT U16 Ringbuffer" OFF)
 option(ADT_RBFS_ENABLE "ADT Statically allocated Ringbuffer" OFF)
 option(ADT_RBFH_ENABLE "ADT Heap-managed Ringbuffer" OFF)
-CMAKE_DEPENDENT_OPTION(TEST_ADT_HASH_FULL "Activate entire adt_hash test suite" OFF "UNIT_TEST" OFF)
+option(ADT_U16MAP_ENABLE "ADT U16 Map" OFF)
 set(ADT_SANITIZERS "" CACHE STRING "Comma-separated sanitizers to enable (for example: address,undefined or thread)")
 set_property(CACHE ADT_SANITIZERS PROPERTY STRINGS "" "address" "address,undefined" "thread")
 
@@ -103,18 +103,21 @@ if(ADT_RBFH_ENABLE)
     target_compile_definitions(adt PUBLIC ADT_RBFH_ENABLE=1)
 endif()
 
+if(ADT_U16MAP_ENABLE)
+    message(STATUS "ADT_U16MAP_ENABLE=1")
+    target_sources(adt PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_u16Map.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_u16Map.c
+    )
+    target_compile_definitions(adt PUBLIC ADT_U16MAP_ENABLE=1)
+endif()
+
 ###
 
 ###Executable adt_unit
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     if (UNIT_TEST)
-        set(TEST_ADT_HASH_FULL_VAL 0)
-        if (TEST_ADT_HASH_FULL)
-            set(TEST_ADT_HASH_FULL_VAL 1)
-            message(STATUS "TEST_ADT_HASH_FULL_VAL=${TEST_ADT_HASH_FULL_VAL}")
-        endif()
-
         set (ADT_TEST_SUITE_LIST
                 test/adt/testsuite_adt_ary.c
                 test/adt/testsuite_adt_bytearray.c
@@ -128,6 +131,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                 test/adt/testsuite_adt_u32List.c
                 test/adt/testsuite_adt_u32Set.c
         )
+
+        if(ADT_U16MAP_ENABLE)
+            list(APPEND ADT_TEST_SUITE_LIST test/adt/testsuite_adt_u16map.c)
+        endif()
 
         set(ADT_UNIT_EXTRA)
         if (LEAK_CHECK)
@@ -143,7 +150,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                                 "${CMAKE_CURRENT_SOURCE_DIR}/inc"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/test"
                                 )
-        target_compile_definitions(adt_unit PRIVATE UNIT_TEST TEST_ADT_HASH_FULL=${TEST_ADT_HASH_FULL_VAL})
+        target_compile_definitions(adt_unit PRIVATE UNIT_TEST)
+        if(ADT_U16MAP_ENABLE)
+            target_compile_definitions(adt_unit PRIVATE TEST_ADT_U16MAP_ENABLE=1)
+        endif()
         if (LEAK_CHECK)
             target_compile_definitions(adt_unit PRIVATE MEM_LEAK_CHECK)
         endif()
@@ -153,6 +163,16 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         set_tests_properties(adt_unit PROPERTIES 
             PASS_REGULAR_EXPRESSION "OK \\([0-9]+ tests\\)"
             LABELS "unit"
+        )
+
+        ### Benchmark / Performance Test
+        add_executable(adt_perf test/perf_adt_hash.c)
+        target_link_libraries(adt_perf PRIVATE adt)
+        target_include_directories(adt_perf PRIVATE
+                                "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+                                )
+        target_compile_definitions(adt_perf PRIVATE
+            DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/3esl.txt"
         )
 
     endif()

@@ -1,21 +1,10 @@
 #include <assert.h>
-#include <setjmp.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include "CuTest.h"
+#include "test_common.h"
 #include "adt_hash.h"
 #include "adt_ary.h"
-#ifdef MEM_LEAK_CHECK
-#include "CMemLeak.h"
-#endif
-
-static void vfree(void *arg)
-{
-   free(arg);
-}
-
 
 void test_adt_hash_constructor(CuTest* tc)
 {
@@ -64,73 +53,6 @@ void test_adt_hash_iterator(CuTest* tc){
 	CuAssertIntEquals(tc,4,adt_hash_length(pHash));
 	adt_hash_delete(pHash);
 }
-#ifndef _MSC_VER //MSCV doesn't have the getline function so we disable this test.
-void test_adt_hash_iterator2(CuTest* tc){
-	adt_hash_t *pHash = adt_hash_new(NULL);
-	CuAssertPtrNotNull(tc, pHash);
-	clock_t start, end;
-	double elapsed_time = 0.0;
-	size_t len = 256;
-	char *line = (char*) malloc(len);
-	ssize_t read;
-	int value = 42;
-	int items = 0;
-	int dup = 0;
-
-	start = clock();
-	FILE *fh = fopen("../../../test/3esl.txt","r");
-	if (fh == 0)
-	{
-	   fh = fopen("../../../../test/3esl.txt","r");
-	}
-    if (fh == 0)
-    {
-      fh = fopen("../test/3esl.txt","r");
-    }
-    if (fh == 0)
-    {
-      fh = fopen("test/3esl.txt","r");
-    }
-	assert(fh != 0);
-	do{
-	   read = getline(&line,&len,fh);
-	   if(read>1){
-	      line[read-1]=0;
-	      items++;
-	      if(adt_hash_get(pHash,line)!=0){
-	         printf("duplicate item: %s\n",line);
-	         dup++;
-	      }
-	      adt_hash_set(pHash,line,&value);
-	   }
-	}while(read>=0);
-	(void)dup;
-	end = clock();
-	elapsed_time = (double)(end - start) / (double)CLOCKS_PER_SEC;
-	printf("added %d items in %.002fs\n",items,elapsed_time);
-	fclose(fh);
-	CuAssertIntEquals(tc,items,adt_hash_length(pHash));
-	adt_hash_iter_init(pHash);
-	void *pVal = 0;
-	const char *pKey;
-
-	uint32_t n = 0;
-	do{
-		pVal = adt_hash_iter_next(pHash,&pKey);
-		if((int) n<items){
-			CuAssertPtrNotNull(tc, pVal);
-			n++;
-		}
-		else{
-			CuAssertPtrEquals(tc,0,pVal);
-		}
-	}while(pVal);
-	CuAssertIntEquals(tc,items,n);
-	CuAssertIntEquals(tc,items,adt_hash_length(pHash));
-	adt_hash_delete(pHash);
-	free(line);
-}
-#endif
 
 void test_adt_hash_keys(CuTest* tc)
 {
@@ -241,18 +163,47 @@ void test_adt_hash_value(CuTest* tc)
    adt_hash_delete(pHash);
 }
 
+void test_adt_hash_exists(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   int val = 123;
+   CuAssertTrue(tc, !adt_hash_exists(pHash, "nonexistent"));
+
+   adt_hash_set(pHash, "key1", &val);
+   CuAssertTrue(tc, adt_hash_exists(pHash, "key1"));
+   CuAssertTrue(tc, !adt_hash_exists(pHash, "key2"));
+
+   adt_hash_delete(pHash);
+}
+
+void test_adt_hash_set_overwrite_destructor(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(vfree);
+   CuAssertPtrNotNull(tc, pHash);
+
+   adt_hash_set(pHash, "my_key", STRDUP("first_value"));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertStrEquals(tc, "first_value", (char*) adt_hash_value(pHash, "my_key"));
+
+   // Overwriting should trigger vfree on "first_value"
+   adt_hash_set(pHash, "my_key", STRDUP("second_value"));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertStrEquals(tc, "second_value", (char*) adt_hash_value(pHash, "my_key"));
+
+   adt_hash_delete(pHash);
+}
+
 CuSuite* testsuite_adt_hash(void)
 {
 	CuSuite* suite = CuSuiteNew();
 
 	SUITE_ADD_TEST(suite, test_adt_hash_constructor);
 	SUITE_ADD_TEST(suite, test_adt_hash_iterator);
-#if (!defined(_MSC_VER) && defined(TEST_ADT_HASH_FULL) && (TEST_ADT_HASH_FULL != 0) ) //Note that this test takes several seconds to run, normally disabled
-	SUITE_ADD_TEST(suite, test_adt_hash_iterator2);
-#endif
 	SUITE_ADD_TEST(suite, test_adt_hash_keys);
 	SUITE_ADD_TEST(suite, test_adt_hash_values);
 	SUITE_ADD_TEST(suite, test_adt_hash_remove);
 	SUITE_ADD_TEST(suite, test_adt_hash_value);
+	SUITE_ADD_TEST(suite, test_adt_hash_exists);
+	SUITE_ADD_TEST(suite, test_adt_hash_set_overwrite_destructor);
 	return suite;
 }
