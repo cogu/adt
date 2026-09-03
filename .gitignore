@@ -1,12 +1,7 @@
-*~
-
 #sphinx-doc files
-/doc/make.bat
-/doc/_build/
-**/CMemLeak.txt
+/docs/make.bat
+/docs/_build/
 
-#Eclipse files
-**/language.settings.xml
 
 #Build directories
 build/
@@ -14,3 +9,5 @@ build-*/
 
 #Other
 TODO.md
+**/CMemLeak.txt
+.venv/
