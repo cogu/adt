@@ -20,14 +20,40 @@ extensions = [
     'sphinx_design',
     'sphinx.ext.githubpages',
     'sphinxcontrib.mermaid',
+    'breathe',
 ]
+
+# -- Breathe configuration ---------------------------------------------------
+
+breathe_projects = {
+    'ADT': '_build/doxygen/xml',
+}
+breathe_default_project = 'ADT'
+
+# Run Doxygen automatically if installed
+import shutil
+import subprocess
+
+docs_dir = os.path.abspath(os.path.dirname(__file__))
+doxyfile_path = os.path.join(docs_dir, 'Doxyfile')
+doxygen_cmd = shutil.which('doxygen')
+
+# Also check for local virtualenv binary if not in system PATH
+if not doxygen_cmd:
+    venv_doxygen = os.path.abspath(os.path.join(docs_dir, '..', '.venv', 'bin', 'doxygen'))
+    if os.path.exists(venv_doxygen):
+        doxygen_cmd = venv_doxygen
+
+if doxygen_cmd and os.path.exists(doxyfile_path):
+    subprocess.run([doxygen_cmd, 'Doxyfile'], cwd=docs_dir, check=False)
+
 
 
 exclude_patterns = [
     '_build',
     '.venv',
     'README.md',
-    'requirements.txt'
+    'requirements*.txt'
 ]
 
 

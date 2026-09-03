@@ -1,4 +1,23 @@
-## Building the Documentation
+## Prerequisites
+
+The documentation toolchain requires **Sphinx** (Python) and **Doxygen** to extract C docstrings.
+
+### Installing Doxygen
+
+- **Linux (Debian / Ubuntu / Linux Mint)**:
+  ```bash
+  sudo apt install doxygen
+  ```
+- **Windows (PowerShell)**:
+  ```powershell
+  winget install Doxygen.Doxygen
+  # or
+  choco install doxygen.install
+  ```
+- **macOS**:
+  ```bash
+  brew install doxygen
+  ```
 
 ## Python Environment Setup
 

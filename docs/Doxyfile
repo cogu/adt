@@ -1,0 +1,27 @@
+# Doxyfile for Sphinx + Breathe integration
+PROJECT_NAME           = "ADT"
+PROJECT_NUMBER         = "0.3.0"
+PROJECT_BRIEF          = "Abstract Data Types in C"
+
+# Input configuration
+INPUT                  = ../inc
+FILE_PATTERNS          = *.h
+RECURSIVE              = NO
+OUTPUT_DIRECTORY       = _build/doxygen
+
+# Language & Parsing
+OPTIMIZE_OUTPUT_FOR_C  = YES
+JAVADOC_AUTOBRIEF      = YES
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = NO
+
+# Output formats: Only XML is needed for Breathe
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+
+# Diagnostics
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
