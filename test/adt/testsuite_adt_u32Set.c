@@ -3,6 +3,9 @@
 #include <malloc.h>
 #include "test_common.h"
 #include "adt_set.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -111,7 +114,7 @@ static void test_adt_u32Set_insert_multiple_values(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 5, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //unordered insertion
    adt_u32Set_clear(&set);
@@ -134,7 +137,7 @@ static void test_adt_u32Set_insert_multiple_values(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 5, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //cleanup
    adt_u32Set_destroy(&set);
@@ -168,7 +171,7 @@ static void test_adt_u32Set_insert_duplicates(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 5, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //cleanup
    adt_u32Set_destroy(&set);

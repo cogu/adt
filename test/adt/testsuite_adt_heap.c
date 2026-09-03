@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include "test_common.h"
 #include "adt_heap.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // CONSTANTS AND DATA TYPES

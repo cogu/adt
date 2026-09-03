@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include "test_common.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 void vfree(void *p)
 {

@@ -30,6 +30,9 @@
 #include <limits.h>
 #include "test_common.h"
 #include "adt_ringbuf.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES

@@ -33,6 +33,7 @@
 #include <malloc.h>
 #include <assert.h>
 #include <stdint.h>
+#include <stddef.h>
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif
@@ -82,7 +83,7 @@ void adt_str_create(adt_str_t *self)
    {
       self->s32Cur = 0;
       self->s32Size = 0;
-      self->pAlloc = (uint8_t*) 0;
+      self->pAlloc = NULL;
       self->lastError = ADT_NO_ERROR;
       self->encoding = ADT_STR_ENCODING_ASCII;
    }
@@ -91,8 +92,8 @@ void adt_str_create(adt_str_t *self)
 adt_str_t *adt_str_new(void)
 {
    adt_str_t *self;
-   if((self = (adt_str_t*) malloc(sizeof(adt_str_t))) == 0){
-      return (adt_str_t*)0;
+   if((self = (adt_str_t*) malloc(sizeof(adt_str_t))) == NULL){
+      return NULL;
    }
    adt_str_create(self);
    return self;
@@ -103,17 +104,17 @@ adt_str_t *adt_str_new(void)
  */
 adt_str_t *adt_str_clone(const adt_str_t* other)
 {
-   adt_str_t *self = (adt_str_t*) 0;
-   if (other != 0)
+   adt_str_t *self = NULL;
+   if (other != NULL)
    {
       self = adt_str_new();
-      if (self != 0)
+      if (self != NULL)
       {
          adt_error_t result = adt_str_set(self, other);
          if (result != ADT_NO_ERROR)
          {
             adt_str_delete(self);
-            self = (adt_str_t*) 0;
+            self = NULL;
          }
       }
    }
@@ -126,17 +127,17 @@ adt_str_t *adt_str_clone(const adt_str_t* other)
  */
 adt_str_t *adt_str_new_bstr(const uint8_t *pBegin, const uint8_t *pEnd)
 {
-   adt_str_t *self = (adt_str_t*) 0;
-   if( (pBegin != 0) && (pEnd != 0) && (pEnd >= pBegin) )
+   adt_str_t *self = NULL;
+   if( (pBegin != NULL) && (pEnd != NULL) && (pEnd >= pBegin) )
    {
       self = adt_str_new();
-      if (self != 0)
+      if (self != NULL)
       {
          adt_error_t result = adt_str_set_bstr(self, pBegin, pEnd);
          if (result != ADT_NO_ERROR)
          {
             adt_str_delete(self);
-            self = (adt_str_t*) 0;
+            self = NULL;
          }
       }
    }
@@ -145,17 +146,17 @@ adt_str_t *adt_str_new_bstr(const uint8_t *pBegin, const uint8_t *pEnd)
 
 adt_str_t *adt_str_new_cstr(const char * other)
 {
-   adt_str_t *self = (adt_str_t*) 0;
-   if( other != 0 )
+   adt_str_t *self = NULL;
+   if( other != NULL )
    {
       self = adt_str_new();
-      if (self != 0)
+      if (self != NULL)
       {
          adt_error_t result = adt_str_set_cstr(self, other);
          if (result != ADT_NO_ERROR)
          {
             adt_str_delete(self);
-            self = (adt_str_t*) 0;
+            self = NULL;
          }
       }
    }
@@ -164,28 +165,28 @@ adt_str_t *adt_str_new_cstr(const char * other)
 
 adt_str_t *adt_str_new_bytearray(adt_bytearray_t *bytearray)
 {
-   if (bytearray != 0)
+   if (bytearray != NULL)
    {
-      adt_str_t *self = (adt_str_t*) 0;
+      adt_str_t *self = NULL;
       const uint8_t *pBegin, *pEnd;
       pBegin = adt_bytearray_data(bytearray);
       pEnd = pBegin + adt_bytearray_length(bytearray);
-      if( (pBegin != 0) && (pEnd != 0) && (pEnd >= pBegin) )
+      if( (pBegin != NULL) && (pEnd != NULL) && (pEnd >= pBegin) )
       {
          self = adt_str_new();
-         if (self != 0)
+         if (self != NULL)
          {
             adt_error_t result = adt_str_set_bstr(self, pBegin, pEnd);
             if (result != ADT_NO_ERROR)
             {
                adt_str_delete(self);
-               self = (adt_str_t*) 0;
+               self = NULL;
             }
          }
       }
       return self;
    }
-   return (adt_str_t*) 0;
+   return NULL;
 }
 
 /**
@@ -197,13 +198,13 @@ adt_str_t *adt_str_concat(const adt_str_t *lhs, const adt_str_t *rhs)
    //NOT YET IMPLEMENTED
    (void) lhs;
    (void) rhs;
-   return (adt_str_t*) 0;
+   return NULL;
 }
 
 adt_str_t *adt_str_new_utf8(void)
 {
    adt_str_t *self = adt_str_new();
-   if (self != 0)
+   if (self != NULL)
    {
       adt_str_setEncoding(self, ADT_STR_ENCODING_UTF8);
    }
@@ -214,12 +215,12 @@ adt_str_t *adt_str_new_utf8(void)
 
 void adt_str_destroy(adt_str_t *self)
 {
-   if(self != 0)
+   if(self != NULL)
    {
-      if(self->pAlloc != 0)
+      if(self->pAlloc != NULL)
       {
          free(self->pAlloc);
-         self->pAlloc = 0;
+         self->pAlloc = NULL;
       }
       self->s32Size = 0;
       adt_str_clear(self);
@@ -228,7 +229,7 @@ void adt_str_destroy(adt_str_t *self)
 
 void adt_str_delete(adt_str_t *self)
 {
-   if(self != 0)
+   if(self != NULL)
    {
       adt_str_destroy(self);
       free(self);
@@ -250,7 +251,7 @@ adt_error_t adt_str_set(adt_str_t *self, const adt_str_t* other)
 {
    adt_error_t retval = ADT_NO_ERROR;
 
-   if( (self == 0) || (other == 0) )
+   if( (self == NULL) || (other == NULL) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -264,7 +265,7 @@ adt_error_t adt_str_set(adt_str_t *self, const adt_str_t* other)
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
          {
-            assert(self->pAlloc != 0);
+            assert(self->pAlloc != NULL);
             assert(self->s32Size > s32Size);
             memcpy(self->pAlloc, other->pAlloc, s32Size);
             self->s32Cur = s32Size;
@@ -282,7 +283,7 @@ adt_error_t adt_str_set_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8
 {
    adt_error_t retval = ADT_NO_ERROR;
 
-   if( (self == 0) || (pBegin == 0) || (pEnd == 0) || (pEnd < pBegin) )
+   if( (self == NULL) || (pBegin == NULL) || (pEnd == NULL) || (pEnd < pBegin) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -300,7 +301,7 @@ adt_error_t adt_str_set_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8
             result = adt_str_reserve(self, strSize);
             if (result == ADT_NO_ERROR)
             {
-               assert(self->pAlloc != 0);
+               assert(self->pAlloc != NULL);
                assert(self->s32Size >= strSize);
                memcpy(self->pAlloc, pBegin, strSize);
                self->s32Cur = strSize;
@@ -318,7 +319,7 @@ adt_error_t adt_str_set_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8
 adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr)
 {
    adt_error_t retval = ADT_NO_ERROR;
-   if( (self == 0) || (cstr == 0) )
+   if( (self == NULL) || (cstr == NULL) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -333,7 +334,7 @@ adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr)
          result = adt_str_reserve(self, s32Size);
          if (result == ADT_NO_ERROR)
          {
-            assert(self->pAlloc != 0);
+            assert(self->pAlloc != NULL);
             assert(self->s32Size > s32Size);
             memcpy(self->pAlloc, cstr, s32Size);
             self->s32Cur = s32Size;
@@ -350,7 +351,7 @@ adt_error_t adt_str_set_cstr(adt_str_t *self, const char *cstr)
 adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other)
 {
    adt_error_t retval = ADT_NO_ERROR;
-   if ( (self == 0) || (other == 0) )
+   if ( (self == NULL) || (other == NULL) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -364,8 +365,8 @@ adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other)
          if (result == ADT_NO_ERROR)
          {
             assert(self->s32Size > newLen);
-            assert(self->pAlloc != 0);
-            assert(other->pAlloc != 0);
+            assert(self->pAlloc != NULL);
+            assert(other->pAlloc != NULL);
             memcpy(self->pAlloc+self->s32Cur, other->pAlloc, other->s32Cur);
             self->s32Cur = newLen;
             if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (other->encoding == ADT_STR_ENCODING_UTF8) )
@@ -388,7 +389,7 @@ adt_error_t adt_str_append(adt_str_t *self, const adt_str_t* other)
 adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const uint8_t *pEnd)
 {
    adt_error_t retval = ADT_NO_ERROR;
-   if( (self == 0) || (pBegin == 0) || (pEnd == 0) || (pEnd < pBegin) )
+   if( (self == NULL) || (pBegin == NULL) || (pEnd == NULL) || (pEnd < pBegin) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -407,7 +408,7 @@ adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const ui
             result = adt_str_reserve(self, newLen);
             if (result == ADT_NO_ERROR)
             {
-               assert(self->pAlloc != 0);
+               assert(self->pAlloc != NULL);
                assert(self->s32Size > newLen);
                memcpy(self->pAlloc + self->s32Cur, pBegin, strSize);
                self->s32Cur = newLen;
@@ -440,7 +441,7 @@ adt_error_t adt_str_append_bstr(adt_str_t *self, const uint8_t *pBegin, const ui
 adt_error_t adt_str_append_cstr(adt_str_t *self, const char *cstr)
 {
    adt_error_t retval = ADT_NO_ERROR;
-   if ( (self == 0) || (cstr == 0) )
+   if ( (self == NULL) || (cstr == NULL) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -479,7 +480,7 @@ void adt_str_prepend_cstr(adt_str_t *self, const char *cstr);
 adt_error_t adt_str_push(adt_str_t *self, const int c)
 {
    adt_error_t retval = ADT_NO_ERROR;
-   if( (self == 0) || (c < 0) )
+   if( (self == NULL) || (c < 0) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -506,7 +507,7 @@ adt_error_t adt_str_push(adt_str_t *self, const int c)
 int adt_str_pop(adt_str_t *self)
 {
    int retval = -1;
-   if(self != 0)
+   if(self != NULL)
    {
       if(self->s32Cur>0)
       {
@@ -522,7 +523,7 @@ int adt_str_charAt(adt_str_t *self, int index)
 {
    int retval = -1;
    adt_error_t errorCode = ADT_NO_ERROR;
-   if(self != 0)
+   if(self != NULL)
    {
       int32_t s32Index;
       if(index < 0)
@@ -560,18 +561,18 @@ int adt_str_charAt(adt_str_t *self, int index)
 
 const char* adt_str_cstr(adt_str_t *self)
 {
-   const char *retval = (const char*) 0;
-   if(self != 0)
+   const char *retval = NULL;
+   if(self != NULL)
    {
       adt_error_t result = ADT_NO_ERROR;
-      if(self->pAlloc == 0)
+      if(self->pAlloc == NULL)
       {
          result = adt_str_reserve(self, 0);
       }
       if (result == ADT_NO_ERROR)
       {
          assert(self->s32Cur < self->s32Size);
-         assert(self->pAlloc != 0);
+         assert(self->pAlloc != NULL);
          self->pAlloc[self->s32Cur] = 0u;
          retval = (const char*) self->pAlloc;
       }
@@ -593,11 +594,11 @@ adt_error_t adt_str_bstr(adt_str_t *self, const char **ppBegin, const char **ppE
 
 adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
 {
-   adt_bytearray_t *retval = (adt_bytearray_t*) 0;
-   if (self != 0)
+   adt_bytearray_t *retval = NULL;
+   if (self != NULL)
    {
       retval = adt_bytearray_new(ADT_BYTE_ARRAY_NO_GROWTH);
-      if (retval != 0)
+      if (retval != NULL)
       {
          adt_error_t result;
          uint32_t u32Size = (uint32_t) self->s32Cur;
@@ -610,7 +611,7 @@ adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
          else
          {
             adt_bytearray_delete(retval);
-            retval = (adt_bytearray_t*) 0;
+            retval = NULL;
          }
       }
    }
@@ -619,8 +620,8 @@ adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
 
 struct adt_bytes_tag *adt_str_bytes(adt_str_t *self)
 {
-   adt_bytes_t *retval = (adt_bytes_t*) 0;
-   if (self != 0)
+   adt_bytes_t *retval = NULL;
+   if (self != NULL)
    {
       retval = adt_bytes_new(self->pAlloc, (uint32_t) self->s32Cur);
    }
@@ -629,7 +630,7 @@ struct adt_bytes_tag *adt_str_bytes(adt_str_t *self)
 
 uint8_t* adt_str_data(adt_str_t const* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->pAlloc;
    }
@@ -648,7 +649,7 @@ void adt_str_setEncoding(adt_str_t *self, adt_str_encoding_t newEncoding)
 
 adt_str_encoding_t adt_str_getEncoding(adt_str_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->encoding;
    }
@@ -657,7 +658,7 @@ adt_str_encoding_t adt_str_getEncoding(adt_str_t *self)
 
 bool adt_str_is_empty(const adt_str_t* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->s32Cur > 0? false : true;
    }
@@ -667,7 +668,7 @@ bool adt_str_is_empty(const adt_str_t* self)
 int32_t adt_str_length(const adt_str_t *self)
 {
    int32_t retval = -1;
-   if (self != 0)
+   if (self != NULL)
    {
       if (self->encoding == ADT_STR_ENCODING_ASCII)
       {
@@ -702,7 +703,7 @@ int32_t adt_str_length(const adt_str_t *self)
 
 int32_t adt_str_size(const adt_str_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->s32Cur;
    }
@@ -716,7 +717,7 @@ adt_error_t adt_str_reserve(adt_str_t *self, int32_t s32NewLen)
 {
    adt_error_t retval = ADT_NO_ERROR;
 
-   if ( (self == 0) || (s32NewLen < 0) )
+   if ( (self == NULL) || (s32NewLen < 0) )
    {
       retval = ADT_INVALID_ARGUMENT_ERROR;
    }
@@ -730,13 +731,13 @@ adt_error_t adt_str_reserve(adt_str_t *self, int32_t s32NewLen)
 
          s32Size = adt_str_calcSize(self->s32Size, s32NewLen);
          pStr = (uint8_t*) malloc(s32Size);
-         if (pStr == 0)
+         if (pStr == NULL)
          {
             retval = ADT_MEM_ERROR;
          }
          else
          {
-            if(self->pAlloc != 0)
+            if(self->pAlloc != NULL)
             {
                memcpy(pStr,self->pAlloc, self->s32Cur);
                free(self->pAlloc);
@@ -755,7 +756,7 @@ adt_error_t adt_str_reserve(adt_str_t *self, int32_t s32NewLen)
 void adt_str_clear(adt_str_t *self)
 {
 
-   if (self != 0)
+   if (self != NULL)
    {
       self->s32Cur = 0;
       self->lastError = ADT_NO_ERROR;
@@ -767,13 +768,13 @@ bool adt_str_equal(const adt_str_t *self, const adt_str_t* other);
 bool adt_str_equal_bstr(const adt_str_t *self, const char *pBegin, const char *pEnd);
 bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr)
 {
-   if ( (self != 0) && (cstr != 0))
+   if ( (self != NULL) && (cstr != NULL))
    {
-      if ( (*cstr == 0) && (self->s32Cur == 0) )
+      if ( (*cstr == '\0') && (self->s32Cur == 0) )
       {
          return true;
       }
-      else if (self->s32Cur > 0 && self->pAlloc != 0)
+      else if (self->s32Cur > 0 && self->pAlloc != NULL)
       {
          const uint8_t *pStr = (const uint8_t*) cstr;
          const uint8_t *pNext = self->pAlloc;
@@ -789,7 +790,7 @@ bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr)
             ++pNext;
             ++pStr;
          }
-         if ( (*pStr == 0) && (pNext == pEnd) )
+         if ( (*pStr == '\0') && (pNext == pEnd) )
          {
             return true;
          }
@@ -805,7 +806,7 @@ bool adt_str_equal_cstr(const adt_str_t *self, const char *cstr)
  */
 int adt_str_lt(const adt_str_t *self, const adt_str_t *other)
 {
-   if ( (self != 0) && (other != 0) )
+   if ( (self != NULL) && (other != NULL) )
    {
       if ( (self->encoding == ADT_STR_ENCODING_ASCII) && (other->encoding == ADT_STR_ENCODING_ASCII) )
       {
@@ -888,7 +889,7 @@ static int32_t adt_str_calcSize(int32_t s32CurSize, int32_t s32NewSize)
  */
 DYN_STATIC adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t maxBufLen, int32_t *strSize)
 {
-   if ( (strBuf == 0) || (maxBufLen < 0) || (strSize == 0) )
+   if ( (strBuf == NULL) || (maxBufLen < 0) || (strSize == NULL) )
    {
       return ADT_STR_ENCODING_UNKNOWN;
    }
@@ -924,7 +925,7 @@ DYN_STATIC int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen,
 {
    int tmp = 0;
    int32_t retval = 0;
-   if ( (strBuf == 0) || (bufLen < 0) || (codePoint == 0) )
+   if ( (strBuf == NULL) || (bufLen < 0) || (codePoint == NULL) )
    {
       return ADT_UTF8_INVALID_ARGUMENT;
    }

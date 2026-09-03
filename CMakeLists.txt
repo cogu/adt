@@ -140,14 +140,14 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             list(APPEND ADT_TEST_SUITE_LIST test/adt/testsuite_adt_u16map.c)
         endif()
 
-        set(ADT_UNIT_EXTRA)
+        set(ADT_LIB_EXTRA)
         if (LEAK_CHECK)
-            list (APPEND ADT_UNIT_EXTRA test/CMemLeak.h)
-            list (APPEND ADT_UNIT_EXTRA test/CMemLeak.c)
+            list (APPEND ADT_LIB_EXTRA test/CMemLeak.h)
+            list (APPEND ADT_LIB_EXTRA test/CMemLeak.c)
         endif()
 
 
-        add_executable(adt_unit test/TestMain.c test/CuTest.c ${ADT_UNIT_EXTRA} ${ADT_TEST_SUITE_LIST})
+        add_executable(adt_unit test/TestMain.c test/CuTest.c ${ADT_LIB_EXTRA} ${ADT_TEST_SUITE_LIST})
         target_link_libraries(adt_unit PRIVATE adt)
         target_include_directories(adt_unit PRIVATE
                                 "${PROJECT_BINARY_DIR}"
@@ -164,13 +164,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
         enable_testing()
         add_test(NAME adt_unit COMMAND adt_unit)
-        set_tests_properties(adt_unit PROPERTIES 
+        set_tests_properties(adt_unit PROPERTIES
             PASS_REGULAR_EXPRESSION "OK \\([0-9]+ tests\\)"
             LABELS "unit"
         )
 
         ### Benchmark / Performance Test
-        add_executable(adt_perf test/perf_adt_hash.c)
+        add_executable(adt_perf test/perf_adt_hash.c ${ADT_LIB_EXTRA})
         target_link_libraries(adt_perf PRIVATE adt)
         target_include_directories(adt_perf PRIVATE
                                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -179,7 +179,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/3esl.txt"
         )
         add_test(NAME adt_perf COMMAND adt_perf)
-        set_tests_properties(adt_perf PROPERTIES 
+        set_tests_properties(adt_perf PROPERTIES
             LABELS "benchmark"
         )
 

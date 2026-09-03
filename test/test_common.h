@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef MEM_LEAK_CHECK
-#include "CMemLeak.h"
-#endif
-
 #ifdef _MSC_VER
 #define STRDUP _strdup
 #else

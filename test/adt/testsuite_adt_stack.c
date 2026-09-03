@@ -5,13 +5,16 @@
 #include <string.h>
 #include "test_common.h"
 #include "adt_stack.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 void test_adt_stack_new(CuTest* tc)
 {
 	adt_stack_t *pStack = adt_stack_new(NULL);
 	CuAssertPtrNotNull(tc, pStack);
-	CuAssertPtrEquals(tc, 0,pStack->ppAlloc);
-	CuAssertPtrEquals(tc, 0,pStack->pDestructor);
+	CuAssertPtrEquals(tc, NULL, pStack->ppAlloc);
+	CuAssertPtrEquals(tc, NULL, pStack->pDestructor);
 	CuAssertIntEquals(tc,0,pStack->u32AllocLen);
 	CuAssertIntEquals(tc,0,pStack->u32CurLen);
 	adt_stack_delete(pStack);
@@ -39,7 +42,7 @@ void test_adt_stack_top(CuTest* tc)
 
 	CuAssertPtrNotNull(tc, pStack);
 	CuAssertIntEquals(tc,0,adt_stack_size(pStack));
-	CuAssertPtrEquals(tc, 0,adt_stack_top(pStack));
+	CuAssertPtrEquals(tc, NULL, adt_stack_top(pStack));
 
 
 	adt_stack_push(pStack,STRDUP("The"));
@@ -80,7 +83,7 @@ void test_adt_stack_pop(CuTest* tc)
 
 	CuAssertPtrNotNull(tc, pStack);
 	CuAssertIntEquals(tc,0,adt_stack_size(pStack));
-	CuAssertPtrEquals(tc, 0,adt_stack_top(pStack));
+	CuAssertPtrEquals(tc, NULL, adt_stack_top(pStack));
 
 	adt_stack_push(pStack,STRDUP("The"));
 	CuAssertIntEquals(tc,1,adt_stack_size(pStack));
@@ -117,8 +120,8 @@ void test_adt_stack_pop(CuTest* tc)
 	CuAssertIntEquals(tc,0,adt_stack_size(pStack));
 	free(pVal);
 
-	CuAssertPtrEquals(tc, 0,adt_stack_pop(pStack));
-	CuAssertPtrEquals(tc, 0,adt_stack_top(pStack));
+	CuAssertPtrEquals(tc, NULL, adt_stack_pop(pStack));
+	CuAssertPtrEquals(tc, NULL, adt_stack_top(pStack));
 
 	adt_stack_delete(pStack);
 }

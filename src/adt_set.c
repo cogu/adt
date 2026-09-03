@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <malloc.h>
 #include <errno.h>
+#include <stddef.h>
 #include "adt_set.h"
 #ifdef MEM_LEAK_CHECK
 # include "CMemLeak.h"
@@ -28,7 +29,7 @@
 //////////////////////////////////////////////////////////////////////////////
 void adt_u32Set_create(adt_u32Set_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_create(&self->list);
    }
@@ -36,7 +37,7 @@ void adt_u32Set_create(adt_u32Set_t *self)
 
 void adt_u32Set_destroy(adt_u32Set_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_destroy(&self->list);
    }
@@ -45,7 +46,7 @@ void adt_u32Set_destroy(adt_u32Set_t *self)
 adt_u32Set_t*  adt_u32Set_new(void)
 {
    adt_u32Set_t *self = (adt_u32Set_t*) malloc(sizeof(adt_u32Set_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32Set_create(self);
    }
@@ -58,7 +59,7 @@ adt_u32Set_t*  adt_u32Set_new(void)
 
 void  adt_u32Set_delete(adt_u32Set_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32Set_destroy(self);
       free(self);
@@ -72,7 +73,7 @@ void  adt_u32Set_vdelete(void *arg)
 
 void adt_u32Set_clear(adt_u32Set_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_clear(&self->list);
    }
@@ -80,7 +81,7 @@ void adt_u32Set_clear(adt_u32Set_t *self)
 
 int32_t adt_u32Set_length(adt_u32Set_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return adt_u32List_length(&self->list);
    }
@@ -93,17 +94,17 @@ int32_t adt_u32Set_length(adt_u32Set_t *self)
  */
 void adt_u32Set_insert(adt_u32Set_t *self, uint32_t val)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_t *iter = adt_u32List_iter_last(&self->list);
-      if ( (iter == 0) ||  (val > iter->item) )
+      if ( (iter == NULL) ||  (val > iter->item) )
       {
          adt_u32List_insert(&self->list, val);
       }
       else if (val != iter->item)
       {
          iter = adt_u32List_iter_first(&self->list);
-         while (iter != 0)
+         while (iter != NULL)
          {
             if (val == iter->item)
             {
@@ -123,10 +124,10 @@ void adt_u32Set_insert(adt_u32Set_t *self, uint32_t val)
 bool adt_u32Set_remove(adt_u32Set_t *self, uint32_t val)
 {
    bool retval = false;
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_t *iter = adt_u32List_iter_last(&self->list);
-      if (iter != 0)
+      if (iter != NULL)
       {
          if ( val == iter->item )
          {
@@ -135,7 +136,7 @@ bool adt_u32Set_remove(adt_u32Set_t *self, uint32_t val)
          else if (val < iter->item)
          {
             iter = adt_u32List_iter_first(&self->list);
-            while (iter != 0)
+            while (iter != NULL)
             {
                if ( val == iter->item )
                {
@@ -161,10 +162,10 @@ bool adt_u32Set_remove(adt_u32Set_t *self, uint32_t val)
 bool adt_u32Set_contains(adt_u32Set_t *self, uint32_t val)
 {
    bool retval = false;
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_t *iter = adt_u32List_iter_last(&self->list);
-      if (iter != 0)
+      if (iter != NULL)
       {
          if ( val == iter->item )
          {
@@ -173,7 +174,7 @@ bool adt_u32Set_contains(adt_u32Set_t *self, uint32_t val)
          else if (val < iter->item)
          {
             iter = adt_u32List_iter_first(&self->list);
-            while (iter != 0)
+            while (iter != NULL)
             {
                if ( val == iter->item )
                {
@@ -194,7 +195,7 @@ bool adt_u32Set_contains(adt_u32Set_t *self, uint32_t val)
 
 bool adt_u32Set_is_empty(const adt_u32Set_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return adt_u32List_is_empty(&self->list);
    }

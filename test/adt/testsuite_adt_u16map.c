@@ -4,6 +4,9 @@
 #include <time.h>       /* time */
 #include "test_common.h"
 #include "adt_u16Map.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 #define NUM_ELEM 20
 #define NUM_ELEM_LARGE 2000
@@ -13,7 +16,7 @@ void test_adt_u16Map_insert(CuTest* tc){
    adt_u16Map_t map;
    adt_u16Map_t *pList = &map;
    adt_u16MapElem_t *it;
-   adt_u16Map_create(pList,elem,10,0);
+   adt_u16Map_create(pList, elem, 10, NULL);
    adt_u16Map_insert(pList,4,0);
    adt_u16Map_insert(pList,3,0);
    adt_u16Map_insert(pList,8,0);
@@ -58,7 +61,7 @@ void test_adt_u16Map_insert(CuTest* tc){
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,9,it->key);
    it = adt_u16Map_iterNext(pList);
-   CuAssertPtrEquals(tc,0,it);
+   CuAssertPtrEquals(tc, NULL, it);
 }
 
 void test_adt_u16Map_duplicates(CuTest* tc){
@@ -66,7 +69,7 @@ void test_adt_u16Map_duplicates(CuTest* tc){
    adt_u16Map_t map;
    adt_u16Map_t *pList = &map;
    adt_u16MapElem_t *it;
-   adt_u16Map_create(pList,elem,10,0);
+   adt_u16Map_create(pList, elem, 10, NULL);
    adt_u16Map_insert(pList,4,(void*) 1);
    adt_u16Map_insert(pList,3,(void*) 2);
    adt_u16Map_insert(pList,5,(void*) 3);
@@ -111,7 +114,7 @@ void test_adt_u16Map_duplicates(CuTest* tc){
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
    it = adt_u16Map_iterNext(pList);
-   CuAssertPtrEquals(tc,0,it);
+   CuAssertPtrEquals(tc, NULL, it);
 }
 
 void test_adt_u16Map_find(CuTest* tc){
@@ -119,7 +122,7 @@ void test_adt_u16Map_find(CuTest* tc){
    adt_u16Map_t map;
    adt_u16Map_t *pList = &map;
    adt_u16MapElem_t *it;
-   adt_u16Map_create(pList,elem,10,0);
+   adt_u16Map_create(pList, elem, 10, NULL);
    adt_u16Map_insert(pList,4,(void*) 1);
    adt_u16Map_insert(pList,3,(void*) 2);
    adt_u16Map_insert(pList,5,(void*) 3);
@@ -132,7 +135,7 @@ void test_adt_u16Map_find(CuTest* tc){
    adt_u16Map_insert(pList,1,(void*) 10);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
    it = adt_u16Map_find(pList,0);
-   CuAssertPtrEquals(tc,0,it);
+   CuAssertPtrEquals(tc, NULL, it);
    it = adt_u16Map_find(pList,1);
    CuAssertPtrNotNull(tc,it);
    it = adt_u16Map_iterInit(pList,it);
@@ -159,7 +162,7 @@ void test_adt_u16Map_find(CuTest* tc){
    CuAssertIntEquals(tc,5,it->key);
    CuAssertPtrEquals(tc,(void*)6,it->val);
    it = adt_u16Map_iterNext(pList);
-   CuAssertPtrEquals(tc,0,it);
+   CuAssertPtrEquals(tc, NULL, it);
 }
 
 void test_adt_u16Map_findExact(CuTest* tc){
@@ -167,7 +170,7 @@ void test_adt_u16Map_findExact(CuTest* tc){
    adt_u16Map_t map;
    adt_u16Map_t *pList = &map;
    adt_u16MapElem_t *it;
-   adt_u16Map_create(pList,elem,10,0);
+   adt_u16Map_create(pList, elem, 10, NULL);
    adt_u16Map_insert(pList,4,(void*) 1);
    adt_u16Map_insert(pList,3,(void*) 2);
    adt_u16Map_insert(pList,5,(void*) 3);
@@ -180,9 +183,9 @@ void test_adt_u16Map_findExact(CuTest* tc){
    adt_u16Map_insert(pList,1,(void*) 10);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
    it = adt_u16Map_findExact(pList,1,(void*) 1);
-   CuAssertPtrEquals(tc,0,0);
+   CuAssertPtrEquals(tc, NULL, NULL);
    it = adt_u16Map_findExact(pList,4,(void*) 7);
-   CuAssertPtrEquals(tc,0,0);
+   CuAssertPtrEquals(tc, NULL, NULL);
    //last item of key 4
    it = adt_u16Map_findExact(pList,4,(void*) 5);
    CuAssertPtrNotNull(tc,it);
@@ -204,7 +207,7 @@ void test_adt_u16Map_sort(CuTest* tc){
    adt_u16MapElem_t data[NUM_ELEM];
    adt_u16Map_t map;
 
-   adt_u16Map_create(&map,&data[0],NUM_ELEM,0);
+   adt_u16Map_create(&map, &data[0], NUM_ELEM, NULL);
    adt_u16Map_insert(&map,5,0);
    adt_u16Map_insert(&map,87,0);
    adt_u16Map_insert(&map,1245,0);
@@ -231,7 +234,7 @@ void test_adt_u16Map_find_rand_set(CuTest* tc){
    data = malloc(sizeof(adt_u16MapElem_t)*NUM_ELEM_LARGE);
    CuAssertPtrNotNull(tc,data);
 
-   adt_u16Map_create(&map,data,NUM_ELEM_LARGE,0);
+   adt_u16Map_create(&map, data, NUM_ELEM_LARGE, NULL);
    for(i=0;i<NUM_ELEM_LARGE-1;i++){
       uint16_t key = (uint16_t)(rand() % 100 + 1);
       adt_u16Map_insert(&map,key,(void*) i);
@@ -254,8 +257,8 @@ void test_adt_u16Map_move(CuTest* tc){
    adt_u16Map_t *pList1 = &map1;
    adt_u16Map_t *pList2 = &map2;
 
-   adt_u16Map_create(pList1,elem1,10,0);
-   adt_u16Map_create(pList2,elem2,10,0);
+   adt_u16Map_create(pList1, elem1, 10, NULL);
+   adt_u16Map_create(pList2, elem2, 10, NULL);
    adt_u16Map_insert(pList1,4,(void*) 1);
    adt_u16Map_insert(pList1,3,(void*) 2);
    adt_u16Map_insert(pList1,5,(void*) 3);

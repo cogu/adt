@@ -10,6 +10,7 @@
 #include <malloc.h>
 #include <assert.h>
 #include <string.h>
+#include <stddef.h>
 #include "adt_stack.h"
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
@@ -30,8 +31,8 @@
 //Constructor/Destructor
 adt_stack_t* adt_stack_new(void (*pDestructor)(void*)){
 	adt_stack_t *self;
-	if((self = (adt_stack_t*) malloc(sizeof(adt_stack_t))) == 0){
-		return (adt_stack_t*)0;
+	if((self = (adt_stack_t*) malloc(sizeof(adt_stack_t))) == NULL){
+		return NULL;
 	}
 	adt_stack_create(self,pDestructor);
 	return self;
@@ -45,7 +46,7 @@ void adt_stack_delete(adt_stack_t *self){
 }
 
 void adt_stack_create(adt_stack_t *self, void (*pDestructor)(void*)){
-	self->ppAlloc = (void**) 0;
+	self->ppAlloc = NULL;
 	self->u32AllocLen = 0;
 	self->u32CurLen = 0;
 	self->u32MinLen = ADT_STACK_DEFAULT_MIN_LEN;
@@ -61,10 +62,10 @@ void adt_stack_destroy(adt_stack_t *self){
 			self->pDestructor(*(ppElem++));
 		}
 	}
-	if(self->ppAlloc != 0){
+	if(self->ppAlloc != NULL){
 		free(self->ppAlloc);
 	}
-	self->ppAlloc = (void**) 0;
+	self->ppAlloc = NULL;
 	self->u32AllocLen = 0;
 	self->u32CurLen = 0;
 }
@@ -87,7 +88,7 @@ void	adt_stack_push(adt_stack_t *self, void *pVal){
 		}
 	}
 	assert(self->u32CurLen<self->u32AllocLen);
-	assert(self->ppAlloc != 0);
+	assert(self->ppAlloc != NULL);
 	self->ppAlloc[self->u32CurLen++] = pVal;
 }
 void* adt_stack_top(const adt_stack_t *self){
@@ -95,7 +96,7 @@ void* adt_stack_top(const adt_stack_t *self){
 		assert(self->ppAlloc);
 		return self->ppAlloc[self->u32CurLen-1];
 	}
-	return (void*)0;
+	return NULL;
 }
 
 void* adt_stack_pop(adt_stack_t *self){
@@ -103,7 +104,7 @@ void* adt_stack_pop(adt_stack_t *self){
 		assert(self->ppAlloc);
 		return self->ppAlloc[--self->u32CurLen];
 	}
-	return (void*)0;
+	return NULL;
 }
 
 //Utility functions
@@ -117,14 +118,14 @@ void adt_stack_reserve(adt_stack_t *self,uint32_t u32Len){
 }
 
 void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
-	void **ppAlloc = (void**) 0;
+	void **ppAlloc = NULL;
 	if(!self) return;
 	if(u32Len == self->u32AllocLen) return; //nothing to do
 
 	assert(self->u32AllocLen>=self->u32CurLen);
 	if(u32Len>0){
 		ppAlloc = (void**) malloc(u32Len * sizeof(void*));
-		assert(ppAlloc != 0);
+		assert(ppAlloc != NULL);
 	}
 	if(self->ppAlloc){
 		if(u32Len > self->u32AllocLen){
