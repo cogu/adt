@@ -25,9 +25,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>inc</name>
+			<name>include</name>
 			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/inc</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/include</locationURI>
 		</link>
 		<link>
 			<name>src</name>

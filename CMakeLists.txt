@@ -50,17 +50,17 @@ endif()
 
 ### Library adt
 set (ADT_HEADER_LIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_ary.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_bytearray.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_bytes.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_error.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_hash.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_heap.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_list.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_ringbuf.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_set.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_stack.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_str.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_ary.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_bytearray.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_bytes.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_error.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_hash.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_heap.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_list.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_ringbuf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_set.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_stack.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_str.h
 )
 
 set (ADT_SOURCE_LIST
@@ -77,7 +77,7 @@ set (ADT_SOURCE_LIST
 )
 
 add_library(adt ${ADT_SOURCE_LIST} ${ADT_HEADER_LIST})
-target_include_directories(adt PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+target_include_directories(adt PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if (UNIT_TEST)
     target_compile_definitions(adt PRIVATE UNIT_TEST)
@@ -106,7 +106,7 @@ endif()
 if(ADT_U16MAP_ENABLE)
     message(STATUS "ADT_U16MAP_ENABLE=1")
     target_sources(adt PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/inc/adt_u16Map.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_u16Map.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_u16Map.c
     )
     target_compile_definitions(adt PUBLIC ADT_U16MAP_ENABLE=1)
@@ -147,7 +147,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         target_link_libraries(adt_unit PRIVATE adt)
         target_include_directories(adt_unit PRIVATE
                                 "${PROJECT_BINARY_DIR}"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/include"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/test"
                                 )
         target_compile_definitions(adt_unit PRIVATE UNIT_TEST)
@@ -169,7 +169,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         add_executable(adt_perf test/perf_adt_hash.c)
         target_link_libraries(adt_perf PRIVATE adt)
         target_include_directories(adt_perf PRIVATE
-                                "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/include"
                                 )
         target_compile_definitions(adt_perf PRIVATE
             DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/3esl.txt"
