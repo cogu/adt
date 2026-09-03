@@ -18,9 +18,13 @@ else()
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(cmake/BuildTypes.cmake)
-    include(cmake/LeakCheck.cmake)
-    include(cmake/UnitTest.cmake)
+    if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+        set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+        set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
+    endif()
+
+    option(UNIT_TEST "Unit Test Build" OFF)
+    option(LEAK_CHECK "Memory Leak Detection" OFF)
 endif()
 include(CMakeDependentOption)
 
