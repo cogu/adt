@@ -32,7 +32,9 @@
 #include "test_common.h"
 #include "adt_str.h"
 #include "adt_bytes.h"
-
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
@@ -133,7 +135,7 @@ static void test_adt_str_create(CuTest *tc)
 {
    adt_str_t str;
    adt_str_create(&str);
-   CuAssertPtrEquals(tc, 0, str.pAlloc);
+   CuAssertPtrEquals(tc, NULL, str.pAlloc);
    CuAssertIntEquals(tc, 0, str.s32Cur);
    CuAssertIntEquals(tc, 0, str.s32Size);
 }

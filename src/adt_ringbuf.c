@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stddef.h>
 #if(ADT_RBFH_ENABLE)
 #include <malloc.h>
 #include <limits.h>
@@ -97,26 +98,26 @@ uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
 {
    uint8_t u8i;
    uint8_t* u8EndPtr = u8Rbf->u8Buffer + (u8Rbf->u16MaxNumElem * u8Rbf->u8ElemSize);
-   
+
    if (u8Rbf->u16NumElem >= u8Rbf->u16MaxNumElem)
    {
       return BUF_E_OVERFLOW;
    }
-   
+
    u8Rbf->u16NumElem++;
-   
+
    //copy data from elem to buffer
    for (u8i = 0; u8i < u8Rbf->u8ElemSize; u8i++)
    {
       *(u8Rbf->u8WritePtr++) = *(u8Data++);
    }
-   
+
    if (u8Rbf->u8WritePtr >= u8EndPtr)
    {
       //rewind
       u8Rbf->u8WritePtr = u8Rbf->u8Buffer;
    }
-   
+
    return BUF_E_OK;
 }
 
@@ -126,23 +127,23 @@ uint8_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
 {
    uint8_t u8i;
    uint8_t* u8EndPtr = u8Rbf->u8Buffer + (u8Rbf->u16MaxNumElem * u8Rbf->u8ElemSize);
-   
+
    if (u8Rbf->u16NumElem == 0)
    {
       return BUF_E_UNDERFLOW;
    }
-   
+
    for (u8i = 0; u8i < u8Rbf->u8ElemSize; u8i++)
    {
       *(u8Data++) = *(u8Rbf->u8ReadPtr++);
    }
-   
+
    if (u8Rbf->u8ReadPtr >= u8EndPtr)
    {
       //rewind
       u8Rbf->u8ReadPtr = u8Rbf->u8Buffer;
    }
-   
+
    u8Rbf->u16NumElem--;
    return BUF_E_OK;
 }
@@ -162,17 +163,17 @@ uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data)
 {
    uint8_t u8i;
    uint8_t* u8ReadPtr = rbf->u8ReadPtr;
-   
+
    if (rbf->u16NumElem == 0)
    {
       return BUF_E_UNDERFLOW;
    }
-   
+
    for (u8i = 0; u8i < rbf->u8ElemSize; u8i++)
    {
       *(u8Data++) = *(u8ReadPtr++);
    }
-   
+
    return BUF_E_OK;
 }
 
@@ -188,7 +189,7 @@ void adt_rbfs_clear(adt_rbfs_t* rbf)
 
 #if(ADT_RBFU16_ENABLE)
 uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem){
-   if ((rbf != 0) && (u16Buffer != 0) && (u16NumElem > 0)){
+   if ((rbf != NULL) && (u16Buffer != NULL) && (u16NumElem > 0)){
       rbf->u16Buffer = u16Buffer;
       rbf->u16MaxNumElem = u16NumElem;
       rbf->u16NumElem = 0;
@@ -200,7 +201,7 @@ uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16Nu
 }
 
 uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
-   if( rbf != 0 ){
+   if( rbf != NULL ){
       uint16_t *pEndPtr = rbf->u16Buffer + rbf->u16MaxNumElem;
       if(rbf->u16NumElem >= rbf->u16MaxNumElem){
          //full
@@ -219,7 +220,7 @@ uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
 }
 
 uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
-   if( (rbf != 0) && (u16Data != 0) ){
+   if( (rbf != NULL) && (u16Data != NULL) ){
       uint16_t *pEndPtr = rbf->u16Buffer + rbf->u16MaxNumElem;
       if(rbf->u16NumElem == 0){
          //full
@@ -238,7 +239,7 @@ uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
 }
 
 uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data){
-   if( (rbf != 0) && (u16Data != 0) ){
+   if( (rbf != NULL) && (u16Data != NULL) ){
       if(rbf->u16NumElem == 0){
          //full
          return BUF_E_UNDERFLOW;
@@ -250,7 +251,7 @@ uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data){
 }
 
 uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf){
-   if(rbf != 0){
+   if(rbf != NULL){
       return rbf->u16NumElem;
    }
    return 0;
@@ -272,19 +273,19 @@ adt_buf_err_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize)
  */
 adt_buf_err_t adt_rbfh_createEx(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
 {
-   if ( (self != 0) && (u8ElemSize > 0) && ( (u16MaxNumElems == 0) || (u16MaxNumElems > u16MinNumElems) ) )
+   if ( (self != NULL) && (u8ElemSize > 0) && ( (u16MaxNumElems == 0) || (u16MaxNumElems > u16MinNumElems) ) )
    {
       if (u16MinNumElems > 0)
       {
          self->u8AllocBuf = (uint8_t*) malloc( ((uint32_t)u8ElemSize)*u16MinNumElems);
-         if (self->u8AllocBuf == 0)
+         if (self->u8AllocBuf == NULL)
          {
             return BUF_E_NOT_OK;
          }
       }
       else
       {
-         self->u8AllocBuf = (uint8_t*) 0;
+         self->u8AllocBuf = NULL;
       }
       self->u16NumElem = 0;
       self->u16AllocLen = u16MinNumElems;
@@ -302,7 +303,7 @@ adt_buf_err_t adt_rbfh_createEx(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u
  */
 void adt_rbfh_destroy(adt_rbfh_t* self)
 {
-   if ( (self != 0) && (self->u8AllocBuf != 0) )
+   if ( (self != NULL) && (self->u8AllocBuf != NULL) )
    {
       free(self->u8AllocBuf);
    }
@@ -314,13 +315,13 @@ void adt_rbfh_destroy(adt_rbfh_t* self)
 adt_rbfh_t *adt_rbfh_new(uint8_t u8ElemSize)
 {
    adt_rbfh_t *self = (adt_rbfh_t*) malloc(sizeof(adt_rbfh_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_buf_err_t result = adt_rbfh_create(self, u8ElemSize);
       if (result != BUF_E_OK)
       {
          free(self);
-         self = (adt_rbfh_t*) 0;
+         self = NULL;
       }
    }
    return self;
@@ -332,13 +333,13 @@ adt_rbfh_t *adt_rbfh_new(uint8_t u8ElemSize)
 adt_rbfh_t *adt_rbfh_newEx(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
 {
    adt_rbfh_t *self = (adt_rbfh_t*) malloc(sizeof(adt_rbfh_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_buf_err_t result = adt_rbfh_createEx(self, u8ElemSize, u16MinNumElems, u16MaxNumElems);
       if (result != BUF_E_OK)
       {
          free(self);
-         self = (adt_rbfh_t*) 0;
+         self = NULL;
       }
    }
    return self;
@@ -349,7 +350,7 @@ adt_rbfh_t *adt_rbfh_newEx(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t
  */
 void adt_rbfh_delete(adt_rbfh_t* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
 
    }
@@ -423,7 +424,7 @@ adt_buf_err_t adt_rbfh_peek(const adt_rbfh_t* self, uint8_t* u8Data)
  */
 uint16_t adt_rbfh_length(const adt_rbfh_t* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->u16NumElem;
    }
@@ -435,7 +436,7 @@ uint16_t adt_rbfh_length(const adt_rbfh_t* self)
  */
 uint16_t adt_rbfh_free(const adt_rbfh_t* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return USHRT_MAX - self->u16NumElem;
    }
@@ -447,7 +448,7 @@ uint16_t adt_rbfh_free(const adt_rbfh_t* self)
  */
 void adt_rbfh_clear(adt_rbfh_t* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       self->u8ReadPtr = self->u8WritePtr = self->u8AllocBuf;
       self->u16NumElem = 0;
@@ -472,7 +473,7 @@ static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self)
       uint8_t *newAllocBuf;
       uint16_t newAllocLen = adt_rbfh_nextLen(self->u16AllocLen+1);
       newAllocBuf = (uint8_t*) malloc( ((uint32_t)self->u8ElemSize)*newAllocLen);
-      if (newAllocBuf != 0)
+      if (newAllocBuf != NULL)
       {
          adt_rbfh_swapBuffers(self, newAllocBuf, newAllocLen);
          return BUF_E_OK;
@@ -490,7 +491,7 @@ static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self)
  */
 static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_t newAllocLen)
 {
-   if ( (self->u8AllocBuf == 0) || (self->u8ReadPtr == 0) || (self->u8WritePtr == 0))
+   if ( (self->u8AllocBuf == NULL) || (self->u8ReadPtr == NULL) || (self->u8WritePtr == NULL))
    {
       self->u8AllocBuf = newAllocBuf;
       self->u16AllocLen = newAllocLen;
@@ -503,7 +504,7 @@ static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_
       uint32_t copyLen;
       uint8_t *u8EndPtr;
       uint32_t allocSize = ((uint32_t) self->u16AllocLen) * ((uint32_t) self->u8ElemSize);
-      assert(self->u8AllocBuf != 0);
+      assert(self->u8AllocBuf != NULL);
       assert(allocSize > 0);
       u8EndPtr = self->u8AllocBuf + allocSize;
       //Step 1.

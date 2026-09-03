@@ -11,6 +11,10 @@
 #include "adt_u16Map.h"
 #include <assert.h>
 #include <malloc.h>
+#include <stddef.h>
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 #define MAX_NUM_TRANSFER 20
 
@@ -22,11 +26,11 @@ static adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, ad
 
 /****************** Public Function Definitions *******************/
 void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint16_t maxNumElem, void (*pDestructor)(void*)){
-   if(self != 0){
+   if(self != NULL){
       assert(maxNumElem<65535); //temporary fix for a design-flaw found in the code
       self->pBegin = pArray;
       self->pEnd = pArray;
-      self->pIter = 0;
+      self->pIter = NULL;
       self->maxNumElem = maxNumElem;
       self->numElem = 0;
       self->pDestructor = pDestructor;
@@ -42,14 +46,14 @@ adt_u16Map_t *adt_u16Map_new(uint16_t maxNumElem,void (*pDestructor)(void*) ){
    adt_u16MapElem_t *elem;
    adt_u16Map_t *self = malloc(sizeof(adt_u16Map_t));
    elem = malloc(sizeof(adt_u16MapElem_t)*maxNumElem);
-   if( (self != 0) && (elem != 0)){
+   if( (self != NULL) && (elem != NULL)){
       adt_u16Map_create(self,elem,maxNumElem,pDestructor);
    }
    return self;
 }
 
 void adt_u16Map_delete(adt_u16Map_t *self){
-   if(self != 0){
+   if(self != NULL){
       adt_u16Map_clear(self);
       free(self->pBegin);
       free(self);
@@ -57,16 +61,16 @@ void adt_u16Map_delete(adt_u16Map_t *self){
 }
 
 void adt_u16Map_destructorEnable(adt_u16Map_t *self,uint8_t enable){
-   if(self != 0){
+   if(self != NULL){
       self->destructorEnable = (enable!=0)? 1 : 0;
    }
 }
 
 void adt_u16Map_clear(adt_u16Map_t *self){
-   if(self != 0){
+   if(self != NULL){
       while(self->numElem > 0){
          self->pEnd--;
-         if( (self->destructorEnable != 0) && (self->pDestructor != 0) ){
+         if( (self->destructorEnable != false) && (self->pDestructor != NULL) ){
             self->pDestructor(self->pEnd->val);
          }
          self->numElem--;
@@ -78,7 +82,7 @@ void adt_u16Map_clear(adt_u16Map_t *self){
 void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
    uint16_t i;
    adt_u16MapElem_t *elem;
-   if(self->pBegin == 0){
+   if(self->pBegin == NULL){
       return;
    }
    elem = self->pBegin;
@@ -115,7 +119,7 @@ void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
 }
 
 void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
-   if( (self==0) || (self->pBegin==0) || (pElem == 0) ){
+   if( (self == NULL) || (self->pBegin == NULL) || (pElem == NULL) ){
       return;
    }
    if( (pElem >= self->pBegin) && (pElem < self->pEnd) ){
@@ -135,7 +139,7 @@ void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
 
 adt_u16MapElem_t* adt_u16Map_find(adt_u16Map_t *self, uint16_t key){
    adt_u16MapElem_t *it = adt_u16Map_binarySearchDup(self->pBegin,self->pEnd, key);
-   if(it != 0){
+   if(it != NULL){
       (void) adt_u16Map_iterInit(self,it);
    }
    return it;
@@ -143,20 +147,20 @@ adt_u16MapElem_t* adt_u16Map_find(adt_u16Map_t *self, uint16_t key){
 
 adt_u16MapElem_t* adt_u16Map_findExact(adt_u16Map_t *self, uint16_t key, const void *val){
    adt_u16MapElem_t *it = adt_u16Map_find(self,key);
-   if(it != 0){
+   if(it != NULL){
       it = adt_u16Map_iterInit(self,it);
-      while( (it!=0) && (it->key == key) ){
+      while( (it != NULL) && (it->key == key) ){
          if(it->val == val ){
             return it;
          }
          it=adt_u16Map_iterNext(self);
       }
    }
-   return (adt_u16MapElem_t*) 0;
+   return NULL;
 }
 
 uint16_t adt_u16Map_size(const adt_u16Map_t *self){
-   if(self != 0){
+   if(self != NULL){
       return self->numElem;
    }
    return 0;
@@ -172,7 +176,7 @@ adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, adt_u16MapElem_t *pEle
       }
       return self->pIter;
    }
-   return (adt_u16MapElem_t*)0;
+   return NULL;
 }
 
 adt_u16MapElem_t* adt_u16Map_iterNext(adt_u16Map_t *self){
@@ -182,7 +186,7 @@ adt_u16MapElem_t* adt_u16Map_iterNext(adt_u16Map_t *self){
          return self->pIter;
       }
    }
-   return (adt_u16MapElem_t*)0;
+   return NULL;
 }
 
 /**
@@ -196,7 +200,7 @@ uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key
    uint16_t numItems = 0;
    uint16_t totalItems = 0;
 
-   if( (dest == 0) || (dest->pBegin==0) || (src==0) || (src->pBegin==0) ){
+   if( (dest == NULL) || (dest->pBegin == NULL) || (src == NULL) || (src->pBegin == NULL) ){
       return 0;
    }
 
@@ -205,10 +209,10 @@ uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key
       pCursor = itemsToMove;
       pData = dataToMove;
       it = adt_u16Map_find(src,key);
-      if(it != (adt_u16MapElem_t*) 0){
+      if(it != NULL){
          it=adt_u16Map_iterInit(src,it);
          while(numItems < MAX_NUM_TRANSFER){
-            if( (it == (adt_u16MapElem_t*) 0) || (it->key != key) ){
+            if( (it == NULL) || (it->key != key) ){
                break; //no more items
             }
             else{
@@ -313,6 +317,6 @@ adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16Ma
          }
       }
    }
-   return (adt_u16MapElem_t *) 0;
+   return NULL;
 }
 

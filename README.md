@@ -71,7 +71,7 @@ by default chooses the appropriate compiler version.
 Configure:
 
 ```sh
-cmake -S . -B build-test -DUNIT_TEST=ON
+cmake -S . -B build-test -GNinja -DUNIT_TEST=ON
 ```
 
 Build:

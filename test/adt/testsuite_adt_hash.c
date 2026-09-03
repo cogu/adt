@@ -5,6 +5,9 @@
 #include "test_common.h"
 #include "adt_hash.h"
 #include "adt_ary.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 void test_adt_hash_constructor(CuTest* tc)
 {
@@ -46,7 +49,7 @@ void test_adt_hash_iterator(CuTest* tc){
 			CuAssertStrEquals(tc,"fox",pKey);
 			break;
 		case 4:
-			CuAssertPtrEquals(tc,0,pVal);
+			CuAssertPtrEquals(tc, NULL, pVal);
 			break;
 		}
 	}while(pVal);

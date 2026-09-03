@@ -39,6 +39,10 @@ FITNESS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
@@ -112,8 +116,8 @@ CuSuite *testsuite_adt_ary(void) {
 static void test_adt_ary_new(CuTest *tc) {
   adt_ary_t *pArray = adt_ary_new(NULL);
   CuAssertPtrNotNull(tc, pArray);
-  CuAssertPtrEquals(tc, 0, pArray->ppAlloc);
-  CuAssertPtrEquals(tc, 0, pArray->pDestructor);
+  CuAssertPtrEquals(tc, NULL, pArray->ppAlloc);
+  CuAssertPtrEquals(tc, NULL, pArray->pDestructor);
   CuAssertIntEquals(tc, 0, pArray->s32AllocLen);
   CuAssertIntEquals(tc, 0, pArray->s32CurLen);
   adt_ary_delete(pArray);
@@ -241,7 +245,7 @@ static void test_adt_ary_resize(CuTest *tc) {
   int four = 4;
   int five = 4;
   int *p;
-  adt_ary_t *a = adt_ary_new(0);
+  adt_ary_t *a = adt_ary_new(NULL);
   adt_ary_push(a, &one);
   adt_ary_push(a, &two);
   adt_ary_push(a, &three);

@@ -34,6 +34,9 @@
 #include "adt_bytearray.h"
 #include "adt_bytes.h"
 #include "adt_ary.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
@@ -91,7 +94,7 @@ static void test_adt_bytearray_new(CuTest* tc)
 {
    adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE);
    CuAssertPtrNotNull(tc, pArray);
-   CuAssertPtrEquals(tc, 0,pArray->pData);
+   CuAssertPtrEquals(tc, NULL, pArray->pData);
    CuAssertIntEquals(tc, 0,pArray->u32CurLen);
    CuAssertIntEquals(tc, 0,pArray->u32AllocLen);
    CuAssertIntEquals(tc, ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE,pArray->u32GrowSize);

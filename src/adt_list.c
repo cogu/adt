@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <stddef.h>
 #include "adt_list.h"
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
@@ -25,33 +26,33 @@ static void  adt_u32List_elem_delete(adt_u32List_elem_t *self);
 /******* adt_list API *************/
 void  adt_list_create(adt_list_t *self, void (*pDestructor)(void*))
 {
-   if (self != 0)
+   if (self != NULL)
    {
       self->pDestructor = pDestructor;
       self->destructorEnable = true;
-      self->pFirst = 0;
-      self->pLast = 0;
+      self->pFirst = NULL;
+      self->pLast = NULL;
    }
 }
 
 void  adt_list_destroy(adt_list_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_elem_t *iter = self->pFirst;
-      void (*destructor)(void*) = (void (*)(void*)) 0;
-      if (iter == 0)
+      void (*destructor)(void*) = NULL;
+      if (iter == NULL)
       {
          return; //empty list
       }
-      if ( (self->destructorEnable != false) && (self->pDestructor != 0) )
+      if ( (self->destructorEnable != false) && (self->pDestructor != NULL) )
       {
          destructor = self->pDestructor;
       }
-      while( iter != 0 )
+      while( iter != NULL )
       {
          adt_list_elem_t *pNext = iter->pNext;
-         if (destructor != 0)
+         if (destructor != NULL)
          {
             destructor(iter->pItem);
          }
@@ -64,7 +65,7 @@ void  adt_list_destroy(adt_list_t *self)
 adt_list_t*  adt_list_new(void (*pDestructor)(void*))
 {
    adt_list_t *self = (adt_list_t*) malloc(sizeof(adt_list_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_create(self,pDestructor);
    }
@@ -77,7 +78,7 @@ adt_list_t*  adt_list_new(void (*pDestructor)(void*))
 
 void  adt_list_delete(adt_list_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_destroy(self);
       free(self);
@@ -90,7 +91,7 @@ void  adt_list_vdelete(void *arg)
 }
 
 void adt_list_destructor_enable(adt_list_t *self, bool enable){
-   if(self != 0){
+   if(self != NULL){
       self->destructorEnable = enable;
    }
 }
@@ -101,14 +102,14 @@ void adt_list_destructor_enable(adt_list_t *self, bool enable){
  */
 void adt_list_insert(adt_list_t *self, void *pItem)
 {
-   if (self != 0)
+   if (self != NULL)
    {
-      adt_list_elem_t *elem = adt_list_elem_new(pItem,0,self->pLast);
-      if (elem != 0)
+      adt_list_elem_t *elem = adt_list_elem_new(pItem, NULL, self->pLast);
+      if (elem != NULL)
       {
-         if (self->pLast==0)
+         if (self->pLast == NULL)
          {
-            assert(self->pFirst == 0); //list must be empty if pLast is NULL
+            assert(self->pFirst == NULL); //list must be empty if pLast is NULL
             self->pLast = elem;
             self->pFirst = elem;
          }
@@ -126,12 +127,12 @@ void adt_list_insert(adt_list_t *self, void *pItem)
  */
 void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
 {
-   if( (self != 0) && (pIter != 0) && (pItem != 0) )
+   if( (self != NULL) && (pIter != NULL) && (pItem != NULL) )
    {
       adt_list_elem_t *pElem = adt_list_elem_new(pItem,pIter, pIter->pPrev);
-      if (pElem != 0)
+      if (pElem != NULL)
       {
-         if (pIter->pPrev != 0)
+         if (pIter->pPrev != NULL)
          {
             pIter->pPrev->pNext = pElem;
          }
@@ -150,12 +151,12 @@ void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pIte
  */
 void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
 {
-   if( (self != 0) && (pIter != 0) && (pItem != 0) )
+   if( (self != NULL) && (pIter != NULL) && (pItem != NULL) )
    {
       adt_list_elem_t *pElem = adt_list_elem_new(pItem,pIter->pNext, pIter);
-      if (pElem != 0)
+      if (pElem != NULL)
       {
-         if (pIter->pNext != 0)
+         if (pIter->pNext != NULL)
          {
             pIter->pNext->pPrev = pElem;
          }
@@ -174,10 +175,10 @@ void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem
  */
 void adt_list_insert_unique(adt_list_t *self, void *pItem)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_elem_t *pIter = self->pFirst; //create a local iterator
-      while( pIter != 0 )
+      while( pIter != NULL )
       {
          adt_list_elem_t *pNext = pIter->pNext;
          if (pIter->pItem == pItem)
@@ -195,10 +196,10 @@ void adt_list_insert_unique(adt_list_t *self, void *pItem)
  */
 bool adt_list_remove(adt_list_t *self, void *pItem)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_elem_t *iter = adt_list_find(self, pItem);
-      if (iter == 0)
+      if (iter == NULL)
       {
          return false;
       }
@@ -213,13 +214,13 @@ bool adt_list_remove(adt_list_t *self, void *pItem)
 
 bool adt_list_is_empty(const adt_list_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
 #ifdef UNIT_TEST
-      if (self->pFirst == 0) { assert (self->pLast == 0); }
-      if (self->pLast == 0) { assert (self->pFirst == 0); }
+      if (self->pFirst == NULL) { assert (self->pLast == NULL); }
+      if (self->pLast == NULL) { assert (self->pFirst == NULL); }
 #endif
-      return (bool) (self->pFirst == 0);
+      return (bool) (self->pFirst == NULL);
    }
    return false;
 }
@@ -227,56 +228,56 @@ bool adt_list_is_empty(const adt_list_t *self)
 
 void *adt_list_first(const adt_list_t *self)
 {
-   if ( (self != 0) && (self->pFirst != 0))
+   if ( (self != NULL) && (self->pFirst != NULL))
    {
       return self->pFirst->pItem;
    }
-   return 0;
+   return NULL;
 }
 
 void* adt_list_last(const adt_list_t *self)
 {
-   if ( (self != 0) && (self->pLast != 0) )
+   if ( (self != NULL) && (self->pLast != NULL) )
    {
       return self->pLast->pItem;
    }
-   return 0;
+   return NULL;
 }
 
 adt_list_elem_t *adt_list_iter_first(adt_list_t const* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->pFirst;
    }
-   return 0;
+   return NULL;
 }
 
 adt_list_elem_t *adt_list_iter_last(adt_list_t const* self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->pLast;
    }
-   return 0;
+   return NULL;
 }
 
 adt_list_elem_t *adt_list_iter_next(adt_list_elem_t *pElem)
 {
-   if (pElem != 0)
+   if (pElem != NULL)
    {
       return pElem->pNext;
    }
-   return 0;
+   return NULL;
 }
 
 adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem)
 {
-   if (pElem != 0)
+   if (pElem != NULL)
    {
       return pElem->pPrev;
    }
-   return 0;
+   return NULL;
 }
 
 /**
@@ -284,14 +285,14 @@ adt_list_elem_t *adt_list_iter_prev(adt_list_elem_t *pElem)
  */
 adt_list_elem_t *adt_list_find(const adt_list_t *self, void *pItem)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_elem_t *iter = self->pFirst;
-      if (iter == 0)
+      if (iter == NULL)
       {
-         return (adt_list_elem_t*) 0; //empty list
+         return NULL; //empty list
       }
-      while(iter != 0 )
+      while(iter != NULL )
       {
          if (iter->pItem == pItem)
          {
@@ -300,7 +301,7 @@ adt_list_elem_t *adt_list_find(const adt_list_t *self, void *pItem)
          iter=iter->pNext;
       }
    }
-   return (adt_list_elem_t*) 0;
+   return NULL;
 }
 
 /**
@@ -308,14 +309,14 @@ adt_list_elem_t *adt_list_find(const adt_list_t *self, void *pItem)
  */
 void adt_list_erase(adt_list_t *self, adt_list_elem_t *pIter)
 {
-   if ( (self != 0) && (pIter != 0) )
+   if ( (self != NULL) && (pIter != NULL) )
    {
       //disconnect element from list
-      if (pIter->pPrev != 0)
+      if (pIter->pPrev != NULL)
       {
          pIter->pPrev->pNext = pIter->pNext;
       }
-      if (pIter->pNext != 0)
+      if (pIter->pNext != NULL)
       {
          pIter->pNext->pPrev = pIter->pPrev;
       }
@@ -323,9 +324,9 @@ void adt_list_erase(adt_list_t *self, adt_list_elem_t *pIter)
       {
          //we are removing the first element, adjust pFirst
          self->pFirst = pIter->pNext;
-         if (self->pFirst == 0)
+         if (self->pFirst == NULL)
          {
-            self->pLast = 0; //if pFirst becomes 0, then pLast must also be set to 0
+            self->pLast = NULL; //if pFirst becomes 0, then pLast must also be set to 0
          }
       }
       if (pIter == self->pLast)
@@ -335,8 +336,8 @@ void adt_list_erase(adt_list_t *self, adt_list_elem_t *pIter)
       }
 #ifdef UNIT_TEST
       //sanity check, these conditions must be true at all times
-      if (self->pFirst == 0) { assert (self->pLast == 0); }
-      if (self->pLast == 0) { assert (self->pFirst == 0); }
+      if (self->pFirst == NULL) { assert (self->pLast == NULL); }
+      if (self->pLast == NULL) { assert (self->pFirst == NULL); }
 #endif
       adt_list_elem_delete(pIter);
    }
@@ -345,10 +346,10 @@ void adt_list_erase(adt_list_t *self, adt_list_elem_t *pIter)
 int32_t adt_list_length(const adt_list_t *self)
 {
    int32_t result=0;
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_elem_t *iter = self->pFirst;
-      while(iter != 0)
+      while(iter != NULL)
       {
          ++result;
          iter = iter->pNext;
@@ -359,34 +360,34 @@ int32_t adt_list_length(const adt_list_t *self)
 
 void adt_list_clear(adt_list_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_destroy(self);
-      self->pFirst = 0;
-      self->pLast = 0;
+      self->pFirst = NULL;
+      self->pLast = NULL;
    }
 }
 
 /******* adt_u32List API *************/
 void  adt_u32List_create(adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
-      self->pFirst = 0;
-      self->pLast = 0;
+      self->pFirst = NULL;
+      self->pLast = NULL;
    }
 }
 
 void  adt_u32List_destroy(adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_t *iter = self->pFirst;
-      if (iter == 0)
+      if (iter == NULL)
       {
          return; //empty list
       }
-      while( iter != 0 )
+      while( iter != NULL )
       {
          adt_u32List_elem_t *pNext = iter->pNext;
          adt_u32List_elem_delete(iter);
@@ -398,7 +399,7 @@ void  adt_u32List_destroy(adt_u32List_t *self)
 adt_u32List_t* adt_u32List_new(void)
 {
    adt_u32List_t *self = (adt_u32List_t*) malloc(sizeof(adt_u32List_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_create(self);
    }
@@ -411,7 +412,7 @@ adt_u32List_t* adt_u32List_new(void)
 
 void adt_u32List_delete(adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_destroy(self);
       free(self);
@@ -428,14 +429,14 @@ void  adt_u32List_vdelete(void *arg)
  */
 void adt_u32List_insert(adt_u32List_t *self, uint32_t item)
 {
-   if (self != 0)
+   if (self != NULL)
    {
-      adt_u32List_elem_t *elem = adt_u32List_elem_new(item, 0, self->pLast);
-      if (elem != 0)
+      adt_u32List_elem_t *elem = adt_u32List_elem_new(item, NULL, self->pLast);
+      if (elem != NULL)
       {
-         if (self->pLast==0)
+         if (self->pLast == NULL)
          {
-            assert(self->pFirst == 0); //list must be empty if pLast is NULL
+            assert(self->pFirst == NULL); //list must be empty if pLast is NULL
             self->pLast = self->pFirst = elem;
          }
          else
@@ -449,12 +450,12 @@ void adt_u32List_insert(adt_u32List_t *self, uint32_t item)
 
 void adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item)
 {
-   if( (self != 0) && (pIter != 0) )
+   if( (self != NULL) && (pIter != NULL) )
    {
       adt_u32List_elem_t *pElem = adt_u32List_elem_new(item, pIter, pIter->pPrev);
-      if (pElem != 0)
+      if (pElem != NULL)
       {
-         if (pIter->pPrev != 0)
+         if (pIter->pPrev != NULL)
          {
             pIter->pPrev->pNext = pElem;
          }
@@ -470,12 +471,12 @@ void adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, u
 
 void adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item)
 {
-   if( (self != 0) && (pIter != 0) )
+   if( (self != NULL) && (pIter != NULL) )
    {
       adt_u32List_elem_t *pElem = adt_u32List_elem_new(item,pIter->pNext, pIter);
-      if (pElem != 0)
+      if (pElem != NULL)
       {
-         if (pIter->pNext != 0)
+         if (pIter->pNext != NULL)
          {
             pIter->pNext->pPrev = pElem;
          }
@@ -494,14 +495,14 @@ void adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, ui
  */
 void adt_u32List_erase(adt_u32List_t *self, adt_u32List_elem_t *pIter)
 {
-   if ( (self != 0) && (pIter != 0) )
+   if ( (self != NULL) && (pIter != NULL) )
    {
       //disconnect element from list
-      if (pIter->pPrev != 0)
+      if (pIter->pPrev != NULL)
       {
          pIter->pPrev->pNext = pIter->pNext;
       }
-      if (pIter->pNext != 0)
+      if (pIter->pNext != NULL)
       {
          pIter->pNext->pPrev = pIter->pPrev;
       }
@@ -509,9 +510,9 @@ void adt_u32List_erase(adt_u32List_t *self, adt_u32List_elem_t *pIter)
       {
          //we are removing the first element, adjust pFirst
          self->pFirst = pIter->pNext;
-         if (self->pFirst == 0)
+         if (self->pFirst == NULL)
          {
-            self->pLast = 0; //if pFirst becomes 0, then pLast must also be set to 0
+            self->pLast = NULL; //if pFirst becomes 0, then pLast must also be set to 0
          }
       }
       if (pIter == self->pLast)
@@ -521,8 +522,8 @@ void adt_u32List_erase(adt_u32List_t *self, adt_u32List_elem_t *pIter)
       }
 #ifdef UNIT_TEST
       //sanity check, these conditions must be true at all times
-      if (self->pFirst == 0) { assert (self->pLast == 0); }
-      if (self->pLast == 0) { assert (self->pFirst == 0); }
+      if (self->pFirst == NULL) { assert (self->pLast == NULL); }
+      if (self->pLast == NULL) { assert (self->pFirst == NULL); }
 #endif
       adt_u32List_elem_delete(pIter);
    }
@@ -530,51 +531,51 @@ void adt_u32List_erase(adt_u32List_t *self, adt_u32List_elem_t *pIter)
 
 bool adt_u32List_is_empty(const adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
 #ifdef UNIT_TEST
-      if (self->pFirst == 0) { assert (self->pLast == 0); }
-      if (self->pLast == 0) { assert (self->pFirst == 0); }
+      if (self->pFirst == NULL) { assert (self->pLast == NULL); }
+      if (self->pLast == NULL) { assert (self->pFirst == NULL); }
 #endif
-      return (bool) (self->pFirst == 0);
+      return (bool) (self->pFirst == NULL);
    }
    return false;
 }
 
 adt_u32List_elem_t *adt_u32List_iter_first(const adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->pFirst;
    }
-   return 0;
+   return NULL;
 }
 
 adt_u32List_elem_t *adt_u32List_iter_last(const adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       return self->pLast;
    }
-   return 0;
+   return NULL;
 }
 
 adt_u32List_elem_t* adt_u32List_iter_next(adt_u32List_elem_t *pElem)
 {
-   if (pElem != 0)
+   if (pElem != NULL)
    {
       return pElem->pNext;
    }
-   return 0;
+   return NULL;
 }
 
 adt_u32List_elem_t* adt_u32List_iter_prev(adt_u32List_elem_t *pElem)
 {
-   if (pElem != 0)
+   if (pElem != NULL)
    {
       return pElem->pPrev;
    }
-   return 0;
+   return NULL;
 }
 
 /**
@@ -582,14 +583,14 @@ adt_u32List_elem_t* adt_u32List_iter_prev(adt_u32List_elem_t *pElem)
  */
 adt_u32List_elem_t* adt_u32List_find(const adt_u32List_t *self, uint32_t item)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_t *iter = self->pFirst;
-      if (iter == 0)
+      if (iter == NULL)
       {
-         return (adt_u32List_elem_t*) 0; //empty list
+         return NULL; //empty list
       }
-      while(iter != 0 )
+      while(iter != NULL )
       {
          if (iter->item == item)
          {
@@ -598,16 +599,16 @@ adt_u32List_elem_t* adt_u32List_find(const adt_u32List_t *self, uint32_t item)
          iter=iter->pNext;
       }
    }
-   return (adt_u32List_elem_t*) 0;
+   return NULL;
 }
 
 int32_t adt_u32List_length(const adt_u32List_t *self)
 {
    int32_t result=0;
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_t *iter = self->pFirst;
-      while(iter != 0)
+      while(iter != NULL)
       {
          ++result;
          iter = iter->pNext;
@@ -618,11 +619,11 @@ int32_t adt_u32List_length(const adt_u32List_t *self)
 
 void adt_u32List_clear(adt_u32List_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_destroy(self);
-      self->pFirst = 0;
-      self->pLast = 0;
+      self->pFirst = NULL;
+      self->pLast = NULL;
    }
 }
 
@@ -630,7 +631,7 @@ void adt_u32List_clear(adt_u32List_t *self)
 /***************** Private Function Definitions *******************/
 void  adt_list_elem_create(adt_list_elem_t *self, void *pItem, adt_list_elem_t *pNext, adt_list_elem_t *pPrev)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       self->pItem = pItem;
       self->pNext = pNext;
@@ -641,7 +642,7 @@ void  adt_list_elem_create(adt_list_elem_t *self, void *pItem, adt_list_elem_t *
 adt_list_elem_t*  adt_list_elem_new(void *pItem, adt_list_elem_t *pNext, adt_list_elem_t *pPrev)
 {
    adt_list_elem_t *self = (adt_list_elem_t*) malloc(sizeof(adt_list_elem_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_list_elem_create(self,pItem,pNext,pPrev);
    }
@@ -654,7 +655,7 @@ adt_list_elem_t*  adt_list_elem_new(void *pItem, adt_list_elem_t *pNext, adt_lis
 
 void adt_list_elem_delete(adt_list_elem_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       free(self);
    }
@@ -662,7 +663,7 @@ void adt_list_elem_delete(adt_list_elem_t *self)
 
 static void  adt_u32List_elem_create(adt_u32List_elem_t *self, uint32_t item, adt_u32List_elem_t *pNext, adt_u32List_elem_t *pPrev)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       self->item = item;
       self->pNext = pNext;
@@ -673,7 +674,7 @@ static void  adt_u32List_elem_create(adt_u32List_elem_t *self, uint32_t item, ad
 static adt_u32List_elem_t*  adt_u32List_elem_new(uint32_t item, adt_u32List_elem_t *pNext, adt_u32List_elem_t *pPrev)
 {
    adt_u32List_elem_t *self = (adt_u32List_elem_t*) malloc(sizeof(adt_u32List_elem_t));
-   if (self != 0)
+   if (self != NULL)
    {
       adt_u32List_elem_create(self,item,pNext,pPrev);
    }
@@ -686,7 +687,7 @@ static adt_u32List_elem_t*  adt_u32List_elem_new(uint32_t item, adt_u32List_elem
 
 static void  adt_u32List_elem_delete(adt_u32List_elem_t *self)
 {
-   if (self != 0)
+   if (self != NULL)
    {
       free(self);
    }

@@ -4,6 +4,9 @@
 #include <string.h>
 #include "test_common.h"
 #include "adt_list.h"
+#ifdef MEM_LEAK_CHECK
+#include "CMemLeak.h"
+#endif
 
 /**************** Private Function Declarations *******************/
 static void test_adt_u32List_create(CuTest* tc);
@@ -43,8 +46,8 @@ static void test_adt_u32List_create(CuTest* tc)
 {
    adt_u32List_t list;
    adt_u32List_create(&list);
-   CuAssertPtrEquals(tc, 0, list.pFirst);
-   CuAssertPtrEquals(tc, 0, list.pLast);
+   CuAssertPtrEquals(tc, NULL, list.pFirst);
+   CuAssertPtrEquals(tc, NULL, list.pLast);
 
    CuAssertIntEquals(tc, 0, adt_u32List_length(&list));
 }
@@ -54,8 +57,8 @@ static void test_adt_u32List_new(CuTest* tc)
    adt_u32List_t *list;
    list = adt_u32List_new();
    CuAssertPtrNotNull(tc, list);
-   CuAssertPtrEquals(tc, 0, list->pFirst);
-   CuAssertPtrEquals(tc, 0, list->pLast);
+   CuAssertPtrEquals(tc, NULL, list->pFirst);
+   CuAssertPtrEquals(tc, NULL, list->pLast);
 
    adt_u32List_delete(list);
 }
@@ -79,7 +82,7 @@ static void test_adt_u32List_insert(CuTest* tc)
    CuAssertPtrNotNull(tc, iter);
    CuAssertUIntEquals(tc, 3, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
    adt_u32List_delete(list);
 }
 
@@ -195,7 +198,7 @@ static void test_adt_u32List_insert_before(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 2, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //insert before last item
    adt_u32List_clear(list);
@@ -210,7 +213,7 @@ static void test_adt_u32List_insert_before(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 2, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //cleanup
    adt_u32List_delete(list);
@@ -235,7 +238,7 @@ static void test_adt_u32List_insert_after(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 2, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //insert after last item
    adt_u32List_clear(list);
@@ -250,7 +253,7 @@ static void test_adt_u32List_insert_after(CuTest* tc)
    iter = adt_u32List_iter_next(iter);
    CuAssertUIntEquals(tc, 99, iter->item);
    iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, 0, iter);
+   CuAssertPtrEquals(tc, NULL, iter);
 
    //cleanup
    adt_u32List_delete(list);

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <malloc.h>
+#include <stddef.h>
 #ifdef MEM_LEAK_CHECK
 # include "CMemLeak.h"
 #endif
@@ -34,14 +35,14 @@
 adt_heap_elem_t* adt_heap_elem_new(void *pItem, uint32_t u32Value){
    adt_heap_elem_t *self;
    self = (adt_heap_elem_t*) malloc(sizeof(adt_heap_elem_t));
-   if ( self != (adt_heap_elem_t*) 0 ){
+   if ( self != NULL ){
       adt_heap_elem_create(self, pItem, u32Value);
    }
    return self;
 }
 
 void adt_heap_elem_delete(adt_heap_elem_t *self){
-   if (self != 0){
+   if (self != NULL){
       adt_heap_elem_destroy(self);
       free(self);
    }
@@ -52,7 +53,7 @@ void adt_heap_elem_vdelete(void *arg){
 }
 
 void adt_heap_elem_create(adt_heap_elem_t *self, void *pItem, uint32_t u32Value){
-   if (self != 0){
+   if (self != NULL){
       self->pItem = pItem;
       self->u32Value = u32Value;
    }
@@ -68,7 +69,7 @@ void adt_heap_elem_destroy(adt_heap_elem_t *self){
  * resorts the heap starting at startIndex. It propagates upwards (bubble up) toward the root of the tree.
  */
 void adt_heap_sortUp(adt_ary_t *heap, int32_t childIndex, adt_heap_family heapFamily){
-   if ( (heap != 0) && (childIndex>0) ){
+   if ( (heap != NULL) && (childIndex>0) ){
       bool swapItems = false;
       void **ppChild, **ppParent;
       adt_heap_elem_t *pChildElem, *pParentElem;
@@ -77,7 +78,7 @@ void adt_heap_sortUp(adt_ary_t *heap, int32_t childIndex, adt_heap_family heapFa
 
       ppChild = adt_ary_get(heap, childIndex);
       ppParent = adt_ary_get(heap, parentIndex);
-      assert ( (ppChild != 0) && (ppParent != 0) );
+      assert ( (ppChild != NULL) && (ppParent != NULL) );
       pChildElem = *ppChild;
       pParentElem = *ppParent;
       if (heapFamily == ADT_MIN_HEAP){
@@ -111,17 +112,17 @@ void adt_heap_sortUp(adt_ary_t *heap, int32_t childIndex, adt_heap_family heapFa
  * resorts the list starting at startIndex. It propagates downwards toward the leaf elements of the tree.
  */
 void adt_heap_sortDown(adt_ary_t *heap, int32_t parentIndex, adt_heap_family heapFamily){
-   if ( (heap != 0) && (parentIndex>=0) ){
+   if ( (heap != NULL) && (parentIndex>=0) ){
       int32_t curLen = adt_ary_length(heap);
       if (parentIndex < curLen ){
          bool swapLeft = false, swapRight = false;
-         void **ppLeft = 0, **ppRight = 0, **ppParent;
+         void **ppLeft = NULL, **ppRight = NULL, **ppParent;
          adt_heap_elem_t *pParentElem;
          int32_t leftChildIndex, rightChildIndex;
          uint32_t leftChildValue = 0;
 
          ppParent = adt_ary_get(heap, parentIndex);
-         assert(ppParent != 0);
+         assert(ppParent != NULL);
          pParentElem = *ppParent;
          //children indices at 2i+1, 2i+2
          leftChildIndex = (parentIndex<<1) + 1;
@@ -129,7 +130,7 @@ void adt_heap_sortDown(adt_ary_t *heap, int32_t parentIndex, adt_heap_family hea
          if(leftChildIndex < curLen){
             adt_heap_elem_t *pLeftElem;
             ppLeft = adt_ary_get(heap, leftChildIndex);
-            assert(ppLeft != 0);
+            assert(ppLeft != NULL);
             pLeftElem = *ppLeft;
             leftChildValue = pLeftElem->u32Value;
             if (heapFamily == ADT_MIN_HEAP){
@@ -147,7 +148,7 @@ void adt_heap_sortDown(adt_ary_t *heap, int32_t parentIndex, adt_heap_family hea
          if( rightChildIndex < curLen ){
             adt_heap_elem_t *pRightElem;
             ppRight = adt_ary_get(heap, rightChildIndex);
-            assert(ppRight != 0);
+            assert(ppRight != NULL);
             pRightElem = *ppRight;
             if (heapFamily == ADT_MIN_HEAP){
                if (pRightElem->u32Value < pParentElem->u32Value){
