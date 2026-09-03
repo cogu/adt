@@ -1,16 +1,7 @@
 #ifndef ADT_LIST_H
 #define ADT_LIST_H
 #include <stdint.h>
-#if defined(_MSC_PLATFORM_TOOLSET) && (_MSC_PLATFORM_TOOLSET<=110)
-#ifndef _MSC_BOOL_DEFINED
-#define _MSC_BOOL_DEFINED
-#define false 0
-#define true 1
-typedef uint8_t bool;
-#endif
-#else
 #include <stdbool.h>
-#endif
 
 #define ADT_LIST_ELEM_HEAD(struct_name, item_type_name) \
       struct struct_name *pNext;\
