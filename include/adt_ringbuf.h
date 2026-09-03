@@ -28,10 +28,6 @@
 
 #include <stdint.h>
 
-#ifdef ADT_RBF_CFG
-#include "adt_ringbuf_cfg.h"
-#endif
-
 #ifndef BUF_E_OK
 #define BUF_E_OK        0
 #endif
