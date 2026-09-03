@@ -174,6 +174,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         target_compile_definitions(adt_perf PRIVATE
             DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/3esl.txt"
         )
+        add_test(NAME adt_perf COMMAND adt_perf)
+        set_tests_properties(adt_perf PROPERTIES 
+            LABELS "benchmark"
+        )
 
     endif()
 endif()

@@ -77,7 +77,7 @@ cmake -S . -B build-test -DUNIT_TEST=ON
 Build:
 
 ```sh
-cmake --build build-test --target adt_unit
+cmake --build build-test
 ```
 
 Run test cases:
@@ -144,6 +144,18 @@ CMake options can be set from command line or using a CMake GUI tool (such as cc
 #### ADT Hash Performance Benchmark
 
 When `-DUNIT_TEST=ON` is set, a dedicated benchmark executable `adt_perf` is built. It benchmarks insertion and lookup performance across ~22,000 dictionary words using [test/3esl.txt](file:///home/cogu/repo/c-apx/adt/test/3esl.txt).
+
+Run directly:
+
+```sh
+./build-test/adt_perf
+```
+
+Or run via CTest:
+
+```sh
+ctest --test-dir build-test -L benchmark --output-on-failure --verbose
+```
 
 #### ADT Ringbuffer
 

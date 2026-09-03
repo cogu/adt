@@ -73,14 +73,16 @@
       "name": "clang-test",
       "configurePreset": "clang-test",
       "targets": [
-        "adt_unit"
+        "adt_unit",
+        "adt_perf"
       ]
     },
     {
       "name": "clang-asan",
       "configurePreset": "clang-asan",
       "targets": [
-        "adt_unit"
+        "adt_unit",
+        "adt_perf"
       ]
     },
     {
