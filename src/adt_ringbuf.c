@@ -97,7 +97,7 @@ uint8_t adt_rbfs_create(adt_rbfs_t* u8Rbf, uint8_t* u8Buffer, uint16_t u16NumEle
 uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
 {
    uint8_t u8i;
-   uint8_t* u8EndPtr = u8Rbf->u8Buffer + (u8Rbf->u16MaxNumElem * u8Rbf->u8ElemSize);
+   uint8_t* u8EndPtr = u8Rbf->u8Buffer + (((size_t) u8Rbf->u16MaxNumElem) * u8Rbf->u8ElemSize);
 
    if (u8Rbf->u16NumElem >= u8Rbf->u16MaxNumElem)
    {
@@ -126,7 +126,7 @@ uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
 uint8_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
 {
    uint8_t u8i;
-   uint8_t* u8EndPtr = u8Rbf->u8Buffer + (u8Rbf->u16MaxNumElem * u8Rbf->u8ElemSize);
+   uint8_t* u8EndPtr = u8Rbf->u8Buffer + (((size_t) u8Rbf->u16MaxNumElem) * u8Rbf->u8ElemSize);
 
    if (u8Rbf->u16NumElem == 0)
    {
@@ -277,7 +277,7 @@ adt_buf_err_t adt_rbfh_createEx(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u
    {
       if (u16MinNumElems > 0)
       {
-         self->u8AllocBuf = (uint8_t*) malloc( ((uint32_t)u8ElemSize)*u16MinNumElems);
+         self->u8AllocBuf = (uint8_t*) malloc( ((size_t) u8ElemSize) * u16MinNumElems);
          if (self->u8AllocBuf == NULL)
          {
             return BUF_E_NOT_OK;
@@ -352,7 +352,8 @@ void adt_rbfh_delete(adt_rbfh_t* self)
 {
    if (self != NULL)
    {
-
+      adt_rbfh_destroy(self);
+      free(self);
    }
 }
 
@@ -362,8 +363,6 @@ void adt_rbfh_delete(adt_rbfh_t* self)
  */
 adt_buf_err_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data)
 {
-   uint8_t* u8EndPtr = self->u8AllocBuf + (self->u16AllocLen * ((uint32_t)self->u8ElemSize));
-
    if (self->u16NumElem == self->u16AllocLen)
    {
       adt_buf_err_t result = adt_rbfh_grow(self);
@@ -372,6 +371,7 @@ adt_buf_err_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data)
          return result;
       }
    }
+   uint8_t* u8EndPtr = self->u8AllocBuf + (((size_t) self->u16AllocLen) * self->u8ElemSize);
    self->u16NumElem++;
    memcpy(self->u8WritePtr, u8Data, (size_t) self->u8ElemSize);
    self->u8WritePtr+=self->u8ElemSize;
@@ -387,12 +387,11 @@ adt_buf_err_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data)
  */
 adt_buf_err_t adt_rbfh_remove(adt_rbfh_t* self, uint8_t* u8Data)
 {
-   uint8_t* u8EndPtr = self->u8AllocBuf + (self->u16AllocLen * ((uint32_t)self->u8ElemSize));
-
    if (self->u16NumElem == 0)
    {
       return BUF_E_UNDERFLOW;
    }
+   uint8_t* u8EndPtr = self->u8AllocBuf + (((size_t) self->u16AllocLen) * self->u8ElemSize);
    memcpy(u8Data, self->u8ReadPtr, (size_t) self->u8ElemSize);
    self->u8ReadPtr+=self->u8ElemSize;
    if (self->u8ReadPtr == u8EndPtr)
@@ -472,7 +471,7 @@ static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self)
    {
       uint8_t *newAllocBuf;
       uint16_t newAllocLen = adt_rbfh_nextLen(self->u16AllocLen+1);
-      newAllocBuf = (uint8_t*) malloc( ((uint32_t)self->u8ElemSize)*newAllocLen);
+      newAllocBuf = (uint8_t*) malloc( ((size_t) self->u8ElemSize) * newAllocLen);
       if (newAllocBuf != NULL)
       {
          adt_rbfh_swapBuffers(self, newAllocBuf, newAllocLen);

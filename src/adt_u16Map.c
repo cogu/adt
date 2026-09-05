@@ -43,12 +43,15 @@ void adt_u16Map_destroy(adt_u16Map_t *self){
    adt_u16Map_clear(self);
 }
 
-adt_u16Map_t *adt_u16Map_new(uint16_t maxNumElem,void (*pDestructor)(void*) ){
-   adt_u16MapElem_t *elem;
-   adt_u16Map_t *self = malloc(sizeof(adt_u16Map_t));
-   elem = malloc(sizeof(adt_u16MapElem_t)*maxNumElem);
-   if( (self != NULL) && (elem != NULL)){
-      adt_u16Map_create(self,elem,maxNumElem,pDestructor);
+adt_u16Map_t *adt_u16Map_new(uint16_t maxNumElem, void (*pDestructor)(void*)){
+   adt_u16Map_t *self = (adt_u16Map_t*) malloc(sizeof(adt_u16Map_t));
+   if(self != NULL){
+      adt_u16MapElem_t *elem = (adt_u16MapElem_t*) malloc(sizeof(adt_u16MapElem_t) * maxNumElem);
+      if(elem == NULL){
+         free(self);
+         return NULL;
+      }
+      adt_u16Map_create(self, elem, maxNumElem, pDestructor);
    }
    return self;
 }
@@ -290,9 +293,9 @@ adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16Ma
       numElem = pHigh-pLow;
       //perform a linear search if there is 3 items or less
       if(numElem <= 3){
-         uint16_t i;
+         uint32_t i;
          for(i=0;i<numElem;i++){
-            if( (pLow[i].key == key) ){
+            if (pLow[i].key == key) {
                if(i==0){
                   //decrease pointer if key is duplicated
                   while((pLow>pBegin) && (pLow[-1].key == key)) pLow--;
