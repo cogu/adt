@@ -102,18 +102,81 @@ typedef struct adt_hash_tag{
 
 
 /***************** Public Function Declarations *******************/
-//Constructor/Destructor
+
+/**
+ * \brief Allocates and initializes a new hash table on the heap.
+ *
+ * \param pDestructor Optional element destructor callback for value cleanup, or NULL.
+ * \return Pointer to newly allocated hash table, or NULL on failure.
+ */
 adt_hash_t* adt_hash_new(void (*pDestructor)(void*));
+
+/**
+ * \brief Destroys all stored values using the configured destructor, frees table nodes, and frees self.
+ *
+ * \param self Pointer to the hash table to delete.
+ */
 void adt_hash_delete(adt_hash_t *self);
-void adt_hash_create(adt_hash_t *self,void (*pDestructor)(void*));
+
+/**
+ * \brief Initializes a hash table instance in place (stack or embedded allocation).
+ *
+ * \param self Pointer to an existing adt_hash_t instance.
+ * \param pDestructor Optional element destructor callback for value cleanup, or NULL.
+ */
+void adt_hash_create(adt_hash_t *self, void (*pDestructor)(void*));
+
+/**
+ * \brief Destroys all stored values using the configured destructor and frees internal nodes. Does not free self.
+ *
+ * \param self Pointer to the hash table to destroy.
+ */
 void adt_hash_destroy(adt_hash_t *self);
 
 
 //Accessors
+
+/**
+ * \brief Inserts or updates a key-value pair in the hash table.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key.
+ * \param pVal Pointer to value to associate with key.
+ */
 void	 adt_hash_set(adt_hash_t *self, const char *pKey,  void *pVal);
+
+/**
+ * \brief Retrieves a pointer to the value slot for the specified key.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key to look up.
+ * \return Pointer to value pointer (void**), or NULL if key is not found.
+ */
 void** adt_hash_get(const adt_hash_t *self, const char *pKey);
+
+/**
+ * \brief Retrieves the stored value pointer for the specified key directly.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key to look up.
+ * \return Stored value pointer (void*), or NULL if key is not found.
+ */
 void*  adt_hash_value(const adt_hash_t *self, const char *pKey);
+
+/**
+ * \brief Removes the key-value pair from the hash table without invoking the element destructor.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key to remove.
+ * \return The removed value pointer (void*), or NULL if key was not found.
+ */
 void*  adt_hash_remove(adt_hash_t *self, const char *pKey);
+
+/**
+ * \brief Initializes or resets the hash table iterator to the beginning.
+ *
+ * \param self Pointer to the hash table.
+ */
 void   adt_hash_iter_init(adt_hash_t *self);
 
 /**
@@ -126,11 +189,41 @@ void   adt_hash_iter_init(adt_hash_t *self);
 void** adt_hash_iter_next(adt_hash_t *self, const char **ppKey);
 
 
-
 //Utility functions
+
+/**
+ * \brief Returns the number of elements in the hash table.
+ *
+ * \param self Pointer to the hash table.
+ * \return Number of elements, or -1 if self is NULL.
+ */
 int32_t 	adt_hash_length(const adt_hash_t *self);
+
+/**
+ * \brief Checks whether a key exists in the hash table.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key to check.
+ * \return true if key exists, false otherwise.
+ */
 bool		adt_hash_exists(const adt_hash_t *self, const char *pKey);
+
+/**
+ * \brief Collects all string keys into the provided array as dynamically allocated strings.
+ *
+ * \param self Pointer to the hash table.
+ * \param pArray Destination array (should use free as destructor).
+ * \return Number of keys copied, or 0 on error.
+ */
 int32_t	adt_hash_keys(adt_hash_t *self, adt_ary_t* pArray);
+
+/**
+ * \brief Collects all value pointers into the provided array.
+ *
+ * \param self Pointer to the hash table.
+ * \param pArray Destination array.
+ * \return Number of values copied, or 0 on error.
+ */
 int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray);
 
 #endif //ADT_HASH_H__

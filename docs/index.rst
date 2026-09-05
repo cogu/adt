@@ -13,6 +13,9 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_bytearray
    adt_bytes
    adt_ary
+   adt_str
+   adt_hash
+   adt_stack
 
 
 Data Structures Catalog
@@ -44,12 +47,12 @@ Below is a summary of all data structures provided by the ADT library:
      - Bytes (``uint8_t``)
      - Yes
      - Immutable byte array buffer.
-   * - ``adt_str_t``
+   * - :c:type:`adt_str_t`
      - ``adt_str.h``
      - Characters (``char*``)
      - Yes
      - Dynamic string container managing UTF-8 and ASCII text.
-   * - ``adt_hash_t``
+   * - :c:type:`adt_hash_t`
      - ``adt_hash.h``
      - Objects (``void*``)
      - Yes
@@ -69,7 +72,7 @@ Below is a summary of all data structures provided by the ADT library:
      - Values (``uint32_t``)
      - Yes
      - Specialized linked list for unsigned 32-bit integers.
-   * - ``adt_stack_t``
+   * - :c:type:`adt_stack_t`
      - ``adt_stack.h``
      - Objects (``void*``)
      - Yes
