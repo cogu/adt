@@ -95,6 +95,20 @@ void adt_ary_destructor_enable(adt_ary_t *self, bool enable){
    }
 }
 
+bool adt_ary_has_destructor(const adt_ary_t *self){
+   if(self != NULL){
+      return (self->pDestructor != NULL);
+   }
+   return false;
+}
+
+bool adt_ary_destructor_is_enabled(const adt_ary_t *self){
+   if(self != NULL){
+      return ((self->pDestructor != NULL) && (self->destructorEnable != false));
+   }
+   return false;
+}
+
 //Accessors
 void**	adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem){
 	if(self == NULL){

@@ -272,20 +272,30 @@ bool adt_hash_is_empty(const adt_hash_t *self);
 bool adt_hash_exists(const adt_hash_t *self, const char *pKey);
 
 /**
- * \brief Collects all string keys into the provided array as dynamically allocated strings.
+ * \brief Collects weak references to all string keys into the provided array.
+ *
+ * Keys are non-owning borrowed pointers referencing strings owned by the hash
+ * table. The destination array must NOT have an active destructor enabled (or
+ * must have it disabled via adt_ary_destructor_enable); passing an array with
+ * an active destructor is an error.
  *
  * \param self Pointer to the hash table.
- * \param pArray Destination array (should use free as destructor).
- * \return Number of keys copied, or 0 on error.
+ * \param pArray Destination array (must have no destructor enabled).
+ * \return Number of keys copied (>= 0), or -1 on error.
  */
 int32_t	adt_hash_keys(adt_hash_t *self, adt_ary_t* pArray);
 
 /**
- * \brief Collects all value pointers into the provided array.
+ * \brief Collects weak references to all value pointers into the provided array.
+ *
+ * Values are non-owning borrowed pointers referencing values stored in the hash
+ * table. The destination array must NOT have an active destructor enabled (or
+ * must have it disabled via adt_ary_destructor_enable); passing an array with
+ * an active destructor is an error.
  *
  * \param self Pointer to the hash table.
- * \param pArray Destination array.
- * \return Number of values copied, or 0 on error.
+ * \param pArray Destination array (must have no destructor enabled).
+ * \return Number of values copied (>= 0), or -1 on error.
  */
 int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray);
 

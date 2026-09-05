@@ -94,6 +94,22 @@ void 	      adt_ary_destroy(adt_ary_t *self);
  */
 void        adt_ary_destructor_enable(adt_ary_t *self, bool enable);
 
+/**
+ * \brief Checks if the array has a destructor callback configured.
+ *
+ * \param self Pointer to the array.
+ * \return True if a destructor callback is set, false if NULL or self is NULL.
+ */
+bool        adt_ary_has_destructor(const adt_ary_t *self);
+
+/**
+ * \brief Checks if automatic invocation of the element destructor is currently active.
+ *
+ * \param self Pointer to the array.
+ * \return True if a destructor callback is set and enabled, false otherwise or if self is NULL.
+ */
+bool        adt_ary_destructor_is_enabled(const adt_ary_t *self);
+
 
 //Accessors
 

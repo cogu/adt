@@ -101,6 +101,9 @@ Alternatively, :c:func:`adt_hash_foreach` can be used to iterate over a map (inc
 Utility & Bulk Extraction
 -------------------------
 
+Both :c:func:`adt_hash_keys` and :c:func:`adt_hash_values` populate the destination array with non-owning (borrowed) weak references.
+The destination ``adt_ary_t`` must not have an active element destructor enabled (or must have it disabled via :c:func:`adt_ary_destructor_enable`).
+
 .. doxygenfunction:: adt_hash_length
 
 .. doxygenfunction:: adt_hash_is_empty
