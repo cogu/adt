@@ -20,6 +20,7 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_heap
    adt_ringbuf
    adt_u16Map
+   adt_set
 
 
 Data Structures Catalog
@@ -101,11 +102,11 @@ Below is a summary of all data structures provided by the ADT library:
      - Values (``uint16_t``)
      - No
      - Embedded circular buffer for 16-bit integer values.
-   * - ``adt_u32Set_t``
+   * - :doc:`adt_u32Set_t <adt_set>`
      - ``adt_set.h``
      - Values (``uint32_t``)
      - Yes
-     - Unordered set of unique 32-bit unsigned integers.
+     - Set container for unique 32-bit unsigned integers.
 
 
 Embedded & Zero-Heap Support
