@@ -1,8 +1,11 @@
 ![unit tests](https://github.com/cogu/adt/workflows/unit%20tests/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/c-adt/badge/?version=latest)](https://c-adt.readthedocs.io/en/latest/?badge=latest)
 
 # ADT
 
 Abstract data types for the C programming language.
+
+Online documentation and API reference: **[c-adt.readthedocs.io](https://c-adt.readthedocs.io/)**
 
 ## What is it?
 
@@ -184,20 +187,4 @@ By default, `adt_ringbuf.c` will not compile anything unless you explicitly enab
 | CMake Option      | Usage                  | Description                      |
 |-------------------|------------------------|----------------------------------|
 | ADT_U16MAP_ENABLE | -DADT_U16MAP_ENABLE=ON | Enables adt_u16Map_t and its API |
-
-## Documentation
-
-Full documentation—including API references, lifecycle patterns, code examples, and the **Virtual Destructors & Memory Ownership Guide**—is built using Sphinx and Doxygen.
-
-To build the HTML documentation locally:
-
-```bash
-cd docs
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m sphinx -b html . _build/html
-```
-
-Open `docs/_build/html/index.html` in your browser to view the documentation.
 
