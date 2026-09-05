@@ -248,7 +248,7 @@ int32_t adt_hash_keys(adt_hash_t *self,adt_ary_t *pArray){
       }
    }while(pKey);
 
-	return (uint32_t) s32i;
+	return s32i;
 }
 
 int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray)

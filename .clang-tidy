@@ -1,0 +1,33 @@
+---
+Checks: >
+  -*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-*,
+  cert-*,
+  performance-*,
+  -bugprone-assignment-in-if-condition,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-macro-parentheses,
+  -bugprone-misplaced-widening-cast,
+  -bugprone-multi-level-implicit-pointer-conversion,
+  -bugprone-reserved-identifier,
+  -bugprone-suspicious-realloc-usage,
+  -bugprone-switch-missing-default-case,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
+  -cert-err33-c,
+  -cert-dcl54-cpp,
+  -cert-dcl58-cpp,
+  -cert-err58-cpp,
+  -cert-err60-cpp,
+  -cert-mem54-cpp,
+  -cert-msc50-cpp,
+  -cert-msc51-cpp,
+  -cert-oop57-cpp,
+  -cert-oop58-cpp
+
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*(include|src).*'
+FormatStyle: none
+...

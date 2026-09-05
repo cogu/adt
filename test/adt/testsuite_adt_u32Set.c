@@ -280,6 +280,7 @@ static void test_adt_u32Set_is_empty(CuTest* tc)
 static void test_adt_u32Set_vdelete(CuTest* tc)
 {
    adt_u32Set_t *set = adt_u32Set_new();
+   CuAssertPtrNotNull(tc, set);
    adt_u32Set_insert(set, 123);
    adt_u32Set_vdelete((void*) set);
 }
