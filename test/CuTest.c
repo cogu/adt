@@ -277,9 +277,12 @@ void CuAssertFnPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const c
    CuFnPtr expected, CuFnPtr actual)
 {
    char buf[STRING_MAX];
+   void *p_expected = NULL;
+   void *p_actual = NULL;
    if (expected == actual) return;
-   sprintf(buf, "expected pointer <0x%p> but was <0x%p>",
-      (const void *)(uintptr_t)expected, (const void *)(uintptr_t)actual);
+   memcpy(&p_expected, &expected, sizeof(p_expected));
+   memcpy(&p_actual, &actual, sizeof(p_actual));
+   sprintf(buf, "expected pointer <0x%p> but was <0x%p>", p_expected, p_actual);
    CuFail_Line(tc, file, line, message, buf);
 }
 
