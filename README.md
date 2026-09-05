@@ -159,13 +159,20 @@ ctest --test-dir build-test -L benchmark --output-on-failure --verbose
 
 #### ADT Ringbuffer
 
-By default, adt_ringbuf.c will not compile anything unless you explicitly enable it using CMake options.
+By default, `adt_ringbuf.c` will not compile anything unless you explicitly enable it using CMake options. This allows embedded targets to enable `adt_rbfs_t` (static buffer) and `adt_rbfu16_t` (embedded `uint16_t` buffer) without enabling or linking heap memory.
 
-| CMake Option      | Usage                 | Description                      |
-|-------------------|-----------------------|----------------------------------|
-| ADT_RBFH_ENABLE   | -DADT_RBFH_ENABLE=ON  | Enables adt_rbfh_t and its API   |
-| ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON  | Enables adt_rbfs_t and its API   |
-| ADT_RBFU16_ENABLE | -DADT_RBFU16_ENABLE=ON | Enables adt_rbfu16_t and its API |
+| CMake Option      | Usage                  | Storage / Memory   | Description                      |
+|-------------------|------------------------|--------------------|----------------------------------|
+| ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON   | Static (zero heap) | Enables adt_rbfs_t and its API   |
+| ADT_RBFU16_ENABLE | -DADT_RBFU16_ENABLE=ON | Static (zero heap) | Enables adt_rbfu16_t and its API |
+| ADT_RBFH_ENABLE   | -DADT_RBFH_ENABLE=ON   | Heap (dynamic)     | Enables adt_rbfh_t and its API   |
+
+#### ADT U16Map
+
+`adt_u16Map_t` is optional and disabled by default. Enable it via CMake:
+
+| CMake Option      | Usage                  | Description                      |
+|-------------------|------------------------|----------------------------------|
 | ADT_U16MAP_ENABLE | -DADT_U16MAP_ENABLE=ON | Enables adt_u16Map_t and its API |
 
 ## Available Data Structures

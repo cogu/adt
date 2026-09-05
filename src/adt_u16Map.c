@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <malloc.h>
 #include <stddef.h>
+#include <stdbool.h>
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif

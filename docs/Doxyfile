@@ -25,3 +25,8 @@ XML_OUTPUT             = xml
 QUIET                  = YES
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = NO
+
+# Preprocessing
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = ADT_RBFS_ENABLE=1 ADT_RBFU16_ENABLE=1 ADT_RBFH_ENABLE=1
