@@ -74,7 +74,7 @@ void test_adt_hash_keys(CuTest* tc)
    int val3 = 3;
    int val4 = 4;
    adt_hash_t *pHash = adt_hash_new(NULL);
-   adt_ary_t *pKeys = adt_ary_new(vfree);
+   adt_ary_t *pKeys = adt_ary_new(NULL);
 
    CuAssertPtrNotNull(tc, pHash);
    CuAssertPtrNotNull(tc, pKeys);
@@ -85,7 +85,7 @@ void test_adt_hash_keys(CuTest* tc)
    adt_hash_set(pHash,"fox",&val4);
 
    CuAssertIntEquals(tc, 0, adt_ary_length(pKeys));
-   adt_hash_keys(pHash, pKeys);
+   CuAssertIntEquals(tc, 4, adt_hash_keys(pHash, pKeys));
    CuAssertIntEquals(tc, 4, adt_ary_length(pKeys));
    CuAssertStrEquals(tc, "The", (const char*) adt_ary_value(pKeys, 0));
    CuAssertStrEquals(tc, "quick", (const char*) adt_ary_value(pKeys, 1));
@@ -115,7 +115,7 @@ void test_adt_hash_values(CuTest* tc)
    adt_hash_set(pHash,"fox",&val4);
 
    CuAssertIntEquals(tc, 0, adt_ary_length(pValues));
-   adt_hash_values(pHash, pValues);
+   CuAssertIntEquals(tc, 4, adt_hash_values(pHash, pValues));
    CuAssertIntEquals(tc, 4, adt_ary_length(pValues));
 
    CuAssertPtrEquals(tc, &val1, adt_ary_value(pValues, 0));
@@ -427,6 +427,45 @@ void test_adt_hash_insert(CuTest* tc)
    adt_hash_delete(pHash);
 }
 
+void test_adt_hash_keys_values_destructor_check(CuTest* tc)
+{
+   int val1 = 1;
+   int val2 = 2;
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   adt_ary_t *pArrDestructor = adt_ary_new(vfree);
+   adt_ary_t *pArrNoDestructor = adt_ary_new(NULL);
+
+   CuAssertPtrNotNull(tc, pHash);
+   CuAssertPtrNotNull(tc, pArrDestructor);
+   CuAssertPtrNotNull(tc, pArrNoDestructor);
+
+   adt_hash_set(pHash, "first", &val1);
+   adt_hash_set(pHash, "second", &val2);
+
+   // Reject arrays with enabled destructor
+   CuAssertIntEquals(tc, -1, adt_hash_keys(pHash, pArrDestructor));
+   CuAssertIntEquals(tc, 0, adt_ary_length(pArrDestructor));
+   CuAssertIntEquals(tc, -1, adt_hash_values(pHash, pArrDestructor));
+   CuAssertIntEquals(tc, 0, adt_ary_length(pArrDestructor));
+
+   // Reject NULL arguments
+   CuAssertIntEquals(tc, -1, adt_hash_keys(NULL, pArrNoDestructor));
+   CuAssertIntEquals(tc, -1, adt_hash_keys(pHash, NULL));
+   CuAssertIntEquals(tc, -1, adt_hash_values(NULL, pArrNoDestructor));
+   CuAssertIntEquals(tc, -1, adt_hash_values(pHash, NULL));
+
+   // Succeed when destructor is disabled via adt_ary_destructor_enable
+   adt_ary_destructor_enable(pArrDestructor, false);
+   CuAssertIntEquals(tc, 2, adt_hash_keys(pHash, pArrDestructor));
+   CuAssertIntEquals(tc, 2, adt_ary_length(pArrDestructor));
+   CuAssertIntEquals(tc, 2, adt_hash_values(pHash, pArrDestructor));
+   CuAssertIntEquals(tc, 2, adt_ary_length(pArrDestructor));
+
+   adt_ary_delete(pArrDestructor);
+   adt_ary_delete(pArrNoDestructor);
+   adt_hash_delete(pHash);
+}
+
 CuSuite* testsuite_adt_hash(void)
 {
 	CuSuite* suite = CuSuiteNew();
@@ -447,5 +486,6 @@ CuSuite* testsuite_adt_hash(void)
 	SUITE_ADD_TEST(suite, test_adt_hash_erase);
 	SUITE_ADD_TEST(suite, test_adt_hash_foreach);
 	SUITE_ADD_TEST(suite, test_adt_hash_insert);
+	SUITE_ADD_TEST(suite, test_adt_hash_keys_values_destructor_check);
 	return suite;
 }

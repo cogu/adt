@@ -54,6 +54,7 @@ static void test_adt_ary_sort_strings_array_with_four_items(CuTest *tc);
 static void test_adt_ary_index_of(CuTest *tc);
 static void test_adt_ary_destructor_enable(CuTest *tc);
 static void test_adt_ary_vdelete(CuTest *tc);
+static void test_adt_ary_destructor_query(CuTest *tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -87,6 +88,7 @@ CuSuite *testsuite_adt_ary(void) {
   SUITE_ADD_TEST(suite, test_adt_ary_index_of);
   SUITE_ADD_TEST(suite, test_adt_ary_destructor_enable);
   SUITE_ADD_TEST(suite, test_adt_ary_vdelete);
+  SUITE_ADD_TEST(suite, test_adt_ary_destructor_query);
 
   return suite;
 }
@@ -568,4 +570,39 @@ static void test_adt_ary_vdelete(CuTest *tc) {
 
   // adt_ary_delete will invoke adt_ary_vdelete on inner1 and inner2
   adt_ary_delete(outer);
+}
+
+static void test_adt_ary_destructor_query(CuTest *tc) {
+  // NULL array checks
+  CuAssertTrue(tc, !adt_ary_has_destructor(NULL));
+  CuAssertTrue(tc, !adt_ary_destructor_is_enabled(NULL));
+
+  // Array with NULL destructor
+  adt_ary_t *array_no_destructor = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array_no_destructor);
+  CuAssertTrue(tc, !adt_ary_has_destructor(array_no_destructor));
+  CuAssertTrue(tc, !adt_ary_destructor_is_enabled(array_no_destructor));
+
+  // Even if enable is called, without a destructor callback it remains not enabled
+  adt_ary_destructor_enable(array_no_destructor, true);
+  CuAssertTrue(tc, !adt_ary_destructor_is_enabled(array_no_destructor));
+  adt_ary_delete(array_no_destructor);
+
+  // Array with destructor callback
+  adt_ary_t *array_with_destructor = adt_ary_new(vfree);
+  CuAssertPtrNotNull(tc, array_with_destructor);
+  CuAssertTrue(tc, adt_ary_has_destructor(array_with_destructor));
+  CuAssertTrue(tc, adt_ary_destructor_is_enabled(array_with_destructor));
+
+  // Disable destructor
+  adt_ary_destructor_enable(array_with_destructor, false);
+  CuAssertTrue(tc, adt_ary_has_destructor(array_with_destructor));
+  CuAssertTrue(tc, !adt_ary_destructor_is_enabled(array_with_destructor));
+
+  // Re-enable destructor
+  adt_ary_destructor_enable(array_with_destructor, true);
+  CuAssertTrue(tc, adt_ary_has_destructor(array_with_destructor));
+  CuAssertTrue(tc, adt_ary_destructor_is_enabled(array_with_destructor));
+
+  adt_ary_delete(array_with_destructor);
 }

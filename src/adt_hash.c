@@ -267,7 +267,7 @@ int32_t adt_hash_keys(adt_hash_t *self, adt_ary_t *pArray){
 	const char *pKey;
 	int32_t s32i = 0;
 
-	if((self == NULL) || (pArray == NULL)) return 0;
+	if((self == NULL) || (pArray == NULL) || adt_ary_destructor_is_enabled(pArray)) return -1;
 
    adt_hash_iter_init(self);
    adt_ary_clear(pArray);
@@ -275,7 +275,7 @@ int32_t adt_hash_keys(adt_hash_t *self, adt_ary_t *pArray){
    do{
       (void) adt_hash_iter_next(self, &pKey);
       if(pKey != NULL){
-         adt_ary_set(pArray, s32i++, STRDUP(pKey));
+         adt_ary_set(pArray, s32i++, (void*)pKey);
       }
    }while(pKey);
 
@@ -287,7 +287,7 @@ int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray)
    const char *pKey;
    int32_t s32i = 0;
 
-   if((self == NULL) || (pArray == NULL)) return 0;
+   if((self == NULL) || (pArray == NULL) || adt_ary_destructor_is_enabled(pArray)) return -1;
    adt_hash_iter_init(self);
    adt_ary_clear(pArray);
    adt_ary_extend(pArray, adt_hash_length(self));

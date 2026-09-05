@@ -58,6 +58,10 @@ Destructor Control
 
 .. doxygenfunction:: adt_ary_destructor_enable
 
+.. doxygenfunction:: adt_ary_has_destructor
+
+.. doxygenfunction:: adt_ary_destructor_is_enabled
+
 List Operations (Insertion & Removal)
 -------------------------------------
 
