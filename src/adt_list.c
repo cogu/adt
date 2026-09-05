@@ -8,6 +8,9 @@
 * SPDX-License-Identifier: MIT
 * See LICENSE in project root for full license terms.
 ******************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
@@ -17,7 +20,13 @@
 #include "CMemLeak.h"
 #endif
 
-/**************** Private Function Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
 static void  adt_list_elem_create(adt_list_elem_t *self, void* pItem, adt_list_elem_t *pNext, adt_list_elem_t *pPrev);
 static adt_list_elem_t*  adt_list_elem_new(void* pItem, adt_list_elem_t *pNext, adt_list_elem_t *pPrev);
 static void  adt_list_elem_delete(adt_list_elem_t *self);
@@ -28,10 +37,13 @@ static void  adt_u32List_elem_delete(adt_u32List_elem_t *self);
 
 
 
-/**************** Private Variable Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE VARIABLES
+//////////////////////////////////////////////////////////////////////////////
 
-
-/****************** Public Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 
 /******* adt_list API *************/
 void  adt_list_create(adt_list_t *self, void (*pDestructor)(void*))
@@ -638,7 +650,9 @@ void adt_u32List_clear(adt_u32List_t *self)
 }
 
 
-/***************** Private Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 void  adt_list_elem_create(adt_list_elem_t *self, void *pItem, adt_list_elem_t *pNext, adt_list_elem_t *pPrev)
 {
    if (self != NULL)

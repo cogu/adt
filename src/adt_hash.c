@@ -8,6 +8,9 @@
 * SPDX-License-Identifier: MIT
 * See LICENSE in project root for full license terms.
 ******************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
 # ifndef _DEFAULT_SOURCE
 #  define _DEFAULT_SOURCE
@@ -25,13 +28,18 @@
 #include "CMemLeak.h"
 #endif
 
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
 #ifdef _MSC_VER
 #define STRDUP _strdup
 #else
 #define STRDUP strdup
 #endif
 
-/**************** Private Function Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
 static void adt_hnode_create(adt_hnode_t *node);
 static void adt_hnode_destroy(adt_hnode_t *node,void (*pDestructor)(void*));
 static void adt_hnode_destroy_shallow(adt_hnode_t *node);
@@ -49,10 +57,13 @@ adt_hit_stored_t *adt_hit_stored_new(adt_hnode_t *pNode,uint8_t u8Cur);
 static void adt_hit_stored_delete(adt_hit_stored_t *pIter);
 static void adt_hit_stored_delete_void(void *pIter);
 
-/**************** Private Variable Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE VARIABLES
+//////////////////////////////////////////////////////////////////////////////
 
-
-/****************** Public Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 
 adt_hash_t*	adt_hash_new(void (*pDestructor)(void*)){
 	adt_hash_t *self = (adt_hash_t*) malloc(sizeof(adt_hash_t));
@@ -271,7 +282,9 @@ int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray)
 }
 
 
-/***************** Private Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 
 
 

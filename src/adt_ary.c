@@ -8,6 +8,9 @@
 * SPDX-License-Identifier: MIT
 * See LICENSE in project root for full license terms.
 ******************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+// INCLUDES
+//////////////////////////////////////////////////////////////////////////////
 #include "adt_ary.h"
 #include <malloc.h>
 #include <assert.h>
@@ -17,20 +20,28 @@
 #include "CMemLeak.h"
 #endif
 
-
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE CONSTANTS AND DATA TYPES
+//////////////////////////////////////////////////////////////////////////////
 #define DATA_BLOCK_MAX 65536 	//maximum amount of bytes that can be copied in memmmove is implementation specific,
 								      //use define to control how many bytes shall be copied
 
 #define ELEM_SIZE (sizeof(void*))
 #define ELEM_VALUE_IS_LESS(T) ( *((T*) a) < *((T*) b) )
 
-/**************** Private Function Declarations *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////////
 static void adt_block_memmove(uint8_t*pDest, uint8_t*pSrc, uint32_t u32Remain);
 static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, bool reverse);
-/**************** Private Variable Declarations *******************/
 
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE VARIABLES
+//////////////////////////////////////////////////////////////////////////////
 
-/****************** Public Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 adt_ary_t*	adt_ary_new(void (*pDestructor)(void*)){
 	adt_ary_t *self;
 	if((self = malloc(sizeof(adt_ary_t)))==NULL){
@@ -525,7 +536,9 @@ int32_t adt_ary_indexOf(adt_ary_t *self, void *pElem)
    return -1;
 }
 
-/***************** Private Function Definitions *******************/
+//////////////////////////////////////////////////////////////////////////////
+// PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////
 /**
  * CG: I had some serious issues with some Microsoft compilers not handling large memmoves.
  * To mitigate this potential problem I use this function to transform one large memmoves into a series of smaller memmoves.
