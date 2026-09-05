@@ -46,9 +46,10 @@ static void adt_hnode_destroy_shallow(adt_hnode_t *node);
 static adt_hnode_t *adt_hnode_new(void);
 static void adt_hnode_delete(adt_hnode_t *node, void (*pDestructor)(void*));
 static void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash);
-static bool adt_hnode_set(adt_hnode_t *node, const char *key, void *val, uint32_t u32Hash, void (*pDestructor)(void*));
+static bool adt_hnode_set(adt_hnode_t *node, const char *key, void *val, uint32_t u32Hash, void (*pDestructor)(void*), bool overwrite);
 static adt_hkey_t * adt_hnode_find(const adt_hnode_t *node, const char *key, uint32_t u32Hash);
 static adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key, uint32_t u32Hash);
+static void adt_hnode_foreach(const adt_hnode_t *node, void (*callback)(const char *key, void *val, void *arg), void *arg);
 static void adt_hkey_create(adt_hkey_t *hkey, const char *key, void *value);
 static void adt_hkey_destroy(adt_hkey_t *hkey, void (*pDestructor)(void*));
 static adt_hkey_t *adt_hkey_new(const char *key, void *value);
@@ -78,6 +79,10 @@ void adt_hash_delete(adt_hash_t *self){
 	}
 }
 
+void adt_hash_vdelete(void *arg){
+	adt_hash_delete((adt_hash_t*) arg);
+}
+
 void adt_hash_create(adt_hash_t *self, void (*pDestructor)(void*)){
 	self->root = adt_hnode_new();
 	self->u32Size = 0;
@@ -97,13 +102,36 @@ void adt_hash_destroy(adt_hash_t *self){
 	self->u32Size = 0;
 }
 
+void adt_hash_clear(adt_hash_t *self){
+	if(self == NULL) return;
+	if(self->root != NULL){
+		adt_hnode_delete(self->root, self->pDestructor);
+		self->root = NULL;
+	}
+	self->root = adt_hnode_new();
+	self->u32Size = 0;
+	self->iter_depth = -1;
+	self->iter_hkey = NULL;
+}
+
 void adt_hash_set(adt_hash_t *self, const char *pKey, void *pVal){
 	if(self && pKey){
 		uint32_t u32HashVal = adt_hash_string(pKey);
-		if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor)){
+		if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor, true)){
 			self->u32Size++;
 		}
 	}
+}
+
+bool adt_hash_insert(adt_hash_t *self, const char *pKey, void *pVal){
+	if(self && pKey){
+		uint32_t u32HashVal = adt_hash_string(pKey);
+		if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor, false)){
+			self->u32Size++;
+			return true;
+		}
+	}
+	return false;
 }
 
 void**	adt_hash_get(const adt_hash_t *self, const char *pKey){
@@ -142,11 +170,28 @@ void*  adt_hash_remove(adt_hash_t *self, const char *pKey){
 	return NULL;
 }
 
+bool adt_hash_erase(adt_hash_t *self, const char *pKey){
+	if(self && pKey){
+		uint32_t u32HashVal = adt_hash_string(pKey);
+		adt_hkey_t *hkey = adt_hnode_remove(self->root, pKey, u32HashVal);
+		if(hkey){
+			adt_hkey_delete(hkey, self->pDestructor);
+			self->u32Size--;
+			return true;
+		}
+	}
+	return false;
+}
+
 int32_t adt_hash_length(const adt_hash_t *self){
 	if(self){
 		return self->u32Size;
 	}
 	return 0;
+}
+
+bool adt_hash_is_empty(const adt_hash_t *self){
+	return (self == NULL) || (self->u32Size <= 0);
 }
 
 bool adt_hash_exists(const adt_hash_t *self, const char *pKey){
@@ -210,6 +255,12 @@ void** adt_hash_iter_next(adt_hash_t *self, const char **ppKey){
 
 	*ppKey = NULL;
 	return NULL;
+}
+
+void adt_hash_foreach(const adt_hash_t *self, void (*callback)(const char *key, void *val, void *arg), void *arg){
+	if(self && self->root && callback){
+		adt_hnode_foreach(self->root, callback, arg);
+	}
 }
 
 int32_t adt_hash_keys(adt_hash_t *self, adt_ary_t *pArray){
@@ -391,14 +442,14 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 	}
 }
 
-static bool adt_hnode_set(adt_hnode_t *node, const char *key, void *val, uint32_t u32Hash, void (*pDestructor)(void*)){
+static bool adt_hnode_set(adt_hnode_t *node, const char *key, void *val, uint32_t u32Hash, void (*pDestructor)(void*), bool overwrite){
 	uint8_t i;
 	assert(node);
 	assert(key);
 	if(node->u8Width == 16){
 		uint32_t u32Bits = ((uint32_t) node->u8Depth) * 4;
 		uint8_t u8Bucket = (uint8_t) ((u32Hash >> u32Bits) & 0xF);
-		return adt_hnode_set(&node->child.node[u8Bucket], key, val, u32Hash, pDestructor);
+		return adt_hnode_set(&node->child.node[u8Bucket], key, val, u32Hash, pDestructor, overwrite);
 	}
 	else{
 		for(i = 0; i < node->u8Cur; i++){
@@ -407,11 +458,13 @@ static bool adt_hnode_set(adt_hnode_t *node, const char *key, void *val, uint32_
 				adt_hkey_t *hprev = NULL;
 				while(hkey){
 					if(strcmp(hkey->key, key) == 0){
-						if(pDestructor && hkey->val){
-							pDestructor(hkey->val);
+						if(overwrite){
+							if(pDestructor && hkey->val){
+								pDestructor(hkey->val);
+							}
+							hkey->val = val;
 						}
-						hkey->val = val;
-						return false; // updated existing
+						return false; // not inserted as new entry
 					}
 					hprev = hkey;
 					hkey = hkey->next;
@@ -602,6 +655,26 @@ adt_hkey_t * adt_hnode_remove(adt_hnode_t *node, const char *key, uint32_t u32Ha
 		}
 	}
 	return NULL;
+}
+
+static void adt_hnode_foreach(const adt_hnode_t *node, void (*callback)(const char *key, void *val, void *arg), void *arg){
+	if(node == NULL) return;
+	if(node->u8Width == 16){
+		for(uint8_t i = 0; i < 16; i++){
+			if(node->child.node[i].u8Cur > 0 || node->child.node[i].u8Width == 16){
+				adt_hnode_foreach(&node->child.node[i], callback, arg);
+			}
+		}
+	}
+	else{
+		for(uint8_t i = 0; i < node->u8Cur; i++){
+			adt_hkey_t *hkey = node->child.match[i].key;
+			while(hkey){
+				callback(hkey->key, hkey->val, arg);
+				hkey = hkey->next;
+			}
+		}
+	}
 }
 
 void adt_hkey_create(adt_hkey_t *hkey, const char *key, void *value){

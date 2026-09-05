@@ -43,22 +43,33 @@ Example:
 Heap Allocation
 ~~~~~~~~~~~~~~~
 
-When allocating both the structure and its nodes on the heap, use :c:func:`adt_hash_new` and free it with :c:func:`adt_hash_delete`.
+When allocating both the structure and its nodes on the heap, use :c:func:`adt_hash_new` and free it with :c:func:`adt_hash_delete`. For nested containers, :c:func:`adt_hash_vdelete` is available as a type-erased destructor.
 
 .. doxygenfunction:: adt_hash_new
 
 .. doxygenfunction:: adt_hash_delete
+
+.. doxygenfunction:: adt_hash_vdelete
+
+Clearing
+~~~~~~~~
+
+.. doxygenfunction:: adt_hash_clear
 
 Key-Value Accessors
 -------------------
 
 .. doxygenfunction:: adt_hash_set
 
+.. doxygenfunction:: adt_hash_insert
+
 .. doxygenfunction:: adt_hash_get
 
 .. doxygenfunction:: adt_hash_value
 
 .. doxygenfunction:: adt_hash_remove
+
+.. doxygenfunction:: adt_hash_erase
 
 .. doxygenfunction:: adt_hash_exists
 
@@ -83,10 +94,16 @@ To iterate over all key-value pairs stored in the hash table, call :c:func:`adt_
 
 .. doxygenfunction:: adt_hash_iter_next
 
+Alternatively, :c:func:`adt_hash_foreach` can be used to iterate over a map (including a ``const adt_hash_t*``) using a callback:
+
+.. doxygenfunction:: adt_hash_foreach
+
 Utility & Bulk Extraction
 -------------------------
 
 .. doxygenfunction:: adt_hash_length
+
+.. doxygenfunction:: adt_hash_is_empty
 
 .. doxygenfunction:: adt_hash_keys
 
