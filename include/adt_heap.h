@@ -1,14 +1,30 @@
+/*****************************************************************************
+* \file      adt_heap.h
+* \author    Conny Gustafsson
+* \date      2017-06-07
+* \brief     Binary heap / priority queue implementation on adt_ary
+*
+* Copyright (c) 2017 Conny Gustafsson
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in
+* the Software without restriction, including without limitation the rights to
+* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+* the Software, and to permit persons to whom the Software is furnished to do so,
+* subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+******************************************************************************/
 #ifndef ADT_PQ_H
 #define ADT_PQ_H
-
-/**
-* ADT priority queue implemented as a binary min heap
-* The primary purpose of this data structure is for schedulers.
-* It can be used to determine the next runnable entity by just looking at
-* the top element of the binary min heap.
-*
-* TODO: implement support for binary max heap later
-*/
 
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
@@ -19,34 +35,89 @@
 //////////////////////////////////////////////////////////////////////////////
 // CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
+
+/**
+ * \brief Element stored in a binary heap.
+ */
 typedef struct adt_priorityHeap_elem_tag
 {
-   void *pItem; //a weak pointer to a user object
-   uint32_t u32Value; //value used for sorting/comparing heap elements
+   void *pItem;       /**< Weak pointer to user-defined data or object. */
+   uint32_t u32Value; /**< Priority / sort key value. */
 } adt_heap_elem_t;
 
+/**
+ * \brief Ordering policy for binary heap algorithms.
+ */
 typedef enum adt_heap_family_tag{
-   ADT_MIN_HEAP=0, //lowest element at the top of the tree
-   ADT_MAX_HEAP    //highest element at the top of the tree
+   ADT_MIN_HEAP=0, /**< Min-heap: lowest value at the root (index 0). */
+   ADT_MAX_HEAP    /**< Max-heap: highest value at the root (index 0). */
 } adt_heap_family;
-
-//////////////////////////////////////////////////////////////////////////////
-// GLOBAL VARIABLES
-//////////////////////////////////////////////////////////////////////////////
-
 
 //////////////////////////////////////////////////////////////////////////////
 // GLOBAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 
-/************************* heap ***************************/
+/**
+ * \brief Allocates and initializes a new heap element on the heap.
+ *
+ * \param pItem User data pointer (weak reference).
+ * \param u32Value Priority or sort key value.
+ * \return Pointer to newly allocated heap element, or NULL on failure.
+ */
 adt_heap_elem_t* adt_heap_elem_new(void *pItem, uint32_t u32Value);
-void adt_heap_elem_delete(adt_heap_elem_t *self);
-void adt_heap_elem_vdelete(void *arg);
-void adt_heap_elem_create(adt_heap_elem_t *self, void *pItem, uint32_t u32Value);
-void adt_heap_elem_destroy(adt_heap_elem_t *self);
-void adt_heap_sortUp(adt_ary_t *heap, int32_t childIndex, adt_heap_family heapFamily);
-void adt_heap_sortDown(adt_ary_t *heap, int32_t parentIndex, adt_heap_family heapFamily);
 
+/**
+ * \brief Destroys and frees a heap element.
+ *
+ * \param self Pointer to the element to delete.
+ */
+void adt_heap_elem_delete(adt_heap_elem_t *self);
+
+/**
+ * \brief Type-erased destructor wrapper for adt_heap_elem_delete.
+ *
+ * Suitable for use as the destructor callback in the backing adt_ary_t container.
+ *
+ * \param arg Pointer to the element (cast to void*).
+ */
+void adt_heap_elem_vdelete(void *arg);
+
+/**
+ * \brief Initializes a heap element in place (stack allocation).
+ *
+ * \param self Pointer to an existing adt_heap_elem_t instance.
+ * \param pItem User data pointer.
+ * \param u32Value Priority or sort key value.
+ */
+void adt_heap_elem_create(adt_heap_elem_t *self, void *pItem, uint32_t u32Value);
+
+/**
+ * \brief Destroys a heap element. Does not free self.
+ *
+ * \param self Pointer to the element to destroy.
+ */
+void adt_heap_elem_destroy(adt_heap_elem_t *self);
+
+/**
+ * \brief Sifts an element upward toward the root to restore heap invariants.
+ *
+ * Call this after appending a new element to the end of the backing array.
+ *
+ * \param heap Pointer to the backing adt_ary_t array holding adt_heap_elem_t pointers.
+ * \param childIndex Zero-based index of the element to bubble up.
+ * \param heapFamily Ordering policy (ADT_MIN_HEAP or ADT_MAX_HEAP).
+ */
+void adt_heap_sortUp(adt_ary_t *heap, int32_t childIndex, adt_heap_family heapFamily);
+
+/**
+ * \brief Sifts an element downward toward the leaves to restore heap invariants.
+ *
+ * Call this after removing or replacing the root element (index 0).
+ *
+ * \param heap Pointer to the backing adt_ary_t array holding adt_heap_elem_t pointers.
+ * \param parentIndex Zero-based index of the element to trickle down.
+ * \param heapFamily Ordering policy (ADT_MIN_HEAP or ADT_MAX_HEAP).
+ */
+void adt_heap_sortDown(adt_ary_t *heap, int32_t parentIndex, adt_heap_family heapFamily);
 
 #endif //ADT_PQ_H
