@@ -179,7 +179,7 @@ By default, `adt_ringbuf.c` will not compile anything unless you explicitly enab
 
 | Name | Header | Storage Type | Requires Heap | Description |
 |------|--------|--------------|---------------|-------------|
-| `adt_ary_t` | `adt_ary.h` | Objects (`void*`) | Yes | Contiguous pointer array with $O(1)$ random access |
+| `adt_ary_t` | `adt_ary.h` | Objects (`void*`) | Yes | Contiguous pointer array with O(1) random access |
 | `adt_bytearray_t` | `adt_bytearray.h` | Bytes (`uint8_t`) | Yes | Mutable byte array with chunked growth |
 | `adt_bytes_t` | `adt_bytes.h` | Bytes (`uint8_t`) | Yes | Immutable byte array |
 | `adt_str_t` | `adt_str.h` | Characters (`char*`) | Yes | Dynamic UTF-8 / ASCII string container |
