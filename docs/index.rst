@@ -18,6 +18,8 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_stack
    adt_list
    adt_heap
+   adt_ringbuf
+   adt_u16Map
 
 
 Data Structures Catalog
@@ -59,7 +61,7 @@ Below is a summary of all data structures provided by the ADT library:
      - Objects (``void*``)
      - Yes
      - Hash table mapping null-terminated string keys to generic pointers.
-   * - ``adt_u16Map_t``
+   * - :doc:`adt_u16Map <adt_u16Map>`
      - ``adt_u16Map.h``
      - Objects (``void*``)
      - No
@@ -84,17 +86,17 @@ Below is a summary of all data structures provided by the ADT library:
      - Objects (``void*``)
      - Yes
      - Binary heap priority queue algorithms operating on :c:type:`adt_ary_t`.
-   * - ``adt_rbfh_t``
+   * - :doc:`adt_rbfh_t <adt_ringbuf>`
      - ``adt_ringbuf.h``
      - Elements (``uint8_t*``)
      - Yes
      - Circular FIFO buffer with heap-allocated storage.
-   * - ``adt_rbfs_t``
+   * - :doc:`adt_rbfs_t <adt_ringbuf>`
      - ``adt_ringbuf.h``
      - Elements (``uint8_t*``)
      - No
      - Static circular FIFO buffer requiring zero heap allocation.
-   * - ``adt_rbfu16_t``
+   * - :doc:`adt_rbfu16_t <adt_ringbuf>`
      - ``adt_ringbuf.h``
      - Values (``uint16_t``)
      - No
