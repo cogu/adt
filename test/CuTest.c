@@ -1,7 +1,7 @@
 /**
 * cogu 2017-02-19: This is a slighty modified version of CuTest.c v1.5 (http://cutest.sourceforge.net)
 * I have fixed a memory leak in the framework as well as adding test macro for unsigned integer equality (CuAssertUIntEquals).
-* 
+* cogu 2026-09-05: Resolve Clang-tidy issues.
 */
 
 #include <assert.h>
@@ -26,7 +26,7 @@ char* CuStrCopy(const char* old)
 {
 	int len = (int) strlen(old);
 	char* newStr = CuStrAlloc(len + 1);
-	strcpy(newStr, old);
+	STRLCPY(newStr, old, (size_t) (len + 1)); //cogu 2026-09-05: Replaced strcpy with STRLCPY to resolve clang-tidy warning
 	return newStr;
 }
 
@@ -77,7 +77,7 @@ void CuStringAppend(CuString* str, const char* text)
 	if (str->length + length + 1 >= str->size)
 		CuStringResize(str, str->length + length + 1 + STRING_INC);
 	str->length += length;
-	strcat(str->buffer, text);
+	STRLCAT(str->buffer, text, (size_t) str->size); //cogu 2026-09-05: Replaced strcat with STRLCAT to resolve clang-tidy warning
 }
 
 void CuStringAppendChar(CuString* str, char ch)
@@ -150,7 +150,7 @@ void CuTestRun(CuTest* tc)
 	tc->jumpBuf = 0;
 }
 
-static void CuFailInternal(CuTest* tc, const char* file, int line, CuString* string)
+static CU_NORETURN void CuFailInternal(CuTest* tc, const char* file, int line, CuString* string)
 {
 	char buf[HUGE_STRING_LEN];
 
@@ -159,15 +159,23 @@ static void CuFailInternal(CuTest* tc, const char* file, int line, CuString* str
 
 	tc->failed = 1;
 	tc->message = string->buffer;
-	if (tc->jumpBuf != 0) longjmp(*(tc->jumpBuf), 0);
+	if (tc->jumpBuf != 0)
+	{
+		longjmp(*(tc->jumpBuf), 0);
+	}
+	else
+	{
+		abort(); //cogu 2026-09-05: Ensure CuFailInternal never returns even if jumpBuf is unset
+	}
 }
 
-void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message)
+/* cogu 2026-09-05: Marked CuFail_Line with CU_NORETURN */
+CU_NORETURN void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message)
 {
 	CuString string;
 
 	CuStringInit(&string);
-	if (message2 != NULL) 
+	if (message2 != NULL)
 	{
 		CuStringAppend(&string, message2);
 		CuStringAppend(&string, ": ");
@@ -182,7 +190,7 @@ void CuAssert_Line(CuTest* tc, const char* file, int line, const char* message, 
 	CuFail_Line(tc, file, line, NULL, message);
 }
 
-void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, 
+void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
 	const char* expected, const char* actual)
 {
 	CuString string;
@@ -194,7 +202,7 @@ void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	}
 
 	CuStringInit(&string);
-	if (message != NULL) 
+	if (message != NULL)
 	{
 		CuStringAppend(&string, message);
 		CuStringAppend(&string, ": ");
@@ -207,7 +215,7 @@ void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	CuFailInternal(tc, file, line, &string);
 }
 
-void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, 
+void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
 	int expected, int actual)
 {
 	char buf[STRING_MAX];
@@ -235,17 +243,17 @@ void CuAssertULIntEquals_LineMsg(CuTest* tc, const char* file, int line, const c
 }
 
 
-void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, 
+void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
 	double expected, double actual, double delta)
 {
 	char buf[STRING_MAX];
 	if (fabs(expected - actual) <= delta) return;
-	sprintf(buf, "expected <%f> but was <%f>", expected, actual); 
+	sprintf(buf, "expected <%f> but was <%f>", expected, actual);
 
 	CuFail_Line(tc, file, line, message, buf);
 }
 
-void CuAssertPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, 
+void CuAssertPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
 	void* expected, void* actual)
 {
 	char buf[STRING_MAX];
