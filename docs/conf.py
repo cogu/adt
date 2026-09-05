@@ -47,6 +47,7 @@ if not doxygen_cmd:
         doxygen_cmd = venv_doxygen
 
 if doxygen_cmd and os.path.exists(doxyfile_path):
+    os.makedirs(os.path.join(docs_dir, '_build', 'doxygen'), exist_ok=True)
     subprocess.run([doxygen_cmd, 'Doxyfile'], cwd=docs_dir, check=False)
 
 

@@ -13,7 +13,7 @@ build:
     - graphviz
   jobs:
     pre_build:
-      - (cd docs && doxygen Doxyfile)
+      - (cd docs && mkdir -p _build/doxygen && doxygen Doxyfile)
 
 sphinx:
   configuration: docs/conf.py
