@@ -1,7 +1,8 @@
 /**
 * cogu 2017-02-19: This is a slighty modified version of CuTest.c v1.5 (http://cutest.sourceforge.net)
 * I have fixed a memory leak in the framework as well as adding test macro for unsigned integer equality (CuAssertUIntEquals).
-* 
+* cogu 2026-09-05: Resolve Clang-tidy issues.
+*
 */
 
 #ifndef CU_TEST_H
@@ -10,8 +11,9 @@
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdarg.h>
+#include <string.h>
 
-#define CUTEST_VERSION  "CuTest 1.5"
+#define CUTEST_VERSION  "CuTest 1.5_COGU_PATCH_1"
 
 /* CuString */
 
@@ -23,6 +25,24 @@ char* CuStrCopy(const char* old);
 #define HUGE_STRING_LEN	8192
 #define STRING_MAX		256
 #define STRING_INC		256
+
+/* cogu 2026-09-05: Added cross-platform string functions */
+#ifdef _MSC_VER
+#define STRLCPY(dest, src, size) strcpy_s((dest), (size), (src))
+#define STRLCAT(dest, src, size) strcat_s((dest), (size), (src))
+#else
+#define STRLCPY(dest, src, size) strlcpy((dest), (src), (size))
+#define STRLCAT(dest, src, size) strlcat((dest), (src), (size))
+#endif
+
+/* cogu 2026-09-05: Added noreturn macro for MSVC and GCC/Clang */
+#if defined(_MSC_VER)
+#define CU_NORETURN __declspec(noreturn)
+#elif defined(__GNUC__) || defined(__clang__)
+#define CU_NORETURN __attribute__((noreturn))
+#else
+#define CU_NORETURN
+#endif
 
 typedef struct
 {
@@ -63,13 +83,13 @@ void CuTestRun(CuTest* tc);
 void CuTestDelete(CuTest *t);
 
 /* Internal versions of assert functions -- use the public versions */
-void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message);
+CU_NORETURN void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message);
 void CuAssert_Line(CuTest* tc, const char* file, int line, const char* message, int condition);
-void CuAssertStrEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
+void CuAssertStrEquals_LineMsg(CuTest* tc,
+	const char* file, int line, const char* message,
 	const char* expected, const char* actual);
-void CuAssertIntEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
+void CuAssertIntEquals_LineMsg(CuTest* tc,
+	const char* file, int line, const char* message,
 	int expected, int actual);
 void CuAssertUIntEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
@@ -77,11 +97,11 @@ void CuAssertUIntEquals_LineMsg(CuTest* tc,
 void CuAssertULIntEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
    unsigned long long int expected, unsigned long long int actual);
-void CuAssertDblEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
+void CuAssertDblEquals_LineMsg(CuTest* tc,
+	const char* file, int line, const char* message,
 	double expected, double actual, double delta);
-void CuAssertPtrEquals_LineMsg(CuTest* tc, 
-	const char* file, int line, const char* message, 
+void CuAssertPtrEquals_LineMsg(CuTest* tc,
+	const char* file, int line, const char* message,
 	void* expected, void* actual);
 void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
@@ -91,8 +111,19 @@ void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
 /* public assert functions */
 
 #define CuFail(tc, ms)                        CuFail_Line(  (tc), __FILE__, __LINE__, NULL, (ms))
-#define CuAssert(tc, ms, cond)                CuAssert_Line((tc), __FILE__, __LINE__, (ms), (cond))
-#define CuAssertTrue(tc, cond)                CuAssert_Line((tc), __FILE__, __LINE__, "assert failed", (cond))
+/* cogu 2026-09-05: Inlined assertion condition checks to avoid false positive null dereference warnings in static analysis */
+#define CuAssert(tc, ms, cond) \
+	do { \
+		if (!(cond)) { \
+			CuFail_Line((tc), __FILE__, __LINE__, NULL, (ms)); \
+		} \
+	} while(0)
+#define CuAssertTrue(tc, cond) \
+	do { \
+		if (!(cond)) { \
+			CuFail_Line((tc), __FILE__, __LINE__, NULL, "assert failed"); \
+		} \
+	} while(0)
 
 #define CuAssertStrEquals(tc,ex,ac)           CuAssertStrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertStrEquals_Msg(tc,ms,ex,ac)    CuAssertStrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
@@ -110,8 +141,18 @@ void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
 #define CuAssertConstPtrEquals_Msg(tc,ms,ex,ac)    CuAssertConstPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
 
 
-#define CuAssertPtrNotNull(tc,p)        CuAssert_Line((tc),__FILE__,__LINE__,"null pointer unexpected",(p != NULL))
-#define CuAssertPtrNotNullMsg(tc,msg,p) CuAssert_Line((tc),__FILE__,__LINE__,(msg),(p != NULL))
+#define CuAssertPtrNotNull(tc,p) \
+	do { \
+		if ((p) == NULL) { \
+			CuFail_Line((tc),__FILE__,__LINE__,NULL,"null pointer unexpected"); \
+		} \
+	} while(0)
+#define CuAssertPtrNotNullMsg(tc,msg,p) \
+	do { \
+		if ((p) == NULL) { \
+			CuFail_Line((tc),__FILE__,__LINE__,(msg),"null pointer unexpected"); \
+		} \
+	} while(0)
 
 /* CuSuite */
 
