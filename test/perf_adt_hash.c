@@ -15,12 +15,20 @@
 #include "adt_hash.h"
 
 #ifndef DICTIONARY_PATH
-#define DICTIONARY_PATH "test/3esl.txt"
+#define DICTIONARY_PATH "test/enable1.txt"
 #endif
 
 static FILE *open_dictionary(const char *path)
 {
    FILE *fh = fopen(path, "r");
+   if (fh == NULL)
+   {
+      fh = fopen("test/enable1.txt", "r");
+   }
+   if (fh == NULL)
+   {
+      fh = fopen("../test/enable1.txt", "r");
+   }
    if (fh == NULL)
    {
       fh = fopen("test/3esl.txt", "r");
@@ -110,6 +118,19 @@ int main(int argc, char **argv)
    end = clock();
    elapsed_time = ((double)(end - start)) / CLOCKS_PER_SEC;
    printf("adt_hash lookup time:    %f s (count: %d)\n", elapsed_time, count);
+
+   // 3. Iteration benchmark
+   int iter_count = 0;
+   const char *iter_key = NULL;
+   start = clock();
+   adt_hash_iter_init(pHash);
+   while (adt_hash_iter_next(pHash, &iter_key) != NULL)
+   {
+      iter_count++;
+   }
+   end = clock();
+   elapsed_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+   printf("adt_hash iteration time: %f s (count: %d)\n", elapsed_time, iter_count);
 
    adt_hash_delete(pHash);
    return 0;

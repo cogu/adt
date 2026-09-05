@@ -180,7 +180,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
                                 )
         target_compile_definitions(adt_perf PRIVATE
-            DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/3esl.txt"
+            DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/enable1.txt"
         )
         add_test(NAME adt_perf COMMAND adt_perf)
         set_tests_properties(adt_perf PROPERTIES

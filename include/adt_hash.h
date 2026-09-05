@@ -17,12 +17,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "adt_stack.h"
 #include "adt_ary.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
+
+#define ADT_HASH_MAX_DEPTH 8
 
 /*
  * ADT-hash is implemented as a tree of nodes containing items. Each item contains a (unique) hash value+linked
@@ -89,23 +90,18 @@ typedef struct adt_hnode_tag{
 	} child;
 } adt_hnode_t;
 
-typedef struct adt_hit_tag{
+typedef struct adt_hit_frame_tag{
 	adt_hnode_t *pNode; //pointer to current node
-	adt_hkey_t *pHkey;  //pointer to current hkey struct
-	uint8_t u8Cur;   //0-8 or 0-15 depending on node type
-}adt_hit_t;
-
-typedef struct adt_hit_stored_tag{
-	adt_hnode_t *pNode; //pointer to current node
-	uint8_t u8Cur;   //0-8 or 0-15 depending on node type
-}adt_hit_stored_t;
+	uint8_t u8Cur;      //0-8 or 0-15 depending on node type
+} adt_hit_frame_t;
 
 typedef struct adt_hash_tag{
 	int32_t u32Size;		//number of elements in hash
-	adt_stack_t iter_stack;	//stack of hiter_stored objects
-	adt_hit_t iter;			//iterator state
 	adt_hnode_t *root;		//root node
 	void (*pDestructor)(void*); //element destructor
+	adt_hit_frame_t iter_frames[ADT_HASH_MAX_DEPTH + 1];
+	int8_t iter_depth;
+	adt_hkey_t *iter_hkey;
 } adt_hash_t;
 
 
