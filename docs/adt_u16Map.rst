@@ -15,7 +15,7 @@ Key features:
 
 * **Zero-Heap Operation**: Can be initialized with caller-supplied array memory (:c:func:`adt_u16Map_create`), making it completely safe for embedded systems where heap allocation is prohibited.
 * **Dynamic Heap Mode**: Can alternatively be allocated on the heap (:c:func:`adt_u16Map_new`) with automatic resizing up to the specified element limit.
-* **Fast Binary Search**: Lookups (:c:func:`adt_u16Map_find` and :c:func:`adt_u16Map_findExact`) operate in $O(\log N)$ time using binary search.
+* **Fast Binary Search**: Lookups (:c:func:`adt_u16Map_find` and :c:func:`adt_u16Map_findExact`) operate in ``O(log N)`` time using binary search.
 * **Duplicate Key Support**: Multiple entries with identical keys but different values can coexist within the map.
 * **Memory Ownership & Destructors**: Integrates with the ADT destructor pattern to automatically clean up dynamically allocated values when entries are removed or the map is destroyed.
 

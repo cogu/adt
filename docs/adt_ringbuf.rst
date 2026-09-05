@@ -51,7 +51,10 @@ By default, ``adt_ringbuf.c`` does not compile any ringbuffer variants unless ex
 
 .. note::
 
-   The primary reason for separate CMake options is to allow embedded targets to enable :c:type:`adt_rbfs_t` and :c:type:`adt_rbfu16_t` without enabling, linking, or requiring heap memory functions (``malloc`` and ``free``). In resource-constrained microcontrollers or safety-critical software where dynamic memory allocation is restricted or prohibited, these static buffers guarantee deterministic $O(1)$ performance and bounded memory usage.
+   The primary reason for separate CMake options is to allow embedded targets to enable :c:type:`adt_rbfs_t` and :c:type:`adt_rbfu16_t` without enabling,
+   linking, or requiring heap memory functions (``malloc`` and ``free``).
+   In resource-constrained microcontrollers or safety-critical software where dynamic memory allocation is restricted or prohibited,
+   these static buffers guarantee deterministic ``O(1)`` performance and bounded memory usage.
 
 Status & Error Codes
 --------------------
