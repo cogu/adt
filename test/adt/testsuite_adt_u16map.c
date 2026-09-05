@@ -10,8 +10,7 @@
 ******************************************************************************/
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <stdlib.h>
 #include "test_common.h"
 #include "adt_u16Map.h"
 #ifdef MEM_LEAK_CHECK
@@ -235,27 +234,32 @@ void test_adt_u16Map_sort(CuTest* tc){
    }
 }
 
+static uint32_t test_prng(uint32_t *state)
+{
+   *state = (*state * 1664525U) + 1013904223U;
+   return *state;
+}
+
 void test_adt_u16Map_find_rand_set(CuTest* tc){
    adt_u16MapElem_t *data;
    adt_u16Map_t map;
    adt_u16MapElem_t *elem;
-   long i;
-   srand (time(NULL));
+   uint32_t prng_state = 42U;
    data = malloc(sizeof(adt_u16MapElem_t)*NUM_ELEM_LARGE);
    CuAssertPtrNotNull(tc,data);
 
    adt_u16Map_create(&map, data, NUM_ELEM_LARGE, NULL);
-   for(i=0;i<NUM_ELEM_LARGE-1;i++){
-      uint16_t key = (uint16_t)(rand() % 100 + 1);
-      adt_u16Map_insert(&map,key,(void*) i);
+   for(uint32_t i = 0; i < NUM_ELEM_LARGE - 1; i++){
+      uint16_t key = (uint16_t)((test_prng(&prng_state) % 100U) + 1U);
+      adt_u16Map_insert(&map, key, &data[i]);
    }
 
-   adt_u16Map_insert(&map,82,0);
-   elem = adt_u16Map_find(&map,82);
-   CuAssertPtrNotNull(tc,elem);
-   CuAssertIntEquals(tc,82,elem->key);
-   elem = adt_u16Map_find(&map,101);
-   CuAssertPtrEquals(tc,NULL,elem);
+   adt_u16Map_insert(&map, 82, NULL);
+   elem = adt_u16Map_find(&map, 82);
+   CuAssertPtrNotNull(tc, elem);
+   CuAssertIntEquals(tc, 82, elem->key);
+   elem = adt_u16Map_find(&map, 101);
+   CuAssertPtrEquals(tc, NULL, elem);
    free(data);
 }
 
