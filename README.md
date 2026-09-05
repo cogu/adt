@@ -6,23 +6,33 @@ Abstract data types for the C programming language.
 
 ## What is it?
 
-Platform-independent and compiler-independent data structures for the C programming language.
+**ADT** provides platform-independent and compiler-independent abstract data types for the C programming language (C99 and later). It offers a rich suite of containers designed for both standard application development and resource-constrained embedded systems:
 
-* Array
-* ByteArray (Mutable array)
-* Bytes (Immutable array)
-* HashTable
-* Heap
-* List
-* RingBuffer
-* Set
-* Stack
-* String
-* U16Map (Deprecated)
+* **Generic Object Containers (`void*`)**: Dynamic pointer array (`adt_ary_t`), hash table with string keys (`adt_hash_t`), doubly-linked list (`adt_list_t`), LIFO stack (`adt_stack_t`), and binary heap priority queue (`adt_heap_t`).
+* **Byte & String Buffers**: Mutable resizable byte array (`adt_bytearray_t`), immutable byte buffer (`adt_bytes_t`), and UTF-8/ASCII string container (`adt_str_t`).
+* **Embedded & Zero-Heap Containers**: Static element ring buffer (`adt_rbfs_t`), embedded 16-bit ring buffer (`adt_rbfu16_t`), and sorted-array key-value map (`adt_u16Map_t`).
+* **Specialized Value Containers**: 32-bit integer linked list (`adt_u32List_t`), unique 32-bit integer set (`adt_u32Set_t`), and dynamically resizing heap ring buffer (`adt_rbfh_t`).
 
-### ADT in embedded projects
+### Available Data Structures
 
-Some data structures in ADT are used in embedded development and does not require heap memory. Look for the column labeled "Requires malloc/free" to find out which ones you can use in your embedded projects.
+| Name | Header | Storage Type | Requires Heap | Description |
+|------|--------|--------------|---------------|-------------|
+| `adt_ary_t` | `adt_ary.h` | Objects (`void*`) | Yes | Contiguous pointer array with O(1) random access |
+| `adt_bytearray_t` | `adt_bytearray.h` | Bytes (`uint8_t`) | Yes | Mutable byte array with chunked growth |
+| `adt_bytes_t` | `adt_bytes.h` | Bytes (`uint8_t`) | Yes | Immutable byte array |
+| `adt_str_t` | `adt_str.h` | Characters (`char*`) | Yes | Dynamic UTF-8 / ASCII string container |
+| `adt_hash_t` | `adt_hash.h` | Objects (`void*`) | Yes | Hash table with string keys |
+| `adt_u16Map_t` | `adt_u16Map.h` | Objects (`void*`) | No | Sorted-array map for `uint16_t` keys |
+| `adt_list_t` | `adt_list.h` | Objects (`void*`) | Yes | Doubly-linked list for mid-sequence edits |
+| `adt_u32List_t` | `adt_list.h` | Values (`uint32_t`) | Yes | Specialized linked list for 32-bit integers |
+| `adt_stack_t` | `adt_stack.h` | Objects (`void*`) | Yes | LIFO stack for generic pointers |
+| `adt_heap_t` | `adt_heap.h` | Objects (`void*`) | Yes | Binary heap priority queue |
+| `adt_rbfs_t` | `adt_ringbuf.h` | Elements (`uint8_t*`) | No | Static circular FIFO buffer (zero heap) |
+| `adt_rbfu16_t` | `adt_ringbuf.h` | Values (`uint16_t`) | No | Embedded circular buffer for `uint16_t` (zero heap) |
+| `adt_rbfh_t` | `adt_ringbuf.h` | Elements (`uint8_t*`) | Yes | Heap-allocated circular FIFO buffer |
+| `adt_u32Set_t` | `adt_set.h` | Values (`uint32_t`) | Yes | Unique set of 32-bit integers |
+
+> **Embedded Development Note**: Data structures with **Requires Heap: No** (such as `adt_rbfs_t`, `adt_rbfu16_t`, and `adt_u16Map_t`) or those initialized via in-place `*_create` / `*_destroy` functions operate completely without dynamic heap allocation (`malloc` / `free`), making them safe for microcontrollers, safety-critical code, and real-time systems.
 
 ## Where is it used?
 
@@ -174,25 +184,6 @@ By default, `adt_ringbuf.c` will not compile anything unless you explicitly enab
 | CMake Option      | Usage                  | Description                      |
 |-------------------|------------------------|----------------------------------|
 | ADT_U16MAP_ENABLE | -DADT_U16MAP_ENABLE=ON | Enables adt_u16Map_t and its API |
-
-## Available Data Structures
-
-| Name | Header | Storage Type | Requires Heap | Description |
-|------|--------|--------------|---------------|-------------|
-| `adt_ary_t` | `adt_ary.h` | Objects (`void*`) | Yes | Contiguous pointer array with O(1) random access |
-| `adt_bytearray_t` | `adt_bytearray.h` | Bytes (`uint8_t`) | Yes | Mutable byte array with chunked growth |
-| `adt_bytes_t` | `adt_bytes.h` | Bytes (`uint8_t`) | Yes | Immutable byte array |
-| `adt_str_t` | `adt_str.h` | Characters (`char*`) | Yes | Dynamic UTF-8 / ASCII string container |
-| `adt_hash_t` | `adt_hash.h` | Objects (`void*`) | Yes | Hash table with string keys |
-| `adt_u16Map_t` | `adt_u16Map.h` | Objects (`void*`) | No | Sorted-array map for `uint16_t` keys |
-| `adt_list_t` | `adt_list.h` | Objects (`void*`) | Yes | Doubly-linked list for mid-sequence edits |
-| `adt_u32List_t` | `adt_list.h` | Values (`uint32_t`) | Yes | Specialized linked list for 32-bit integers |
-| `adt_stack_t` | `adt_stack.h` | Objects (`void*`) | Yes | LIFO stack for generic pointers |
-| `adt_heap_t` | `adt_heap.h` | Objects (`void*`) | Yes | Binary heap priority queue |
-| `adt_rbfh_t` | `adt_ringbuf.h` | Elements (`uint8_t*`) | Yes | Heap-allocated circular FIFO buffer |
-| `adt_rbfs_t` | `adt_ringbuf.h` | Elements (`uint8_t*`) | No | Static circular FIFO buffer (zero heap) |
-| `adt_rbfu16_t` | `adt_ringbuf.h` | Values (`uint16_t`) | No | Embedded circular buffer for `uint16_t` |
-| `adt_u32Set_t` | `adt_set.h` | Values (`uint32_t`) | Yes | Unordered set of 32-bit integers |
 
 ## Documentation
 
