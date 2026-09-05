@@ -13,7 +13,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
 #include <malloc.h>
-#include <errno.h>
 #include <stddef.h>
 #include "adt_set.h"
 #ifdef MEM_LEAK_CHECK
@@ -59,10 +58,6 @@ adt_u32Set_t*  adt_u32Set_new(void)
    {
       adt_u32Set_create(self);
    }
-   else
-   {
-      errno = ENOMEM;
-   }
    return self;
 }
 
@@ -94,7 +89,6 @@ int32_t adt_u32Set_length(adt_u32Set_t *self)
    {
       return adt_u32List_length(&self->list);
    }
-   errno=EINVAL;
    return -1;
 }
 

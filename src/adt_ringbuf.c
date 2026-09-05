@@ -12,7 +12,6 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
-#include <errno.h>
 #include <string.h>
 #include <stddef.h>
 #if(ADT_RBFH_ENABLE)

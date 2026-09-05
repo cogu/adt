@@ -12,7 +12,6 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <assert.h>
-#include <errno.h>
 #include <malloc.h>
 #include <stddef.h>
 #include "adt_list.h"
@@ -90,10 +89,6 @@ adt_list_t*  adt_list_new(void (*pDestructor)(void*))
    if (self != NULL)
    {
       adt_list_create(self,pDestructor);
-   }
-   else
-   {
-      errno = ENOMEM;
    }
    return self;
 }
@@ -425,10 +420,6 @@ adt_u32List_t* adt_u32List_new(void)
    {
       adt_u32List_create(self);
    }
-   else
-   {
-      errno = ENOMEM;
-   }
    return self;
 }
 
@@ -670,10 +661,6 @@ adt_list_elem_t*  adt_list_elem_new(void *pItem, adt_list_elem_t *pNext, adt_lis
    {
       adt_list_elem_create(self,pItem,pNext,pPrev);
    }
-   else
-   {
-      errno = ENOMEM;
-   }
    return self;
 }
 
@@ -701,10 +688,6 @@ static adt_u32List_elem_t*  adt_u32List_elem_new(uint32_t item, adt_u32List_elem
    if (self != NULL)
    {
       adt_u32List_elem_create(self,item,pNext,pPrev);
-   }
-   else
-   {
-      errno = ENOMEM;
    }
    return self;
 }
