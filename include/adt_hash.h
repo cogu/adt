@@ -117,12 +117,13 @@ void*  adt_hash_remove(adt_hash_t *self, const char *pKey);
 void   adt_hash_iter_init(adt_hash_t *self);
 
 /**
- * \param[in] this adt_hash
- * \param[out] pKey pointer to key string
- * \param[out] pKeyLen pointer to integer containing length of key string
- * \return pointer to value or NULL
+ * \brief Advances the iterator and retrieves the next key-value pair.
+ *
+ * \param self Pointer to the hash table.
+ * \param ppKey Optional pointer to receive the current key string (can be NULL).
+ * \return Pointer to the value pointer (void**), or NULL when iteration ends.
  */
-void** adt_hash_iter_next(adt_hash_t *self,const char **ppKey);
+void** adt_hash_iter_next(adt_hash_t *self, const char **ppKey);
 
 
 
