@@ -303,7 +303,7 @@ adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16Ma
    uint32_t num_elem;
    while(1){
       assert(pHigh >= pLow);
-      num_elem = pHigh-pLow;
+      num_elem = (uint32_t)(pHigh - pLow);
       //perform a linear search if there is 3 items or less
       if(num_elem <= 3){
          uint32_t i;

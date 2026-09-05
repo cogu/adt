@@ -12,6 +12,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdint.h>
 
 #define CUTEST_VERSION  "CuTest 1.5_COGU_PATCH_1"
 
@@ -66,6 +67,7 @@ void CuStringDelete(CuString* str);
 typedef struct CuTest CuTest;
 
 typedef void (*TestFunction)(CuTest *);
+typedef void (*CuFnPtr)(void);
 
 struct CuTest
 {
@@ -106,6 +108,9 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc,
 void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
    const void* expected, const void* actual);
+void CuAssertFnPtrEquals_LineMsg(CuTest* tc,
+   const char* file, int line, const char* message,
+   CuFnPtr expected, CuFnPtr actual);
 
 
 /* public assert functions */
@@ -139,6 +144,9 @@ void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
 #define CuAssertPtrEquals_Msg(tc,ms,ex,ac)    CuAssertPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
 #define CuAssertConstPtrEquals(tc,ex,ac)           CuAssertConstPtrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertConstPtrEquals_Msg(tc,ms,ex,ac)    CuAssertConstPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
+/* cogu 2026-09-05: Added below helper functions to solve a compiler warning issue */
+#define CuAssertFnPtrEquals(tc,ex,ac)              CuAssertFnPtrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(CuFnPtr)(ex),(CuFnPtr)(ac))
+#define CuAssertFnPtrEquals_Msg(tc,ms,ex,ac)       CuAssertFnPtrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(CuFnPtr)(ex),(CuFnPtr)(ac))
 
 
 #define CuAssertPtrNotNull(tc,p) \
