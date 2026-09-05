@@ -206,6 +206,108 @@ void test_adt_hash_set_overwrite_destructor(CuTest* tc)
    adt_hash_delete(pHash);
 }
 
+void test_adt_hash_multi_level_split_and_lookup(CuTest* tc)
+{
+   char key_buf[32];
+   int values[200];
+   bool seen[200];
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   CuAssertPtrNotNull(tc, pHash);
+
+   for (int i = 0; i < 200; i++)
+   {
+      values[i] = i * 10;
+      seen[i] = false;
+      snprintf(key_buf, sizeof(key_buf), "key_%03d", i);
+      adt_hash_set(pHash, key_buf, &values[i]);
+   }
+
+   CuAssertIntEquals(tc, 200, adt_hash_length(pHash));
+
+   // Verify all keys exist and return correct values
+   for (int i = 0; i < 200; i++)
+   {
+      snprintf(key_buf, sizeof(key_buf), "key_%03d", i);
+      CuAssertTrue(tc, adt_hash_exists(pHash, key_buf));
+      int *val = (int*) adt_hash_value(pHash, key_buf);
+      CuAssertPtrNotNull(tc, val);
+      CuAssertIntEquals(tc, i * 10, *val);
+   }
+
+   // Verify iteration visits all 200 elements exactly once
+   int iter_count = 0;
+   const char *pKey = NULL;
+   adt_hash_iter_init(pHash);
+   while (adt_hash_iter_next(pHash, &pKey) != NULL)
+   {
+      CuAssertPtrNotNull(tc, pKey);
+      if (strncmp(pKey, "key_", 4) == 0)
+      {
+         long idx = strtol(pKey + 4, NULL, 10);
+         if (idx >= 0 && idx < 200)
+         {
+            CuAssertTrue(tc, !seen[idx]);
+            seen[idx] = true;
+         }
+      }
+      iter_count++;
+   }
+   CuAssertIntEquals(tc, 200, iter_count);
+   for (int i = 0; i < 200; i++)
+   {
+      CuAssertTrue(tc, seen[i]);
+   }
+
+   // Overwrite 50 elements
+   int new_val = 9999;
+   for (int i = 0; i < 50; i++)
+   {
+      snprintf(key_buf, sizeof(key_buf), "key_%03d", i);
+      adt_hash_set(pHash, key_buf, &new_val);
+   }
+   CuAssertIntEquals(tc, 200, adt_hash_length(pHash));
+   for (int i = 0; i < 50; i++)
+   {
+      snprintf(key_buf, sizeof(key_buf), "key_%03d", i);
+      CuAssertIntEquals(tc, 9999, *(int*)adt_hash_value(pHash, key_buf));
+   }
+
+   // Remove 50 elements
+   for (int i = 0; i < 50; i++)
+   {
+      snprintf(key_buf, sizeof(key_buf), "key_%03d", i);
+      void *removed = adt_hash_remove(pHash, key_buf);
+      CuAssertPtrEquals(tc, &new_val, removed);
+      CuAssertTrue(tc, !adt_hash_exists(pHash, key_buf));
+   }
+   CuAssertIntEquals(tc, 150, adt_hash_length(pHash));
+
+   // Remaining 150 should still exist
+   for (int i = 50; i < 200; i++)
+   {
+      snprintf(key_buf, sizeof(key_buf), "key_%03d", i);
+      CuAssertTrue(tc, adt_hash_exists(pHash, key_buf));
+      CuAssertIntEquals(tc, i * 10, *(int*)adt_hash_value(pHash, key_buf));
+   }
+
+   adt_hash_delete(pHash);
+}
+
+void test_adt_hash_empty_table_iter(CuTest* tc)
+{
+   adt_hash_t hash;
+   adt_hash_create(&hash, NULL);
+   CuAssertIntEquals(tc, 0, adt_hash_length(&hash));
+
+   const char *pKey = NULL;
+   adt_hash_iter_init(&hash);
+   void **pVal = adt_hash_iter_next(&hash, &pKey);
+   CuAssertPtrEquals(tc, NULL, pVal);
+   CuAssertPtrEquals(tc, NULL, (void*)pKey);
+
+   adt_hash_destroy(&hash);
+}
+
 CuSuite* testsuite_adt_hash(void)
 {
 	CuSuite* suite = CuSuiteNew();
@@ -218,5 +320,7 @@ CuSuite* testsuite_adt_hash(void)
 	SUITE_ADD_TEST(suite, test_adt_hash_value);
 	SUITE_ADD_TEST(suite, test_adt_hash_exists);
 	SUITE_ADD_TEST(suite, test_adt_hash_set_overwrite_destructor);
+	SUITE_ADD_TEST(suite, test_adt_hash_multi_level_split_and_lookup);
+	SUITE_ADD_TEST(suite, test_adt_hash_empty_table_iter);
 	return suite;
 }
