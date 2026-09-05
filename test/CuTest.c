@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 #include "CuTest.h"
 
 /*-------------------------------------------------------------------------*
@@ -269,6 +270,16 @@ void CuAssertConstPtrEquals_LineMsg(CuTest* tc, const char* file, int line, cons
    char buf[STRING_MAX];
    if (expected == actual) return;
    sprintf(buf, "expected pointer <0x%p> but was <0x%p>", expected, actual);
+   CuFail_Line(tc, file, line, message, buf);
+}
+
+void CuAssertFnPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+   CuFnPtr expected, CuFnPtr actual)
+{
+   char buf[STRING_MAX];
+   if (expected == actual) return;
+   sprintf(buf, "expected pointer <0x%p> but was <0x%p>",
+      (const void *)(uintptr_t)expected, (const void *)(uintptr_t)actual);
    CuFail_Line(tc, file, line, message, buf);
 }
 

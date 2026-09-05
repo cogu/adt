@@ -98,7 +98,7 @@ static void test_adt_ary_new(CuTest *tc) {
   adt_ary_t *pArray = adt_ary_new(NULL);
   CuAssertPtrNotNull(tc, pArray);
   CuAssertPtrEquals(tc, NULL, pArray->ppAlloc);
-  CuAssertPtrEquals(tc, NULL, pArray->pDestructor);
+  CuAssertFnPtrEquals(tc, NULL, pArray->pDestructor);
   CuAssertIntEquals(tc, 0, pArray->s32AllocLen);
   CuAssertIntEquals(tc, 0, pArray->s32CurLen);
   adt_ary_delete(pArray);
@@ -113,7 +113,7 @@ static void test_adt_ary_push_pop(CuTest *tc) {
   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, STRDUP("brown")));
   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, STRDUP("fox")));
   CuAssertPtrNotNull(tc, pArray->ppAlloc);
-  CuAssertPtrEquals(tc, vfree, pArray->pDestructor);
+  CuAssertFnPtrEquals(tc, vfree, pArray->pDestructor);
   CuAssertIntEquals(tc, 4, pArray->s32AllocLen);
   CuAssertIntEquals(tc, 4, pArray->s32CurLen);
   CuAssertPtrNotNull(tc, (pVal = (char *)adt_ary_pop(pArray)));
@@ -151,7 +151,7 @@ static void test_adt_ary_unshift(CuTest *tc) {
 
   CuAssertPtrNotNull(tc, pArray);
   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
-  CuAssertPtrEquals(tc, vfree, pArray->pDestructor);
+  CuAssertFnPtrEquals(tc, vfree, pArray->pDestructor);
 
   CuAssertIntEquals(tc, ADT_NO_ERROR,
                     adt_ary_unshift(pArray, tmp = STRDUP("The")));

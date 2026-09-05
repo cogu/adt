@@ -24,7 +24,7 @@ void test_adt_stack_new(CuTest* tc)
 	adt_stack_t *pStack = adt_stack_new(NULL);
 	CuAssertPtrNotNull(tc, pStack);
 	CuAssertPtrEquals(tc, NULL, pStack->ppAlloc);
-	CuAssertPtrEquals(tc, NULL, pStack->pDestructor);
+	CuAssertFnPtrEquals(tc, NULL, pStack->pDestructor);
 	CuAssertIntEquals(tc,0,pStack->u32AllocLen);
 	CuAssertIntEquals(tc,0,pStack->u32CurLen);
 	adt_stack_delete(pStack);
@@ -39,7 +39,7 @@ void test_adt_stack_push(CuTest* tc)
 	adt_stack_push(pStack,STRDUP("brown"));
 	adt_stack_push(pStack,STRDUP("fox"));
 	CuAssertPtrNotNull(tc,pStack->ppAlloc);
-	CuAssertPtrEquals(tc, vfree,pStack->pDestructor);
+	CuAssertFnPtrEquals(tc, vfree,pStack->pDestructor);
 	CuAssertIntEquals(tc,8,pStack->u32AllocLen);
 	CuAssertIntEquals(tc,4,pStack->u32CurLen);
 	adt_stack_delete(pStack);
