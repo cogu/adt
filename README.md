@@ -188,3 +188,14 @@ By default, `adt_ringbuf.c` will not compile anything unless you explicitly enab
 |-------------------|------------------------|----------------------------------|
 | ADT_U16MAP_ENABLE | -DADT_U16MAP_ENABLE=ON | Enables adt_u16Map_t and its API |
 
+
+#### Unit testing all data structures
+
+
+Command to build unit test with all optional data structures enabled:
+
+```sh
+cmake -S . -B build-test -GNinja -DUNIT_TEST=ON -DADT_RBFS_ENABLE=ON -DADT_RBFU16_ENABLE=ON -DADT_RBFH_ENABLE=ON -DADT_U16MAP_ENABLE=ON
+cmake --build build-test
+ctest --test-dir build-test --output-on-failure
+```
