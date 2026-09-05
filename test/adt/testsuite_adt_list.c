@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      testsuite_adt_list.c
+* \author    Conny Gustafsson
+* \date      2017-01-27
+* \brief     Unit tests for adt_list_t
+*
+* Copyright (c) 2017-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,11 +1,12 @@
 /*****************************************************************************
-* \author:     Conny Gustafsson
-* \date:       2013-06-03
-* \brief:      array data structure
-* \details     https://github.com/cogu/adt
+* \file      adt_ary.c
+* \author    Conny Gustafsson
+* \date      2013-06-03
+* \brief     array data structure
 *
-* Copyright (c) 2013-2019 Conny Gustafsson
-*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
 ******************************************************************************/
 #include "adt_ary.h"
 #include <malloc.h>

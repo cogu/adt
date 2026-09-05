@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      adt_list.c
+* \author    Conny Gustafsson
+* \date      2017-01-27
+* \brief     Doubly-linked list data structure
+*
+* Copyright (c) 2017-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>

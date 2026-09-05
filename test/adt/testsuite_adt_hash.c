@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      testsuite_adt_hash.c
+* \author    Conny Gustafsson
+* \date      2013-08-06
+* \brief     Unit tests for adt_hash_t
+*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>

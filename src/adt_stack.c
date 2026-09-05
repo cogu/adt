@@ -1,11 +1,12 @@
 /*****************************************************************************
-* \file:   		adt_stack.c
-* \author:		Conny Gustafsson
-* \date:		2013-07-21
-* \brief:		stack data structure
+* \file      adt_stack.c
+* \author    Conny Gustafsson
+* \date      2013-07-21
+* \brief     stack data structure
 *
-* Copyright (c) 2013 Conny Gustafsson
-*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
 ******************************************************************************/
 #include <malloc.h>
 #include <assert.h>

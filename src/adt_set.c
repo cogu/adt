@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      adt_set.c
+* \author    Conny Gustafsson
+* \date      2018-07-27
+* \brief     Set container for 32-bit unsigned integers
+*
+* Copyright (c) 2018-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////

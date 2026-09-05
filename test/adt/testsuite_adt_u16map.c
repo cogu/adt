@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      testsuite_adt_u16map.c
+* \author    Conny Gustafsson
+* \date      2016-11-20
+* \brief     Unit tests for adt_u16Map_t
+*
+* Copyright (c) 2016-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>     /* srand, rand */

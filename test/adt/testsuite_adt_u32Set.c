@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      testsuite_adt_u32Set.c
+* \author    Conny Gustafsson
+* \date      2018-07-27
+* \brief     Unit tests for adt_u32Set_t
+*
+* Copyright (c) 2018-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <stdbool.h>
 #include <assert.h>
 #include <malloc.h>
