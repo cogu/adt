@@ -1,12 +1,12 @@
 /*****************************************************************************
-* \file:   		adt_u16Map.h
-* \author:		Conny Gustafsson
-* \date:		2013-10-01
-* \brief:		key/value map table using a sorted array as storage container
-* \details		https://github.com/cogu/adt
+* \file      adt_u16Map.c
+* \author    Conny Gustafsson
+* \date      2013-10-01
+* \brief     key/value map table using a sorted array as storage container
 *
-* Copyright (c) 2013-2014 Conny Gustafsson
-*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
 ******************************************************************************/
 #include "adt_u16Map.h"
 #include <assert.h>

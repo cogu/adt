@@ -1,11 +1,12 @@
 /*****************************************************************************
-* \file:   		adt_hash.c
-* \author:		Conny Gustafsson
-* \date:		2013-06-08
-* \brief:		hash data structure
+* \file      adt_hash.c
+* \author    Conny Gustafsson
+* \date      2013-06-08
+* \brief     hash data structure
 *
-* Copyright (c) 2013 Conny Gustafsson
-*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
 ******************************************************************************/
 #if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
 # ifndef _DEFAULT_SOURCE

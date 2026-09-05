@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      TestMain.c
+* \author    Conny Gustafsson
+* \date      2013-08-06
+* \brief     Unit test runner main
+*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <stdio.h>
 #include "test_common.h"
 #ifdef MEM_LEAK_CHECK

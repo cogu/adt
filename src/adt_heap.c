@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      adt_heap.c
+* \author    Conny Gustafsson
+* \date      2017-06-07
+* \brief     Binary heap / priority queue implementation on adt_ary
+*
+* Copyright (c) 2017-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////

@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      test_common.h
+* \author    Conny Gustafsson
+* \date      2026-08-31
+* \brief     Common test definitions and utilities
+*
+* Copyright (c) 2026-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #ifndef TEST_COMMON_H
 #define TEST_COMMON_H
 

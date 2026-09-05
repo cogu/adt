@@ -4,8 +4,9 @@
 * \date      2013-07-21
 * \brief     stack data structure
 *
-* Copyright (c) 2013 Conny Gustafsson
-*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
 ******************************************************************************/
 #ifndef ADT_STACK_H__
 #define ADT_STACK_H__

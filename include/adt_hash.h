@@ -1,11 +1,12 @@
 /*****************************************************************************
-* \file:   		adt_hash.h
-* \author:		Conny Gustafsson
-* \date:		2013-06-08
-* \brief:		hash data structure
+* \file      adt_hash.h
+* \author    Conny Gustafsson
+* \date      2013-06-08
+* \brief     hash data structure
 *
-* Copyright (c) 2013 Conny Gustafsson
-*
+* Copyright (c) 2013-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
 ******************************************************************************/
 #ifndef ADT_HASH_H__
 #define ADT_HASH_H__

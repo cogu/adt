@@ -1,3 +1,13 @@
+/*****************************************************************************
+* \file      testsuite_adt_u32List.c
+* \author    Conny Gustafsson
+* \date      2018-07-26
+* \brief     Unit tests for adt_u32List_t
+*
+* Copyright (c) 2018-2026 Conny Gustafsson
+* SPDX-License-Identifier: MIT
+* See LICENSE in project root for full license terms.
+******************************************************************************/
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
