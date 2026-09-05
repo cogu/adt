@@ -16,6 +16,8 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_str
    adt_hash
    adt_stack
+   adt_list
+   adt_heap
 
 
 Data Structures Catalog
@@ -62,12 +64,12 @@ Below is a summary of all data structures provided by the ADT library:
      - Objects (``void*``)
      - No
      - Sorted-array key/value map using 16-bit integer keys.
-   * - ``adt_list_t``
+   * - :c:type:`adt_list_t`
      - ``adt_list.h``
      - Objects (``void*``)
      - Yes
      - Doubly-linked list for fast mid-sequence insertions and removals.
-   * - ``adt_u32List_t``
+   * - :c:type:`adt_u32List_t`
      - ``adt_list.h``
      - Values (``uint32_t``)
      - Yes
@@ -77,11 +79,11 @@ Below is a summary of all data structures provided by the ADT library:
      - Objects (``void*``)
      - Yes
      - LIFO (Last-In First-Out) stack for generic pointers.
-   * - ``adt_heap_t``
+   * - :doc:`adt_heap <adt_heap>`
      - ``adt_heap.h``
      - Objects (``void*``)
      - Yes
-     - Binary heap priority queue storing generic pointers.
+     - Binary heap priority queue algorithms operating on :c:type:`adt_ary_t`.
    * - ``adt_rbfh_t``
      - ``adt_ringbuf.h``
      - Elements (``uint8_t*``)
