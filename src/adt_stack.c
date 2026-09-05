@@ -143,7 +143,9 @@ void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
 					}
 				}
 			}
-			memcpy(ppAlloc,self->ppAlloc,u32Len * sizeof(void*));
+			if(ppAlloc != NULL){
+				memcpy(ppAlloc,self->ppAlloc,u32Len * sizeof(void*));
+			}
 		}
 		free(self->ppAlloc);
 	}

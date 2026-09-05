@@ -338,6 +338,7 @@ void adt_hnode_insert(adt_hnode_t *node, adt_hkey_t *key, uint32_t u32Hash){
 	uint8_t i;
 	assert(node);
 	assert(key);
+	assert((node->u8Width > 0) && (node->u8Width <= 16));
 	if(node->u8Width == 16){
 		uint32_t u32Bits = (node->u8Depth)*4;
 		uint8_t u8Bucket = (uint8_t) ((u32Hash >> u32Bits) & 0xF);
