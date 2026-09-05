@@ -1,5 +1,5 @@
-Welcome to ADT's Documentation
-==============================
+Abstract Data Types (ADT)
+=========================
 
 **ADT** provides platform-independent and compiler-independent abstract data types for the C programming language (C99 and later).
 
