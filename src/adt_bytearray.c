@@ -43,7 +43,7 @@ void adt_bytearray_create(adt_bytearray_t *self,uint32_t u32GrowSize){
       self->pData = NULL;
       self->u32AllocLen = 0;
       self->u32CurLen = 0;
-      adt_bytearray_setGrowthSize(self, u32GrowSize);
+      adt_bytearray_set_growth_size(self, u32GrowSize);
    }
 }
 
@@ -117,7 +117,7 @@ void adt_bytearray_vdelete(void *arg)
    adt_bytearray_delete((adt_bytearray_t*) arg);
 }
 
-void adt_bytearray_setGrowthSize(adt_bytearray_t *self,uint32_t u32GrowSize)
+void adt_bytearray_set_growth_size(adt_bytearray_t *self,uint32_t u32GrowSize)
 {
    if (self != NULL)
    {
@@ -158,12 +158,7 @@ adt_error_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, ui
    return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-/**
- * Removes all bytes to the left of pSrc, saves all bytes to the right of pSrc (including pSrc itself)
- * \param self pointer to bytearray_t
- * \param pSrc pointer to a byte inside the array
- */
-adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc){
+adt_error_t adt_bytearray_trim_left(adt_bytearray_t *self, const uint8_t *pSrc){
    if( (self != NULL) && (pSrc != NULL) && (self->pData <= pSrc) && (pSrc <= self->pData + self->u32CurLen) ){
       uint32_t start, remain;
       /*

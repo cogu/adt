@@ -85,7 +85,7 @@ static void test_adt_rbfh_insert_then_grow(CuTest* tc)
 {
    adt_rbfh_t buf;
    uint32_t value;
-   adt_rbfh_createEx(&buf, sizeof(uint32_t), 5, 0);
+   adt_rbfh_create_ex(&buf, sizeof(uint32_t), 5, 0);
    CuAssertPtrNotNull(tc, buf.u8AllocBuf);
    CuAssertUIntEquals(tc, 5, buf.u16AllocLen);
    CuAssertUIntEquals(tc, 0, adt_rbfh_length(&buf));
@@ -113,7 +113,7 @@ static void test_adt_rbfh_insert_then_grow2(CuTest* tc)
 {
    adt_rbfh_t buf;
    uint32_t value;
-   adt_rbfh_createEx(&buf, sizeof(uint32_t), 5, 0);
+   adt_rbfh_create_ex(&buf, sizeof(uint32_t), 5, 0);
    CuAssertPtrNotNull(tc, buf.u8AllocBuf);
    CuAssertUIntEquals(tc, 5, buf.u16AllocLen);
    CuAssertUIntEquals(tc, 0, adt_rbfh_length(&buf));
@@ -155,7 +155,7 @@ static void test_adt_rbfh_insert_then_remove(CuTest* tc)
    adt_rbfh_t buf;
    uint32_t inValue;
    uint32_t outValue;
-   adt_rbfh_createEx(&buf, sizeof(uint32_t), 5, 0);
+   adt_rbfh_create_ex(&buf, sizeof(uint32_t), 5, 0);
    CuAssertPtrNotNull(tc, buf.u8AllocBuf);
    CuAssertUIntEquals(tc, 0, adt_rbfh_length(&buf));
    inValue = 1;
@@ -192,7 +192,7 @@ static void test_adt_rbfh_peek(CuTest* tc)
    adt_rbfh_t buf;
    uint32_t inValue;
    uint32_t outValue;
-   adt_rbfh_createEx(&buf, sizeof(uint32_t), 0, 0);
+   adt_rbfh_create_ex(&buf, sizeof(uint32_t), 0, 0);
 
    inValue = 1;
    CuAssertUIntEquals(tc, BUF_E_OK, adt_rbfh_insert(&buf, (uint8_t*) &inValue));
@@ -258,7 +258,7 @@ static void test_adt_rbfh_new_delete(CuTest* tc)
 
    adt_rbfh_delete(rbf);
 
-   adt_rbfh_t *rbfEx = adt_rbfh_newEx(sizeof(uint16_t), 10, 100);
+   adt_rbfh_t *rbfEx = adt_rbfh_new_ex(sizeof(uint16_t), 10, 100);
    CuAssertPtrNotNull(tc, rbfEx);
    adt_rbfh_delete(rbfEx);
 }

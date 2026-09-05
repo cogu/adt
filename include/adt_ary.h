@@ -281,7 +281,7 @@ adt_error_t adt_ary_sort(adt_ary_t *self, adt_vlt_func_t *key, bool reverse);
  * \param pElem Element pointer to search for.
  * \return Zero-based index of the element, or -1 if not found.
  */
-int32_t     adt_ary_indexOf(adt_ary_t *self, void *pElem);
+int32_t adt_ary_index_of(adt_ary_t *self, void *pElem);
 
 //built-in lt functions (for sorting)
 

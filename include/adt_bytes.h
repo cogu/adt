@@ -107,7 +107,7 @@ uint32_t adt_bytes_length(const adt_bytes_t *self);
  * \param self Pointer to the bytes object.
  * \return Const pointer to internal byte buffer, or NULL if empty or self is NULL.
  */
-const uint8_t* adt_bytes_constData(const adt_bytes_t *self);
+const uint8_t* adt_bytes_const_data(const adt_bytes_t *self);
 
 /**
  * \brief Converts the immutable bytes object into a mutable adt_bytearray_t on the heap.

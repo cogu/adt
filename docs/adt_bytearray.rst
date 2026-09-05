@@ -75,7 +75,7 @@ Capacity & Size
 
 .. doxygenfunction:: adt_bytearray_grow
 
-.. doxygenfunction:: adt_bytearray_setGrowthSize
+.. doxygenfunction:: adt_bytearray_set_growth_size
 
 Data Access
 -----------
@@ -93,7 +93,7 @@ Modification
 
 .. doxygenfunction:: adt_bytearray_push
 
-.. doxygenfunction:: adt_bytearray_trimLeft
+.. doxygenfunction:: adt_bytearray_trim_left
 
 .. doxygenfunction:: adt_bytearray_clear
 

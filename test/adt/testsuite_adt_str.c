@@ -684,7 +684,7 @@ static void test_adt_str_bytes(CuTest* tc)
    bytes = adt_str_bytes(str);
    CuAssertPtrNotNull(tc, bytes);
    CuAssertUIntEquals(tc, 4, adt_bytes_length(bytes));
-   CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytes_constData(bytes), 4));
+   CuAssertIntEquals(tc, 0, memcmp(cstr, adt_bytes_const_data(bytes), 4));
    adt_bytes_delete(bytes);
    adt_str_delete(str);
 }

@@ -521,7 +521,7 @@ int adt_u32_vlt(const void *a, const void *b)
 /**
  * Returns the array index of the element pElem. In the event that pElem is not in the array the function returns -1
  */
-int32_t adt_ary_indexOf(adt_ary_t *self, void *pElem)
+int32_t adt_ary_index_of(adt_ary_t *self, void *pElem)
 {
    if (self != NULL)
    {

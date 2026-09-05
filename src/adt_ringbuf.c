@@ -248,14 +248,14 @@ uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf){
  */
 adt_buf_err_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize)
 {
-   return adt_rbfh_createEx(self, u8ElemSize, ADT_RBFSH_MIN_NUM_ELEM, ADT_RBFSH_MAX_NUM_ELEM);
+   return adt_rbfh_create_ex(self, u8ElemSize, ADT_RBFSH_MIN_NUM_ELEM, ADT_RBFSH_MAX_NUM_ELEM);
 }
 
 /**
  * More advanced constructor which allows user to select lower and upper limit of the number of elements
  * When u16MaxNumElems is 0, it is treated as if it has no upper limit
  */
-adt_buf_err_t adt_rbfh_createEx(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
+adt_buf_err_t adt_rbfh_create_ex(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
 {
    if ( (self != NULL) && (u8ElemSize > 0) && ( (u16MaxNumElems == 0) || (u16MaxNumElems > u16MinNumElems) ) )
    {
@@ -312,14 +312,14 @@ adt_rbfh_t *adt_rbfh_new(uint8_t u8ElemSize)
 }
 
 /**
- * Same as adt_rbfh_new but internally calls adt_rbfh_createEx.
+ * Same as adt_rbfh_new but internally calls adt_rbfh_create_ex.
  */
-adt_rbfh_t *adt_rbfh_newEx(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
+adt_rbfh_t *adt_rbfh_new_ex(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
 {
    adt_rbfh_t *self = (adt_rbfh_t*) malloc(sizeof(adt_rbfh_t));
    if (self != NULL)
    {
-      adt_buf_err_t result = adt_rbfh_createEx(self, u8ElemSize, u16MinNumElems, u16MaxNumElems);
+      adt_buf_err_t result = adt_rbfh_create_ex(self, u8ElemSize, u16MinNumElems, u16MaxNumElems);
       if (result != BUF_E_OK)
       {
          free(self);
@@ -330,7 +330,7 @@ adt_rbfh_t *adt_rbfh_newEx(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t
 }
 
 /**
- * Deletes ringbuffer created using adt_rbfh_new or adt_rbfh_newEx
+ * Deletes ringbuffer created using adt_rbfh_new or adt_rbfh_new_ex
  */
 void adt_rbfh_delete(adt_rbfh_t* self)
 {
