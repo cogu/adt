@@ -159,7 +159,7 @@ Example 3: Dynamically Growing Heap Buffer
    void example_heap_ringbuf(void)
    {
        // Create heap-managed buffer: elements of uint32_t, min=10, max=1000
-       adt_rbfh_t *rbf = adt_rbfh_new_ex(sizeof(uint32_t), 10, 1000);
+       adt_rbfh_t *rbf = adt_rbfh_new_with_params(sizeof(uint32_t), 10, 1000);
        if (rbf == NULL) return;
 
        // Insert values; buffer automatically grows dynamically if needed
@@ -217,13 +217,13 @@ Heap-Managed Ringbuffer (adt_rbfh) API
 
 .. doxygenfunction:: adt_rbfh_create
 
-.. doxygenfunction:: adt_rbfh_create_ex
+.. doxygenfunction:: adt_rbfh_create_with_params
 
 .. doxygenfunction:: adt_rbfh_destroy
 
 .. doxygenfunction:: adt_rbfh_new
 
-.. doxygenfunction:: adt_rbfh_new_ex
+.. doxygenfunction:: adt_rbfh_new_with_params
 
 .. doxygenfunction:: adt_rbfh_delete
 
