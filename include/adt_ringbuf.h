@@ -247,7 +247,7 @@ adt_buf_err_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize);
  * @param u16MaxNumElems Maximum element capacity before growth is capped (0 for no upper limit up to 65535).
  * @return BUF_E_OK (0) on success, or BUF_E_NOT_OK (1) on allocation failure or invalid argument.
  */
-adt_buf_err_t adt_rbfh_createEx(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems);
+adt_buf_err_t adt_rbfh_create_ex(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems);
 
 /**
  * Releases heap memory allocated by the ring buffer's internal storage.
@@ -272,12 +272,12 @@ adt_rbfh_t *adt_rbfh_new(uint8_t u8ElemSize);
  * @param u16MaxNumElems Maximum element capacity (0 for unlimited up to 65535).
  * @return Pointer to newly allocated adt_rbfh_t, or NULL on allocation failure.
  */
-adt_rbfh_t *adt_rbfh_newEx(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems);
+adt_rbfh_t *adt_rbfh_new_ex(uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems);
 
 /**
  * Releases internal storage and frees the heap-allocated ring buffer object itself.
  *
- * @param self Pointer to ring buffer previously created with adt_rbfh_new or adt_rbfh_newEx.
+ * @param self Pointer to ring buffer previously created with adt_rbfh_new or adt_rbfh_new_ex.
  */
 void adt_rbfh_delete(adt_rbfh_t* self);
 

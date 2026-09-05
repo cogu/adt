@@ -51,7 +51,7 @@ static void test_adt_ary_sort_array_with_one_item(CuTest *tc);
 static void test_adt_ary_sort_array_with_seven_items(CuTest *tc);
 static void test_adt_ary_reverse_sort_array_with_seven_items(CuTest *tc);
 static void test_adt_ary_sort_strings_array_with_four_items(CuTest *tc);
-static void test_adt_ary_indexOf(CuTest *tc);
+static void test_adt_ary_index_of(CuTest *tc);
 static void test_adt_ary_destructor_enable(CuTest *tc);
 static void test_adt_ary_vdelete(CuTest *tc);
 
@@ -84,7 +84,7 @@ CuSuite *testsuite_adt_ary(void) {
   SUITE_ADD_TEST(suite, test_adt_ary_sort_array_with_seven_items);
   SUITE_ADD_TEST(suite, test_adt_ary_reverse_sort_array_with_seven_items);
   SUITE_ADD_TEST(suite, test_adt_ary_sort_strings_array_with_four_items);
-  SUITE_ADD_TEST(suite, test_adt_ary_indexOf);
+  SUITE_ADD_TEST(suite, test_adt_ary_index_of);
   SUITE_ADD_TEST(suite, test_adt_ary_destructor_enable);
   SUITE_ADD_TEST(suite, test_adt_ary_vdelete);
 
@@ -477,7 +477,7 @@ static void test_adt_ary_sort_strings_array_with_four_items(CuTest *tc) {
   adt_ary_delete(array);
 }
 
-static void test_adt_ary_indexOf(CuTest *tc) {
+static void test_adt_ary_index_of(CuTest *tc) {
   adt_ary_t *array = adt_ary_new(NULL);
   CuAssertPtrNotNull(tc, array);
   CuAssertIntEquals(tc, ADT_NO_ERROR,
@@ -492,13 +492,13 @@ static void test_adt_ary_indexOf(CuTest *tc) {
                     adt_ary_push(array, &m_numbers[4])); // index 4
   CuAssertIntEquals(tc, 5, adt_ary_length(array));
 
-  CuAssertIntEquals(tc, 0, adt_ary_indexOf(array, &m_numbers[0]));
-  CuAssertIntEquals(tc, 1, adt_ary_indexOf(array, &m_numbers[1]));
-  CuAssertIntEquals(tc, 2, adt_ary_indexOf(array, &m_numbers[2]));
-  CuAssertIntEquals(tc, 3, adt_ary_indexOf(array, &m_numbers[3]));
-  CuAssertIntEquals(tc, 4, adt_ary_indexOf(array, &m_numbers[4]));
-  CuAssertIntEquals(tc, -1, adt_ary_indexOf(array, &m_numbers[5]));
-  CuAssertIntEquals(tc, -1, adt_ary_indexOf(array, &m_numbers[6]));
+  CuAssertIntEquals(tc, 0, adt_ary_index_of(array, &m_numbers[0]));
+  CuAssertIntEquals(tc, 1, adt_ary_index_of(array, &m_numbers[1]));
+  CuAssertIntEquals(tc, 2, adt_ary_index_of(array, &m_numbers[2]));
+  CuAssertIntEquals(tc, 3, adt_ary_index_of(array, &m_numbers[3]));
+  CuAssertIntEquals(tc, 4, adt_ary_index_of(array, &m_numbers[4]));
+  CuAssertIntEquals(tc, -1, adt_ary_index_of(array, &m_numbers[5]));
+  CuAssertIntEquals(tc, -1, adt_ary_index_of(array, &m_numbers[6]));
 
   adt_ary_delete(array);
 }

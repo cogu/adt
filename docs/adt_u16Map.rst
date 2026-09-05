@@ -15,7 +15,7 @@ Key features:
 
 * **Zero-Heap Operation**: Can be initialized with caller-supplied array memory (:c:func:`adt_u16Map_create`), making it completely safe for embedded systems where heap allocation is prohibited.
 * **Dynamic Heap Mode**: Can alternatively be allocated on the heap (:c:func:`adt_u16Map_new`) with automatic resizing up to the specified element limit.
-* **Fast Binary Search**: Lookups (:c:func:`adt_u16Map_find` and :c:func:`adt_u16Map_findExact`) operate in ``O(log N)`` time using binary search.
+* **Fast Binary Search**: Lookups (:c:func:`adt_u16Map_find` and :c:func:`adt_u16Map_find_exact`) operate in ``O(log N)`` time using binary search.
 * **Duplicate Key Support**: Multiple entries with identical keys but different values can coexist within the map.
 * **Memory Ownership & Destructors**: Integrates with the ADT destructor pattern to automatically clean up dynamically allocated values when entries are removed or the map is destroyed.
 
@@ -71,9 +71,9 @@ Example 1: Static Lookup Table (Zero Heap)
        }
 
        // Iterate in ascending key order (100 -> 250 -> 400)
-       for (adt_u16MapElem_t *it = adt_u16Map_iterInit(&map, NULL);
+       for (adt_u16MapElem_t *it = adt_u16Map_iter_init(&map, NULL);
             it != NULL;
-            it = adt_u16Map_iterNext(&map))
+            it = adt_u16Map_iter_next(&map))
        {
            printf("ID %u -> %s\n", it->key, (const char*) it->val);
        }
@@ -119,7 +119,7 @@ Lifecycle & Memory Management
 
 .. doxygenfunction:: adt_u16Map_delete
 
-.. doxygenfunction:: adt_u16Map_destructorEnable
+.. doxygenfunction:: adt_u16Map_destructor_enable
 
 Operations & Query
 ------------------
@@ -130,19 +130,19 @@ Operations & Query
 
 .. doxygenfunction:: adt_u16Map_find
 
-.. doxygenfunction:: adt_u16Map_findExact
+.. doxygenfunction:: adt_u16Map_find_exact
 
 .. doxygenfunction:: adt_u16Map_size
 
 .. doxygenfunction:: adt_u16Map_clear
 
-.. doxygenfunction:: adt_u16Map_removeVal
+.. doxygenfunction:: adt_u16Map_remove_val
 
-.. doxygenfunction:: adt_u16Map_moveElem
+.. doxygenfunction:: adt_u16Map_move_elem
 
 Iteration
 ---------
 
-.. doxygenfunction:: adt_u16Map_iterInit
+.. doxygenfunction:: adt_u16Map_iter_init
 
-.. doxygenfunction:: adt_u16Map_iterNext
+.. doxygenfunction:: adt_u16Map_iter_next

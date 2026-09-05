@@ -37,16 +37,16 @@ static adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, ad
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint16_t maxNumElem, void (*pDestructor)(void*)){
+void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint16_t max_num_elem, void (*pDestructor)(void*)){
    if(self != NULL){
-      assert(maxNumElem<65535); //temporary fix for a design-flaw found in the code
+      assert(max_num_elem<65535); //temporary fix for a design-flaw found in the code
       self->pBegin = pArray;
       self->pEnd = pArray;
       self->pIter = NULL;
-      self->maxNumElem = maxNumElem;
-      self->numElem = 0;
+      self->max_num_elem = max_num_elem;
+      self->num_elem = 0;
       self->pDestructor = pDestructor;
-      self->destructorEnable = 1;
+      self->destructor_enable = 1;
    }
 }
 
@@ -54,15 +54,15 @@ void adt_u16Map_destroy(adt_u16Map_t *self){
    adt_u16Map_clear(self);
 }
 
-adt_u16Map_t *adt_u16Map_new(uint16_t maxNumElem, void (*pDestructor)(void*)){
+adt_u16Map_t *adt_u16Map_new(uint16_t max_num_elem, void (*pDestructor)(void*)){
    adt_u16Map_t *self = (adt_u16Map_t*) malloc(sizeof(adt_u16Map_t));
    if(self != NULL){
-      adt_u16MapElem_t *elem = (adt_u16MapElem_t*) malloc(sizeof(adt_u16MapElem_t) * maxNumElem);
+      adt_u16MapElem_t *elem = (adt_u16MapElem_t*) malloc(sizeof(adt_u16MapElem_t) * max_num_elem);
       if(elem == NULL){
          free(self);
          return NULL;
       }
-      adt_u16Map_create(self, elem, maxNumElem, pDestructor);
+      adt_u16Map_create(self, elem, max_num_elem, pDestructor);
    }
    return self;
 }
@@ -75,20 +75,20 @@ void adt_u16Map_delete(adt_u16Map_t *self){
    }
 }
 
-void adt_u16Map_destructorEnable(adt_u16Map_t *self,uint8_t enable){
+void adt_u16Map_destructor_enable(adt_u16Map_t *self,uint8_t enable){
    if(self != NULL){
-      self->destructorEnable = (enable!=0)? 1 : 0;
+      self->destructor_enable = (enable!=0)? 1 : 0;
    }
 }
 
 void adt_u16Map_clear(adt_u16Map_t *self){
    if(self != NULL){
-      while(self->numElem > 0){
+      while(self->num_elem > 0){
          self->pEnd--;
-         if( (self->destructorEnable != false) && (self->pDestructor != NULL) ){
+         if( (self->destructor_enable != false) && (self->pDestructor != NULL) ){
             self->pDestructor(self->pEnd->val);
          }
-         self->numElem--;
+         self->num_elem--;
       }
       assert(self->pBegin == self->pEnd);
    }
@@ -101,11 +101,11 @@ void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
       return;
    }
    elem = self->pBegin;
-   if(self->numElem >= self->maxNumElem){
+   if(self->num_elem >= self->max_num_elem){
       //new item won't fit in map
       return;
    }
-   for(i=0;i < self->numElem; i++){
+   for(i=0;i < self->num_elem; i++){
       if(elem->key == key){
          if(elem->val == val){
             //element already in map, ignore insert request
@@ -117,19 +117,19 @@ void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
       }
       elem++;
    }
-   if(i < self->numElem){
+   if(i < self->num_elem){
       uint16_t j;
       //make room for elem
-      for(j=self->numElem;j > i ; j--){
+      for(j=self->num_elem;j > i ; j--){
          self->pBegin[j]=self->pBegin[j-1];
       }
       assert(i==j);
    }
-   assert(i<self->maxNumElem);
+   assert(i<self->max_num_elem);
    assert(&self->pBegin[i] == elem);
    elem->key = key;
    elem->val = val;
-   self->numElem++;
+   self->num_elem++;
    self->pEnd++;
 }
 
@@ -141,13 +141,13 @@ void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
       uint32_t i;
       uint32_t j;
       i = (uint32_t) (pElem-self->pBegin);
-      assert( i < self->numElem);
+      assert( i < self->num_elem);
       //remove element by copy data left
-      for(j=i+1;j < self->numElem ; j++){
+      for(j=i+1;j < self->num_elem ; j++){
          self->pBegin[j-1]=self->pBegin[j];
       }
-      assert(j == self->numElem);
-      self->numElem--;
+      assert(j == self->num_elem);
+      self->num_elem--;
       self->pEnd--;
    }
 }
@@ -155,20 +155,20 @@ void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
 adt_u16MapElem_t* adt_u16Map_find(adt_u16Map_t *self, uint16_t key){
    adt_u16MapElem_t *it = adt_u16Map_binarySearchDup(self->pBegin,self->pEnd, key);
    if(it != NULL){
-      (void) adt_u16Map_iterInit(self,it);
+      (void) adt_u16Map_iter_init(self,it);
    }
    return it;
 }
 
-adt_u16MapElem_t* adt_u16Map_findExact(adt_u16Map_t *self, uint16_t key, const void *val){
+adt_u16MapElem_t* adt_u16Map_find_exact(adt_u16Map_t *self, uint16_t key, const void *val){
    adt_u16MapElem_t *it = adt_u16Map_find(self,key);
    if(it != NULL){
-      it = adt_u16Map_iterInit(self,it);
+      it = adt_u16Map_iter_init(self,it);
       while( (it != NULL) && (it->key == key) ){
          if(it->val == val ){
             return it;
          }
-         it=adt_u16Map_iterNext(self);
+         it=adt_u16Map_iter_next(self);
       }
    }
    return NULL;
@@ -176,12 +176,12 @@ adt_u16MapElem_t* adt_u16Map_findExact(adt_u16Map_t *self, uint16_t key, const v
 
 uint16_t adt_u16Map_size(const adt_u16Map_t *self){
    if(self != NULL){
-      return self->numElem;
+      return self->num_elem;
    }
    return 0;
 }
 
-adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, adt_u16MapElem_t *pElem){
+adt_u16MapElem_t* adt_u16Map_iter_init(adt_u16Map_t *self, adt_u16MapElem_t *pElem){
    if(self->pBegin < self->pEnd){
       if( (pElem >= self->pBegin) && (pElem < self->pEnd) ){
          self->pIter = pElem;
@@ -194,7 +194,7 @@ adt_u16MapElem_t* adt_u16Map_iterInit(adt_u16Map_t *self, adt_u16MapElem_t *pEle
    return NULL;
 }
 
-adt_u16MapElem_t* adt_u16Map_iterNext(adt_u16Map_t *self){
+adt_u16MapElem_t* adt_u16Map_iter_next(adt_u16Map_t *self){
    if(self->pIter < self->pEnd){
       ++self->pIter;
       if(self->pIter < self->pEnd){
@@ -207,7 +207,7 @@ adt_u16MapElem_t* adt_u16Map_iterNext(adt_u16Map_t *self){
 /**
  * move all items matching key \param key from \param src to \param dest
  */
-uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key){
+uint16_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key){
    adt_u16MapElem_t *itemsToMove[MAX_NUM_TRANSFER];
    adt_u16MapElem_t dataToMove[MAX_NUM_TRANSFER];
    adt_u16MapElem_t **pCursor;
@@ -225,7 +225,7 @@ uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key
       pData = dataToMove;
       it = adt_u16Map_find(src,key);
       if(it != NULL){
-         it=adt_u16Map_iterInit(src,it);
+         it=adt_u16Map_iter_init(src,it);
          while(numItems < MAX_NUM_TRANSFER){
             if( (it == NULL) || (it->key != key) ){
                break; //no more items
@@ -236,7 +236,7 @@ uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key
                *(pData++) = *it;
                numItems++;
             }
-            it = adt_u16Map_iterNext(src);
+            it = adt_u16Map_iter_next(src);
          }
          pData = dataToMove;
          totalItems+=numItems;
@@ -258,23 +258,23 @@ uint16_t adt_u16Map_moveElem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key
    return 0;
 }
 
-void adt_u16Map_removeVal(adt_u16Map_t *self, const void *val){
+void adt_u16Map_remove_val(adt_u16Map_t *self, const void *val){
    uint16_t tmp[MAX_NUM_TRANSFER];
    uint16_t tmpLen = 0;
    adt_u16MapElem_t *it;
    while(1){
       tmpLen = 0;
-      it = adt_u16Map_iterInit(self,0);
+      it = adt_u16Map_iter_init(self,0);
       while((tmpLen < MAX_NUM_TRANSFER) && it){
          if(it->val == val){
             tmp[tmpLen++] = it->key;
          }
-         it = adt_u16Map_iterNext(self);
+         it = adt_u16Map_iter_next(self);
       }
       if(tmpLen>0){
          uint16_t i;
          for(i=0;i<tmpLen;i++){
-            it = adt_u16Map_findExact(self,tmp[i],val);
+            it = adt_u16Map_find_exact(self,tmp[i],val);
             if(it){
                adt_u16Map_remove(self,it);
             }
@@ -300,14 +300,14 @@ adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16Ma
    adt_u16MapElem_t *pLow = pBegin;
    adt_u16MapElem_t *pHigh = pEnd;
 
-   uint32_t numElem;
+   uint32_t num_elem;
    while(1){
       assert(pHigh >= pLow);
-      numElem = pHigh-pLow;
+      num_elem = pHigh-pLow;
       //perform a linear search if there is 3 items or less
-      if(numElem <= 3){
+      if(num_elem <= 3){
          uint32_t i;
-         for(i=0;i<numElem;i++){
+         for(i=0;i<num_elem;i++){
             if (pLow[i].key == key) {
                if(i==0){
                   //decrease pointer if key is duplicated
@@ -320,7 +320,7 @@ adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16Ma
          break;
       }
       else{
-         pMid = pLow+(numElem/2);
+         pMid = pLow+(num_elem/2);
          assert( (pMid>=pLow) && (pMid<pHigh));
          if(pMid->key < key){
             pLow = pMid;
@@ -336,4 +336,5 @@ adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16Ma
    }
    return NULL;
 }
+
 

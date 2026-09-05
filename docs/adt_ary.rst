@@ -103,7 +103,7 @@ Indices can be positive (zero-based from the beginning) or negative (counting fr
 
 .. doxygenfunction:: adt_ary_exists
 
-.. doxygenfunction:: adt_ary_indexOf
+.. doxygenfunction:: adt_ary_index_of
 
 Sizing & Capacity
 -----------------

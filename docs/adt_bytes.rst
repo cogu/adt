@@ -54,7 +54,7 @@ Inspection & Data Access
 
 .. doxygenfunction:: adt_bytes_length
 
-.. doxygenfunction:: adt_bytes_constData
+.. doxygenfunction:: adt_bytes_const_data
 
 Conversion
 ----------

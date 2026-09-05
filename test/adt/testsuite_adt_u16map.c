@@ -40,37 +40,37 @@ void test_adt_u16Map_insert(CuTest* tc){
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
    adt_u16Map_insert(pList,10,0);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
-   it = adt_u16Map_iterInit(pList,0);
+   it = adt_u16Map_iter_init(pList,0);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,0,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,1,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,2,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,3,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,4,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,6,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,7,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,8,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,9,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrEquals(tc, NULL, it);
 }
 
@@ -93,37 +93,37 @@ void test_adt_u16Map_duplicates(CuTest* tc){
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
    adt_u16Map_insert(pList,10,0);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
-   it = adt_u16Map_iterInit(pList,0);
+   it = adt_u16Map_iter_init(pList,0);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,1,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,1,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,3,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,3,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,3,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,4,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,4,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,4,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrEquals(tc, NULL, it);
 }
 
@@ -148,34 +148,34 @@ void test_adt_u16Map_find(CuTest* tc){
    CuAssertPtrEquals(tc, NULL, it);
    it = adt_u16Map_find(pList,1);
    CuAssertPtrNotNull(tc,it);
-   it = adt_u16Map_iterInit(pList,it);
+   it = adt_u16Map_iter_init(pList,it);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,1,it->key);
    CuAssertPtrEquals(tc,(void*)9,it->val);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,1,it->key);
    CuAssertPtrEquals(tc,(void*)10,it->val);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,3,it->key);
    CuAssertPtrEquals(tc,(void*)2,it->val);
 
    it = adt_u16Map_find(pList,5);
    CuAssertPtrNotNull(tc,it);
-   it = adt_u16Map_iterInit(pList,it);
+   it = adt_u16Map_iter_init(pList,it);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
    CuAssertPtrEquals(tc,(void*)3,it->val);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
    CuAssertPtrEquals(tc,(void*)6,it->val);
-   it = adt_u16Map_iterNext(pList);
+   it = adt_u16Map_iter_next(pList);
    CuAssertPtrEquals(tc, NULL, it);
 }
 
-void test_adt_u16Map_findExact(CuTest* tc){
+void test_adt_u16Map_find_exact(CuTest* tc){
    adt_u16MapElem_t elem[10];
    adt_u16Map_t map;
    adt_u16Map_t *pList = &map;
@@ -192,22 +192,22 @@ void test_adt_u16Map_findExact(CuTest* tc){
    adt_u16Map_insert(pList,1,(void*) 9);
    adt_u16Map_insert(pList,1,(void*) 10);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
-   it = adt_u16Map_findExact(pList,1,(void*) 1);
+   it = adt_u16Map_find_exact(pList,1,(void*) 1);
    CuAssertPtrEquals(tc, NULL, it);
-   it = adt_u16Map_findExact(pList,4,(void*) 7);
+   it = adt_u16Map_find_exact(pList,4,(void*) 7);
    CuAssertPtrEquals(tc, NULL, it);
    //last item of key 4
-   it = adt_u16Map_findExact(pList,4,(void*) 5);
+   it = adt_u16Map_find_exact(pList,4,(void*) 5);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,4,it->key);
    CuAssertPtrEquals(tc,(void*) 5,it->val);
    //first item of key 5
-   it = adt_u16Map_findExact(pList,5,(void*) 3);
+   it = adt_u16Map_find_exact(pList,5,(void*) 3);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,5,it->key);
    CuAssertPtrEquals(tc,(void*) 3,it->val);
    //mit item of key 3
-   it = adt_u16Map_findExact(pList,3,(void*) 7);
+   it = adt_u16Map_find_exact(pList,3,(void*) 7);
    CuAssertPtrNotNull(tc,it);
    CuAssertIntEquals(tc,3,it->key);
    CuAssertPtrEquals(tc,(void*) 7,it->val);
@@ -227,9 +227,9 @@ void test_adt_u16Map_sort(CuTest* tc){
    adt_u16Map_insert(&map,600,0);
    adt_u16MapElem_t *elem;
    uint16_t i = 0;
-   adt_u16Map_iterInit(&map,NULL);
+   adt_u16Map_iter_init(&map,NULL);
    uint16_t expected[] = {1,2,5,11,87,600,1245};
-   while((elem = adt_u16Map_iterNext(&map)) != 0){
+   while((elem = adt_u16Map_iter_next(&map)) != 0){
       CuAssertPtrNotNull(tc,elem);
       CuAssertIntEquals(tc,expected[i++],elem->key);
    }
@@ -281,7 +281,7 @@ void test_adt_u16Map_move(CuTest* tc){
    adt_u16Map_insert(pList1,1,(void*) 10);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList1));
    CuAssertIntEquals(tc,0,adt_u16Map_size(pList2));
-   adt_u16Map_moveElem(pList2,pList1,4);
+   adt_u16Map_move_elem(pList2,pList1,4);
    CuAssertIntEquals(tc,3,adt_u16Map_size(pList2));
    CuAssertIntEquals(tc,7,adt_u16Map_size(pList1));
 }
@@ -293,7 +293,7 @@ CuSuite* testsuite_adt_u16Map(void)
    SUITE_ADD_TEST(suite, test_adt_u16Map_insert);
    SUITE_ADD_TEST(suite, test_adt_u16Map_duplicates);
    SUITE_ADD_TEST(suite, test_adt_u16Map_find);
-   SUITE_ADD_TEST(suite, test_adt_u16Map_findExact);
+   SUITE_ADD_TEST(suite, test_adt_u16Map_find_exact);
    SUITE_ADD_TEST(suite, test_adt_u16Map_move);
    SUITE_ADD_TEST(suite, test_adt_u16Map_find_rand_set);
 

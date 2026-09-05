@@ -121,7 +121,7 @@ void adt_bytearray_vdelete(void *arg);
  * \param self Pointer to the byte array.
  * \param u32GrowSize Growth chunk size in bytes (maximum allowed is 32 MB).
  */
-void adt_bytearray_setGrowthSize(adt_bytearray_t *self, uint32_t u32GrowSize);
+void adt_bytearray_set_growth_size(adt_bytearray_t *self, uint32_t u32GrowSize);
 
 /**
  * \brief Ensures that capacity is at least u32NewLen bytes without changing the logical length of the array.
@@ -158,7 +158,7 @@ adt_error_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, ui
  * \param pSrc Pointer to a byte within the array buffer.
  * \return ADT_NO_ERROR on success, or ADT_INVALID_ARGUMENT_ERROR if pSrc is out of bounds.
  */
-adt_error_t adt_bytearray_trimLeft(adt_bytearray_t *self, const uint8_t *pSrc);
+adt_error_t adt_bytearray_trim_left(adt_bytearray_t *self, const uint8_t *pSrc);
 
 /**
  * \brief Changes the size of the array to u32NewLen.
