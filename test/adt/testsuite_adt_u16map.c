@@ -183,9 +183,9 @@ void test_adt_u16Map_findExact(CuTest* tc){
    adt_u16Map_insert(pList,1,(void*) 10);
    CuAssertIntEquals(tc,10,adt_u16Map_size(pList));
    it = adt_u16Map_findExact(pList,1,(void*) 1);
-   CuAssertPtrEquals(tc, NULL, NULL);
+   CuAssertPtrEquals(tc, NULL, it);
    it = adt_u16Map_findExact(pList,4,(void*) 7);
-   CuAssertPtrEquals(tc, NULL, NULL);
+   CuAssertPtrEquals(tc, NULL, it);
    //last item of key 4
    it = adt_u16Map_findExact(pList,4,(void*) 5);
    CuAssertPtrNotNull(tc,it);
