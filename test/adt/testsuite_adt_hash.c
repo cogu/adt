@@ -308,6 +308,125 @@ void test_adt_hash_empty_table_iter(CuTest* tc)
    adt_hash_destroy(&hash);
 }
 
+void test_adt_hash_clear(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(vfree);
+   adt_hash_set(pHash, "k1", STRDUP("v1"));
+   adt_hash_set(pHash, "k2", STRDUP("v2"));
+   adt_hash_set(pHash, "k3", STRDUP("v3"));
+   CuAssertIntEquals(tc, 3, adt_hash_length(pHash));
+   CuAssertTrue(tc, !adt_hash_is_empty(pHash));
+
+   adt_hash_clear(pHash);
+   CuAssertIntEquals(tc, 0, adt_hash_length(pHash));
+   CuAssertTrue(tc, adt_hash_is_empty(pHash));
+   CuAssertTrue(tc, !adt_hash_exists(pHash, "k1"));
+
+   // Can insert again after clear
+   adt_hash_set(pHash, "k4", STRDUP("v4"));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertStrEquals(tc, "v4", (char*) adt_hash_value(pHash, "k4"));
+
+   adt_hash_delete(pHash);
+}
+
+void test_adt_hash_vdelete(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(vfree);
+   adt_hash_set(pHash, "k1", STRDUP("v1"));
+   adt_hash_vdelete(pHash);
+   CuAssertTrue(tc, true);
+}
+
+void test_adt_hash_is_empty(CuTest* tc)
+{
+   CuAssertTrue(tc, adt_hash_is_empty(NULL));
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   CuAssertTrue(tc, adt_hash_is_empty(pHash));
+   int val = 1;
+   adt_hash_set(pHash, "k", &val);
+   CuAssertTrue(tc, !adt_hash_is_empty(pHash));
+   adt_hash_remove(pHash, "k");
+   CuAssertTrue(tc, adt_hash_is_empty(pHash));
+   adt_hash_delete(pHash);
+}
+
+void test_adt_hash_erase(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(vfree);
+   adt_hash_set(pHash, "k1", STRDUP("v1"));
+   adt_hash_set(pHash, "k2", STRDUP("v2"));
+
+   CuAssertIntEquals(tc, 2, adt_hash_length(pHash));
+   CuAssertTrue(tc, adt_hash_erase(pHash, "k1"));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertTrue(tc, !adt_hash_exists(pHash, "k1"));
+   CuAssertTrue(tc, adt_hash_exists(pHash, "k2"));
+
+   // Erasing non-existent key returns false
+   CuAssertTrue(tc, !adt_hash_erase(pHash, "k1"));
+   CuAssertTrue(tc, !adt_hash_erase(pHash, "nonexistent"));
+
+   adt_hash_delete(pHash);
+}
+
+typedef struct {
+   int count;
+   int sum;
+} foreach_ctx_t;
+
+static void foreach_callback(const char *key, void *val, void *arg)
+{
+   (void) key;
+   foreach_ctx_t *ctx = (foreach_ctx_t*) arg;
+   ctx->count++;
+   ctx->sum += *(int*) val;
+}
+
+void test_adt_hash_foreach(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   int v1 = 10;
+   int v2 = 20;
+   int v3 = 30;
+   adt_hash_set(pHash, "k1", &v1);
+   adt_hash_set(pHash, "k2", &v2);
+   adt_hash_set(pHash, "k3", &v3);
+
+   const adt_hash_t *const_hash = pHash;
+   foreach_ctx_t ctx = {0, 0};
+   adt_hash_foreach(const_hash, foreach_callback, &ctx);
+   CuAssertIntEquals(tc, 3, ctx.count);
+   CuAssertIntEquals(tc, 60, ctx.sum);
+
+   adt_hash_delete(pHash);
+}
+
+void test_adt_hash_insert(CuTest* tc)
+{
+   adt_hash_t *pHash = adt_hash_new(vfree);
+   CuAssertPtrNotNull(tc, pHash);
+
+   // Insert when absent succeeds
+   CuAssertTrue(tc, adt_hash_insert(pHash, "key1", STRDUP("val1")));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertStrEquals(tc, "val1", (char*) adt_hash_value(pHash, "key1"));
+
+   // Insert when present fails and does not overwrite
+   char *dup_val = STRDUP("val2");
+   CuAssertTrue(tc, !adt_hash_insert(pHash, "key1", dup_val));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertStrEquals(tc, "val1", (char*) adt_hash_value(pHash, "key1"));
+   free(dup_val);
+
+   // Set overwrites
+   adt_hash_set(pHash, "key1", STRDUP("val3"));
+   CuAssertIntEquals(tc, 1, adt_hash_length(pHash));
+   CuAssertStrEquals(tc, "val3", (char*) adt_hash_value(pHash, "key1"));
+
+   adt_hash_delete(pHash);
+}
+
 CuSuite* testsuite_adt_hash(void)
 {
 	CuSuite* suite = CuSuiteNew();
@@ -322,5 +441,11 @@ CuSuite* testsuite_adt_hash(void)
 	SUITE_ADD_TEST(suite, test_adt_hash_set_overwrite_destructor);
 	SUITE_ADD_TEST(suite, test_adt_hash_multi_level_split_and_lookup);
 	SUITE_ADD_TEST(suite, test_adt_hash_empty_table_iter);
+	SUITE_ADD_TEST(suite, test_adt_hash_clear);
+	SUITE_ADD_TEST(suite, test_adt_hash_vdelete);
+	SUITE_ADD_TEST(suite, test_adt_hash_is_empty);
+	SUITE_ADD_TEST(suite, test_adt_hash_erase);
+	SUITE_ADD_TEST(suite, test_adt_hash_foreach);
+	SUITE_ADD_TEST(suite, test_adt_hash_insert);
 	return suite;
 }

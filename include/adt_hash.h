@@ -126,6 +126,15 @@ adt_hash_t* adt_hash_new(void (*pDestructor)(void*));
 void adt_hash_delete(adt_hash_t *self);
 
 /**
+ * \brief Type-erased destructor wrapper for adt_hash_delete.
+ *
+ * Suitable for use as a generic destructor callback void (*)(void*) in other ADT containers.
+ *
+ * \param arg Pointer to adt_hash_t instance to delete (cast from void*).
+ */
+void adt_hash_vdelete(void *arg);
+
+/**
  * \brief Initializes a hash table instance in place (stack or embedded allocation).
  *
  * \param self Pointer to an existing adt_hash_t instance.
@@ -140,6 +149,13 @@ void adt_hash_create(adt_hash_t *self, void (*pDestructor)(void*));
  */
 void adt_hash_destroy(adt_hash_t *self);
 
+/**
+ * \brief Removes all elements from the hash table, invoking the destructor on each stored value if configured.
+ *
+ * \param self Pointer to the hash table.
+ */
+void adt_hash_clear(adt_hash_t *self);
+
 
 //Accessors
 
@@ -150,7 +166,19 @@ void adt_hash_destroy(adt_hash_t *self);
  * \param pKey Null-terminated string key.
  * \param pVal Pointer to value to associate with key.
  */
-void	 adt_hash_set(adt_hash_t *self, const char *pKey,  void *pVal);
+void adt_hash_set(adt_hash_t *self, const char *pKey,  void *pVal);
+
+/**
+ * \brief Inserts a key-value pair only if the key is not already present in the hash table.
+ *
+ * If the key already exists, the table is not modified and false is returned.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key.
+ * \param pVal Pointer to value to associate with key.
+ * \return true if the key was inserted, false if the key already exists or arguments are invalid.
+ */
+bool adt_hash_insert(adt_hash_t *self, const char *pKey, void *pVal);
 
 /**
  * \brief Retrieves a pointer to the value slot for the specified key.
@@ -168,7 +196,7 @@ void** adt_hash_get(const adt_hash_t *self, const char *pKey);
  * \param pKey Null-terminated string key to look up.
  * \return Stored value pointer (void*), or NULL if key is not found.
  */
-void*  adt_hash_value(const adt_hash_t *self, const char *pKey);
+void* adt_hash_value(const adt_hash_t *self, const char *pKey);
 
 /**
  * \brief Removes the key-value pair from the hash table without invoking the element destructor.
@@ -177,7 +205,16 @@ void*  adt_hash_value(const adt_hash_t *self, const char *pKey);
  * \param pKey Null-terminated string key to remove.
  * \return The removed value pointer (void*), or NULL if key was not found.
  */
-void*  adt_hash_remove(adt_hash_t *self, const char *pKey);
+void* adt_hash_remove(adt_hash_t *self, const char *pKey);
+
+/**
+ * \brief Removes the key-value pair from the hash table and invokes the element destructor on the value.
+ *
+ * \param self Pointer to the hash table.
+ * \param pKey Null-terminated string key to remove.
+ * \return true if the key was found and erased, false otherwise.
+ */
+bool adt_hash_erase(adt_hash_t *self, const char *pKey);
 
 /**
  * \brief Initializes or resets the hash table iterator to the beginning.
@@ -195,6 +232,17 @@ void   adt_hash_iter_init(adt_hash_t *self);
  */
 void** adt_hash_iter_next(adt_hash_t *self, const char **ppKey);
 
+/**
+ * \brief Iterates over all key-value pairs in the hash table, calling the callback for each pair.
+ *
+ * This function does not modify the table and can be safely called on a const table.
+ *
+ * \param self Pointer to the hash table.
+ * \param callback Callback function taking (const char *key, void *val, void *arg).
+ * \param arg User-defined argument passed to each callback invocation.
+ */
+void adt_hash_foreach(const adt_hash_t *self, void (*callback)(const char *key, void *val, void *arg), void *arg);
+
 
 //Utility functions
 
@@ -204,7 +252,15 @@ void** adt_hash_iter_next(adt_hash_t *self, const char **ppKey);
  * \param self Pointer to the hash table.
  * \return Number of elements, or -1 if self is NULL.
  */
-int32_t 	adt_hash_length(const adt_hash_t *self);
+int32_t adt_hash_length(const adt_hash_t *self);
+
+/**
+ * \brief Checks whether the hash table is empty (contains zero elements).
+ *
+ * \param self Pointer to the hash table.
+ * \return true if self is NULL or table is empty, false otherwise.
+ */
+bool adt_hash_is_empty(const adt_hash_t *self);
 
 /**
  * \brief Checks whether a key exists in the hash table.
@@ -213,7 +269,7 @@ int32_t 	adt_hash_length(const adt_hash_t *self);
  * \param pKey Null-terminated string key to check.
  * \return true if key exists, false otherwise.
  */
-bool		adt_hash_exists(const adt_hash_t *self, const char *pKey);
+bool adt_hash_exists(const adt_hash_t *self, const char *pKey);
 
 /**
  * \brief Collects all string keys into the provided array as dynamically allocated strings.
