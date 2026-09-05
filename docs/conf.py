@@ -29,6 +29,8 @@ breathe_projects = {
     'ADT': '_build/doxygen/xml',
 }
 breathe_default_project = 'ADT'
+breathe_domain_by_extension = {"h": "c"}
+
 
 # Run Doxygen automatically if installed
 import shutil
