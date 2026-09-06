@@ -77,12 +77,12 @@ CuSuite* testsuite_adt_bytearray(void)
 //////////////////////////////////////////////////////////////////////////////
 static void test_adt_bytearray_new(CuTest* tc)
 {
-   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE);
+   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTEARRAY_DEFAULT_GROW_SIZE);
    CuAssertPtrNotNull(tc, pArray);
    CuAssertPtrEquals(tc, NULL, pArray->pData);
    CuAssertIntEquals(tc, 0,pArray->u32CurLen);
    CuAssertIntEquals(tc, 0,pArray->u32AllocLen);
-   CuAssertIntEquals(tc, ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE,pArray->u32GrowSize);
+   CuAssertIntEquals(tc, ADT_BYTEARRAY_DEFAULT_GROW_SIZE,pArray->u32GrowSize);
    adt_bytearray_delete(pArray);
 }
 
@@ -100,7 +100,7 @@ static void test_adt_bytearray_make(CuTest* tc)
 {
    adt_bytearray_t *pArray;
    const uint8_t data[] = {100,240,127,0,5};
-   pArray = adt_bytearray_make(data, 5, ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE);
+   pArray = adt_bytearray_make(data, 5, ADT_BYTEARRAY_DEFAULT_GROW_SIZE);
    CuAssertPtrNotNull(tc, pArray);
    adt_bytearray_delete(pArray);
 }
@@ -109,7 +109,7 @@ static void test_adt_bytearray_make_cstr(CuTest* tc)
 {
    adt_bytearray_t *pArray;
    const char* cstr= "Test1";
-   pArray = adt_bytearray_make_cstr(cstr, ADT_BYTE_ARRAY_NO_GROWTH);
+   pArray = adt_bytearray_make_cstr(cstr, ADT_BYTEARRAY_NO_GROWTH);
    CuAssertPtrNotNull(tc, pArray);
    CuAssertIntEquals(tc, 5, pArray->u32CurLen);
    CuAssertIntEquals(tc, 0, memcmp(cstr, pArray->pData, 5));
@@ -145,7 +145,7 @@ static void test_adt_bytearray_equals(CuTest* tc)
 static void test_adt_bytearray_manual_grow(CuTest* tc)
 {
    const uint8_t data[] = {100, 240, 127, 0, 5};
-   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTE_ARRAY_NO_GROWTH);
+   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTEARRAY_NO_GROWTH);
    CuAssertIntEquals(tc, 0u, pArray->u32CurLen);
    CuAssertIntEquals(tc, 0u, pArray->u32AllocLen);
    CuAssertIntEquals(tc, 0u, pArray->u32GrowSize);
@@ -159,7 +159,7 @@ static void test_adt_bytearray_manual_grow(CuTest* tc)
 static void test_adt_bytearray_manual_shrink(CuTest* tc)
 {
    const uint8_t data[] = {100, 240, 127, 0, 5};
-   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTE_ARRAY_NO_GROWTH);
+   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTEARRAY_NO_GROWTH);
    adt_bytearray_append(pArray, &data[0], (uint32_t) sizeof(data));
    CuAssertIntEquals(tc, 5u, pArray->u32CurLen);
    CuAssertIntEquals(tc, 5u, pArray->u32AllocLen);

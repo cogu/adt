@@ -111,7 +111,7 @@ static void test_adt_bytes_bytearray(CuTest *tc) {
 
   adt_bytes_t *bytes = adt_bytes_new(&data[0], sizeof(data));
   CuAssertPtrNotNull(tc, bytes);
-  adt_bytearray_t *array = adt_bytes_bytearray(bytes, ADT_BYTE_ARRAY_NO_GROWTH);
+  adt_bytearray_t *array = adt_bytes_bytearray(bytes, ADT_BYTEARRAY_NO_GROWTH);
   CuAssertPtrNotNull(tc, array);
   CuAssertUIntEquals(tc, 5, adt_bytearray_length(array));
   CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytearray_data(array), 5));

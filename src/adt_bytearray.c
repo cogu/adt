@@ -121,9 +121,9 @@ void adt_bytearray_set_growth_size(adt_bytearray_t *self,uint32_t u32GrowSize)
 {
    if (self != NULL)
    {
-      if ( u32GrowSize > ADT_BYTE_ARRAY_MAX_GROW_SIZE )
+      if ( u32GrowSize > ADT_BYTEARRAY_MAX_GROW_SIZE )
       {
-         u32GrowSize = ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE;
+         u32GrowSize = ADT_BYTEARRAY_DEFAULT_GROW_SIZE;
       }
       self->u32GrowSize = u32GrowSize;
    }
@@ -225,7 +225,7 @@ adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
    if(self != NULL)
    {
       adt_error_t errorCode;
-      if ( (self->u32GrowSize == ADT_BYTE_ARRAY_NO_GROWTH) && (u32NewLen < self->u32CurLen) ) {
+      if ( (self->u32GrowSize == ADT_BYTEARRAY_NO_GROWTH) && (u32NewLen < self->u32CurLen) ) {
          errorCode = adt_bytearray_realloc(self, u32NewLen); //reduce allocated array
       }
       else {

@@ -8,8 +8,8 @@
 * SPDX-License-Identifier: MIT
 * See LICENSE in project root for full license terms.
 ******************************************************************************/
-#ifndef ADT_BYTE_ARRAY_H
-#define ADT_BYTE_ARRAY_H
+#ifndef ADT_BYTEARRAY_H
+#define ADT_BYTEARRAY_H
 
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
@@ -32,16 +32,9 @@ typedef struct adt_bytearray_tag
    uint32_t u32GrowSize;
 } adt_bytearray_t;
 
-//Corrected names
 #define ADT_BYTEARRAY_NO_GROWTH 0u  //will malloc exactly the number of bytes it currently needs
 #define ADT_BYTEARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
 #define ADT_BYTEARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
-
-//Deprecated names
-#define ADT_BYTE_ARRAY_VERSION ADT_BYTEARRAY_NO_GROWTH
-#define ADT_BYTE_ARRAY_NO_GROWTH ADT_BYTEARRAY_NO_GROWTH
-#define ADT_BYTE_ARRAY_DEFAULT_GROW_SIZE ADT_BYTEARRAY_DEFAULT_GROW_SIZE
-#define ADT_BYTE_ARRAY_MAX_GROW_SIZE ADT_BYTEARRAY_MAX_GROW_SIZE
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -238,4 +231,4 @@ bool adt_bytearray_data_equals(const adt_bytearray_t* self, const uint8_t* data,
  */
 struct adt_bytes_tag* adt_bytearray_bytes(const adt_bytearray_t *self);
 
-#endif //ADT_BYTE_ARRAY_H
+#endif //ADT_BYTEARRAY_H
