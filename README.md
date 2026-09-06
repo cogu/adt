@@ -21,7 +21,7 @@ Online documentation and API reference: **[c-adt.readthedocs.io](https://c-adt.r
 | Name | Header | Storage Type | Requires Heap | Description |
 |------|--------|--------------|---------------|-------------|
 | `adt_ary_t` | `adt_ary.h` | Objects (`void*`) | Yes | Contiguous pointer array with O(1) random access |
-| `adt_bytearray_t` | `adt_bytearray.h` | Bytes (`uint8_t`) | Yes | Mutable byte array with chunked growth |
+| `adt_bytearray_t` | `adt_bytearray.h` | Bytes (`uint8_t`) | Yes | Mutable byte array with geometric growth |
 | `adt_bytes_t` | `adt_bytes.h` | Bytes (`uint8_t`) | Yes | Immutable byte array |
 | `adt_str_t` | `adt_str.h` | Characters (`char*`) | Yes | Dynamic UTF-8 / ASCII string container |
 | `adt_hash_t` | `adt_hash.h` | Objects (`void*`) | Yes | Hash table with string keys |
