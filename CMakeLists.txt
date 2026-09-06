@@ -174,7 +174,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         )
 
         ### Benchmark / Performance Test
-        add_executable(adt_perf test/perf_adt_hash.c test/perf_adt_ary.c ${ADT_LIB_EXTRA})
+        add_executable(adt_perf test/adt_perf_main.c test/perf_adt_hash.c test/perf_adt_ary.c ${ADT_LIB_EXTRA})
         target_link_libraries(adt_perf PRIVATE adt)
         target_include_directories(adt_perf PRIVATE
                                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
