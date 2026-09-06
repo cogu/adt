@@ -15,6 +15,7 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
+#include "adt_error.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
@@ -25,23 +26,23 @@
  * @{
  */
 #ifndef BUF_E_OK
-#define BUF_E_OK        0 /**< Operation completed successfully. */
+#define BUF_E_OK        ADT_NO_ERROR               /**< Operation completed successfully. */
 #endif
 #ifndef BUF_E_NOT_OK
-#define BUF_E_NOT_OK    1 /**< Operation failed due to invalid arguments or allocation error. */
+#define BUF_E_NOT_OK    ADT_INVALID_ARGUMENT_ERROR /**< Operation failed due to invalid arguments or allocation error. */
 #endif
 #ifndef BUF_E_OVERFLOW
-#define BUF_E_OVERFLOW  2 /**< Ring buffer is full; element cannot be inserted. */
+#define BUF_E_OVERFLOW  ADT_OVERFLOW_ERROR         /**< Ring buffer is full; element cannot be inserted. */
 #endif
 #ifndef BUF_E_UNDERFLOW
-#define BUF_E_UNDERFLOW 3 /**< Ring buffer is empty; element cannot be removed or peeked. */
+#define BUF_E_UNDERFLOW ADT_UNDERFLOW_ERROR        /**< Ring buffer is empty; element cannot be removed or peeked. */
 #endif
 /** @} */
 
 /**
- * Ringbuffer error status type.
+ * Ringbuffer error status type (backward-compatible alias for adt_error_t).
  */
-typedef uint8_t adt_buf_err_t;
+typedef adt_error_t adt_buf_err_t;
 
 /**
  * Static circular FIFO ring buffer for elements of fixed byte size.
@@ -102,7 +103,7 @@ typedef struct adt_rbfh_tag
  * @param u8ElemSize Size of each element in bytes.
  * @return BUF_E_OK (0) on success.
  */
-uint8_t adt_rbfs_create(adt_rbfs_t* rbf, uint8_t* u8Buffer, uint16_t u32NumElem, uint8_t u8ElemSize);
+adt_error_t adt_rbfs_create(adt_rbfs_t* rbf, uint8_t* u8Buffer, uint16_t u32NumElem, uint8_t u8ElemSize);
 
 /**
  * Inserts an element into the static ring buffer.
@@ -113,7 +114,7 @@ uint8_t adt_rbfs_create(adt_rbfs_t* rbf, uint8_t* u8Buffer, uint16_t u32NumElem,
  * @param u8Data Pointer to the element data to copy into the buffer.
  * @return BUF_E_OK (0) on success, or BUF_E_OVERFLOW (2) if the buffer is full.
  */
-uint8_t adt_rbfs_insert(adt_rbfs_t* rbf, const uint8_t* u8Data);
+adt_error_t adt_rbfs_insert(adt_rbfs_t* rbf, const uint8_t* u8Data);
 
 /**
  * Removes the oldest element from the static ring buffer.
@@ -124,7 +125,7 @@ uint8_t adt_rbfs_insert(adt_rbfs_t* rbf, const uint8_t* u8Data);
  * @param u8Data Pointer to destination memory where the element will be copied.
  * @return BUF_E_OK (0) on success, or BUF_E_UNDERFLOW (3) if the buffer is empty.
  */
-uint8_t adt_rbfs_remove(adt_rbfs_t* rbf, uint8_t* u8Data);
+adt_error_t adt_rbfs_remove(adt_rbfs_t* rbf, uint8_t* u8Data);
 
 /**
  * Peeks at the oldest element without removing it from the static ring buffer.
@@ -135,7 +136,7 @@ uint8_t adt_rbfs_remove(adt_rbfs_t* rbf, uint8_t* u8Data);
  * @param u8Data Pointer to destination memory where the element will be copied.
  * @return BUF_E_OK (0) on success, or BUF_E_UNDERFLOW (3) if the buffer is empty.
  */
-uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data);
+adt_error_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data);
 
 /**
  * Returns the number of elements currently stored in the static ring buffer.
@@ -168,7 +169,7 @@ void adt_rbfs_clear(adt_rbfs_t* rbf);
  * @param u16NumElem Maximum number of uint16_t elements that can be stored.
  * @return BUF_E_OK (0) on success, or BUF_E_NOT_OK (1) if pointers are NULL or count is 0.
  */
-uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem);
+adt_error_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem);
 
 /**
  * Inserts a uint16_t value into the ring buffer.
@@ -177,7 +178,7 @@ uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16Nu
  * @param u16Data 16-bit unsigned integer value to store.
  * @return BUF_E_OK (0) on success, BUF_E_OVERFLOW (2) if full, or BUF_E_NOT_OK (1) on invalid argument.
  */
-uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data);
+adt_error_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data);
 
 /**
  * Removes the oldest uint16_t value from the ring buffer.
@@ -186,7 +187,7 @@ uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data);
  * @param u16Data Pointer to destination uint16_t where the removed value will be stored.
  * @return BUF_E_OK (0) on success, BUF_E_UNDERFLOW (3) if empty, or BUF_E_NOT_OK (1) on invalid argument.
  */
-uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data);
+adt_error_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data);
 
 /**
  * Peeks at the oldest uint16_t value without removing it from the buffer.
@@ -195,7 +196,7 @@ uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data);
  * @param u16Data Pointer to destination uint16_t where the value will be stored.
  * @return BUF_E_OK (0) on success, BUF_E_UNDERFLOW (3) if empty, or BUF_E_NOT_OK (1) on invalid argument.
  */
-uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data);
+adt_error_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data);
 
 /**
  * Returns the number of uint16_t elements currently stored in the ring buffer.

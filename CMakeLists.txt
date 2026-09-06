@@ -73,6 +73,7 @@ set (ADT_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_ary.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_bytearray.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_bytes.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_error.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_hash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_heap.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_list.c
@@ -110,6 +111,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                 test/adt/testsuite_adt_ary.c
                 test/adt/testsuite_adt_bytearray.c
                 test/adt/testsuite_adt_bytes.c
+                test/adt/testsuite_adt_error.c
                 test/adt/testsuite_adt_hash.c
                 test/adt/testsuite_adt_heap.c
                 test/adt/testsuite_adt_list.c
@@ -163,10 +165,12 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         target_compile_definitions(adt_perf PRIVATE
             DICTIONARY_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/enable1.txt"
         )
-        add_test(NAME adt_perf COMMAND adt_perf)
-        set_tests_properties(adt_perf PROPERTIES
-            LABELS "benchmark"
-        )
+        if (NOT LEAK_CHECK)
+            add_test(NAME adt_perf COMMAND adt_perf)
+            set_tests_properties(adt_perf PROPERTIES
+                LABELS "benchmark"
+            )
+        endif()
 
     endif()
 endif()

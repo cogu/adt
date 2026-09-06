@@ -3,7 +3,7 @@ Ringbuffer (adt_ringbuf)
 
 .. c:type:: adt_buf_err_t
 
-   Error status code returned by ringbuffer operations (``uint8_t``).
+   Error status code returned by ringbuffer operations (``adt_error_t``, backward-compatible alias).
 
 .. c:type:: adt_rbfs_t
 
@@ -51,12 +51,15 @@ For small embedded systems or safety-critical software where dynamic memory allo
 Status & Error Codes
 --------------------
 
-Ringbuffer operations return one of the following status codes:
+Ringbuffer operations return standard ADT error codes (:c:type:`adt_error_t`):
 
-* ``BUF_E_OK`` (``0``): Operation succeeded.
-* ``BUF_E_NOT_OK`` (``1``): Operation failed due to invalid arguments (e.g. NULL pointer or zero element count) or memory allocation error.
-* ``BUF_E_OVERFLOW`` (``2``): Ring buffer is full; insertion rejected.
-* ``BUF_E_UNDERFLOW`` (``3``): Ring buffer is empty; remove or peek cannot return an element.
+* ``ADT_NO_ERROR`` / ``BUF_E_OK`` (``0``): Operation succeeded.
+* ``ADT_INVALID_ARGUMENT_ERROR`` / ``BUF_E_NOT_OK`` (``1``): Operation failed due to invalid arguments (e.g. NULL pointer or zero element count).
+* ``ADT_OVERFLOW_ERROR`` / ``BUF_E_OVERFLOW`` (``9`` / legacy alias): Ring buffer is full; insertion rejected.
+* ``ADT_UNDERFLOW_ERROR`` / ``BUF_E_UNDERFLOW`` (``10`` / legacy alias): Ring buffer is empty; remove or peek cannot return an element.
+* ``ADT_MEM_ERROR`` (``2``): Memory allocation failed (in heap-managed :c:type:`adt_rbfh_t`).
+
+Legacy constants ``BUF_E_OK``, ``BUF_E_NOT_OK``, ``BUF_E_OVERFLOW``, ``BUF_E_UNDERFLOW`` and typedef ``adt_buf_err_t`` are preserved as aliases for full backward compatibility.
 
 Code Examples
 -------------

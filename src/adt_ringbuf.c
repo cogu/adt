@@ -46,7 +46,7 @@
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 #if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
-static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self);
+static adt_error_t adt_rbfh_grow(adt_rbfh_t* self);
 static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_t newAllocLen);
 DYN_STATIC  uint16_t adt_rbfh_nextLen(uint16_t wanted);
 #endif
@@ -62,28 +62,33 @@ DYN_STATIC  uint16_t adt_rbfh_nextLen(uint16_t wanted);
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
 
-//returns 0 on success
-uint8_t adt_rbfs_create(adt_rbfs_t* u8Rbf, uint8_t* u8Buffer, uint16_t u16NumElem, uint8_t u8ElemSize)
+adt_error_t adt_rbfs_create(adt_rbfs_t* u8Rbf, uint8_t* u8Buffer, uint16_t u16NumElem, uint8_t u8ElemSize)
 {
+   if ((u8Rbf == NULL) || (u8Buffer == NULL) || (u16NumElem == 0) || (u8ElemSize == 0))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    u8Rbf->u8Buffer = u8Buffer;
    u8Rbf->u8ReadPtr = u8Buffer;
    u8Rbf->u8WritePtr = u8Buffer;
    u8Rbf->u8ElemSize = u8ElemSize;
    u8Rbf->u16MaxNumElem = u16NumElem;
    u8Rbf->u16NumElem = 0;
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
 
-
-//returns 0 on success, 1 on overflow, 2 on underflow
-uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
+adt_error_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
 {
+   if ((u8Rbf == NULL) || (u8Data == NULL))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    uint8_t u8i;
    uint8_t* u8EndPtr = u8Rbf->u8Buffer + (((size_t) u8Rbf->u16MaxNumElem) * u8Rbf->u8ElemSize);
 
    if (u8Rbf->u16NumElem >= u8Rbf->u16MaxNumElem)
    {
-      return BUF_E_OVERFLOW;
+      return ADT_OVERFLOW_ERROR;
    }
 
    u8Rbf->u16NumElem++;
@@ -100,19 +105,21 @@ uint8_t adt_rbfs_insert(adt_rbfs_t* u8Rbf, const uint8_t* u8Data)
       u8Rbf->u8WritePtr = u8Rbf->u8Buffer;
    }
 
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
 
-
-//returns 0 on success, 1 on overflow, 2 on underflow
-uint8_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
+adt_error_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
 {
+   if ((u8Rbf == NULL) || (u8Data == NULL))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    uint8_t u8i;
    uint8_t* u8EndPtr = u8Rbf->u8Buffer + (((size_t) u8Rbf->u16MaxNumElem) * u8Rbf->u8ElemSize);
 
    if (u8Rbf->u16NumElem == 0)
    {
-      return BUF_E_UNDERFLOW;
+      return ADT_UNDERFLOW_ERROR;
    }
 
    for (u8i = 0; u8i < u8Rbf->u8ElemSize; u8i++)
@@ -127,9 +134,8 @@ uint8_t adt_rbfs_remove(adt_rbfs_t* u8Rbf, uint8_t* u8Data)
    }
 
    u8Rbf->u16NumElem--;
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
-
 
 uint16_t adt_rbfs_size(const adt_rbfs_t* u8Rbf)
 {
@@ -141,14 +147,18 @@ uint16_t adt_rbfs_free(const adt_rbfs_t* rbf)
    return (uint16_t) (rbf->u16MaxNumElem-rbf->u16NumElem);
 }
 
-uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data)
+adt_error_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data)
 {
+   if ((rbf == NULL) || (u8Data == NULL))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    uint8_t u8i;
    uint8_t* u8ReadPtr = rbf->u8ReadPtr;
 
    if (rbf->u16NumElem == 0)
    {
-      return BUF_E_UNDERFLOW;
+      return ADT_UNDERFLOW_ERROR;
    }
 
    for (u8i = 0; u8i < rbf->u8ElemSize; u8i++)
@@ -156,7 +166,7 @@ uint8_t adt_rbfs_peek(const adt_rbfs_t* rbf, uint8_t* u8Data)
       *(u8Data++) = *(u8ReadPtr++);
    }
 
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
 
 void adt_rbfs_clear(adt_rbfs_t* rbf)
@@ -166,24 +176,24 @@ void adt_rbfs_clear(adt_rbfs_t* rbf)
    rbf->u16NumElem = 0;
 }
 
-uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem){
+adt_error_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem){
    if ((rbf != NULL) && (u16Buffer != NULL) && (u16NumElem > 0)){
       rbf->u16Buffer = u16Buffer;
       rbf->u16MaxNumElem = u16NumElem;
       rbf->u16NumElem = 0;
       rbf->u16ReadPtr = u16Buffer;
       rbf->u16WritePtr = u16Buffer;
-      return BUF_E_OK;
+      return ADT_NO_ERROR;
    }
-   return BUF_E_NOT_OK;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
+adt_error_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
    if( rbf != NULL ){
       uint16_t *pEndPtr = rbf->u16Buffer + rbf->u16MaxNumElem;
       if(rbf->u16NumElem >= rbf->u16MaxNumElem){
          //full
-         return BUF_E_OVERFLOW;
+         return ADT_OVERFLOW_ERROR;
       }
       rbf->u16NumElem++;
       *rbf->u16WritePtr++ = u16Data;
@@ -192,17 +202,17 @@ uint8_t adt_rbfu16_insert(adt_rbfu16_t* rbf, uint16_t u16Data){
           //rewind
          rbf->u16WritePtr = rbf->u16Buffer;
       }
-      return BUF_E_OK;
+      return ADT_NO_ERROR;
    }
-   return BUF_E_NOT_OK;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
+adt_error_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
    if( (rbf != NULL) && (u16Data != NULL) ){
       uint16_t *pEndPtr = rbf->u16Buffer + rbf->u16MaxNumElem;
       if(rbf->u16NumElem == 0){
-         //full
-         return BUF_E_UNDERFLOW;
+         //empty
+         return ADT_UNDERFLOW_ERROR;
       }
       *u16Data = *rbf->u16ReadPtr++;
       if (rbf->u16ReadPtr >= pEndPtr)
@@ -211,21 +221,21 @@ uint8_t adt_rbfu16_remove(adt_rbfu16_t* rbf, uint16_t* u16Data){
          rbf->u16ReadPtr = rbf->u16Buffer;
       }
       rbf->u16NumElem--;
-      return BUF_E_OK;
+      return ADT_NO_ERROR;
    }
-   return BUF_E_NOT_OK;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data){
+adt_error_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data){
    if( (rbf != NULL) && (u16Data != NULL) ){
       if(rbf->u16NumElem == 0){
-         //full
-         return BUF_E_UNDERFLOW;
+         //empty
+         return ADT_UNDERFLOW_ERROR;
       }
       *u16Data = *rbf->u16ReadPtr;
-      return BUF_E_OK;
+      return ADT_NO_ERROR;
    }
-   return BUF_E_NOT_OK;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf){
@@ -239,7 +249,7 @@ uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf){
 /**
  * Creates new heap-managed ringbuffer containing elements of fixed size (u8ElemSize)
  */
-adt_buf_err_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize)
+adt_error_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize)
 {
    return adt_rbfh_create_with_params(self, u8ElemSize, ADT_RBFSH_MIN_NUM_ELEM, ADT_RBFSH_MAX_NUM_ELEM);
 }
@@ -248,7 +258,7 @@ adt_buf_err_t adt_rbfh_create(adt_rbfh_t* self, uint8_t u8ElemSize)
  * More advanced constructor which allows user to select lower and upper limit of the number of elements
  * When u16MaxNumElems is 0, it is treated as if it has no upper limit
  */
-adt_buf_err_t adt_rbfh_create_with_params(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
+adt_error_t adt_rbfh_create_with_params(adt_rbfh_t* self, uint8_t u8ElemSize, uint16_t u16MinNumElems, uint16_t u16MaxNumElems)
 {
    if ( (self != NULL) && (u8ElemSize > 0) && ( (u16MaxNumElems == 0) || (u16MaxNumElems > u16MinNumElems) ) )
    {
@@ -257,7 +267,7 @@ adt_buf_err_t adt_rbfh_create_with_params(adt_rbfh_t* self, uint8_t u8ElemSize, 
          self->u8AllocBuf = (uint8_t*) malloc( ((size_t) u8ElemSize) * u16MinNumElems);
          if (self->u8AllocBuf == NULL)
          {
-            return BUF_E_NOT_OK;
+            return ADT_MEM_ERROR;
          }
       }
       else
@@ -270,9 +280,9 @@ adt_buf_err_t adt_rbfh_create_with_params(adt_rbfh_t* self, uint8_t u8ElemSize, 
       self->u8ElemSize = u8ElemSize;
       self->u8ReadPtr = self->u8AllocBuf;
       self->u8WritePtr = self->u8AllocBuf;
-      return BUF_E_OK;
+      return ADT_NO_ERROR;
    }
-   return BUF_E_NOT_OK;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 /**
@@ -338,12 +348,16 @@ void adt_rbfh_delete(adt_rbfh_t* self)
 /**
  * Inserts one element into the rinbguffer
  */
-adt_buf_err_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data)
+adt_error_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data)
 {
+   if ((self == NULL) || (u8Data == NULL))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    if (self->u16NumElem == self->u16AllocLen)
    {
-      adt_buf_err_t result = adt_rbfh_grow(self);
-      if (result != BUF_E_OK)
+      adt_error_t result = adt_rbfh_grow(self);
+      if (result != ADT_NO_ERROR)
       {
          return result;
       }
@@ -356,17 +370,21 @@ adt_buf_err_t adt_rbfh_insert(adt_rbfh_t* self, const uint8_t* u8Data)
    {
       self->u8WritePtr = self->u8AllocBuf;
    }
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
 
 /**
  * Removes (and copies) oldest element from the ringbuffer.
  */
-adt_buf_err_t adt_rbfh_remove(adt_rbfh_t* self, uint8_t* u8Data)
+adt_error_t adt_rbfh_remove(adt_rbfh_t* self, uint8_t* u8Data)
 {
+   if ((self == NULL) || (u8Data == NULL))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    if (self->u16NumElem == 0)
    {
-      return BUF_E_UNDERFLOW;
+      return ADT_UNDERFLOW_ERROR;
    }
    uint8_t* u8EndPtr = self->u8AllocBuf + (((size_t) self->u16AllocLen) * self->u8ElemSize);
    memcpy(u8Data, self->u8ReadPtr, (size_t) self->u8ElemSize);
@@ -376,23 +394,26 @@ adt_buf_err_t adt_rbfh_remove(adt_rbfh_t* self, uint8_t* u8Data)
       self->u8ReadPtr = self->u8AllocBuf;
    }
    self->u16NumElem--;
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
 
 /**
  * Copies oldest data element but does not (yet) remove it from the buffer.
  */
-adt_buf_err_t adt_rbfh_peek(const adt_rbfh_t* self, uint8_t* u8Data)
+adt_error_t adt_rbfh_peek(const adt_rbfh_t* self, uint8_t* u8Data)
 {
-
+   if ((self == NULL) || (u8Data == NULL))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    if (self->u16NumElem == 0)
    {
-      return BUF_E_UNDERFLOW;
+      return ADT_UNDERFLOW_ERROR;
    }
 
    memcpy(u8Data, self->u8ReadPtr, (size_t) self->u8ElemSize);
 
-   return BUF_E_OK;
+   return ADT_NO_ERROR;
 }
 
 /**
@@ -438,11 +459,11 @@ void adt_rbfh_clear(adt_rbfh_t* self)
 //////////////////////////////////////////////////////////////////////////////
 
 #if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
-static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self)
+static adt_error_t adt_rbfh_grow(adt_rbfh_t* self)
 {
    if (self->u16AllocLen == USHRT_MAX)
    {
-      return BUF_E_OVERFLOW;
+      return ADT_OVERFLOW_ERROR;
    }
    else
    {
@@ -452,10 +473,10 @@ static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self)
       if (newAllocBuf != NULL)
       {
          adt_rbfh_swapBuffers(self, newAllocBuf, newAllocLen);
-         return BUF_E_OK;
+         return ADT_NO_ERROR;
       }
    }
-   return BUF_E_NOT_OK;
+   return ADT_MEM_ERROR;
 }
 
 

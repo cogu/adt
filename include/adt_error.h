@@ -28,10 +28,15 @@
 #define ADT_NOT_IMPLEMENTED_ERROR      6
 #define ADT_UNKNOWN_ENCODING_ERROR     7
 #define ADT_OBJECT_COMPARE_ERROR       8
+#define ADT_OVERFLOW_ERROR             9
+#define ADT_UNDERFLOW_ERROR            10
+#define ADT_NOT_FOUND_ERROR            11
+#define ADT_ALREADY_EXISTS_ERROR       12
 
 typedef int8_t adt_error_t;
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
+const char *adt_error_str(adt_error_t error);
 
 #endif //ADT_ERROR_H
