@@ -373,11 +373,16 @@ void test_adt_u16Map_move_large(CuTest* tc){
    adt_u16Map_create(map1, elems1, 100, NULL);
    adt_u16Map_create(map2, elems2, 100, NULL);
 
-   adt_u16Map_insert(map1, 10, (void*) 1);
+   int val1 = 1;
+   int val2 = 2;
+   int values[50];
+
+   adt_u16Map_insert(map1, 10, &val1);
    for (uint32_t i = 0; i < count; i++) {
-      adt_u16Map_insert(map1, 50, (void*)(uintptr_t)(i + 100));
+      values[i] = (int)(i + 100);
+      adt_u16Map_insert(map1, 50, &values[i]);
    }
-   adt_u16Map_insert(map1, 90, (void*) 2);
+   adt_u16Map_insert(map1, 90, &val2);
    CuAssertUIntEquals(tc, count + 2, adt_u16Map_size(map1));
 
    uint32_t moved = adt_u16Map_move_elem(map2, map1, 50);
@@ -395,13 +400,34 @@ void test_adt_u16Map_move_large(CuTest* tc){
    for (uint32_t i = 0; i < count; i++) {
       CuAssertPtrNotNull(tc, it);
       CuAssertIntEquals(tc, 50, it->key);
-      CuAssertPtrEquals(tc, (void*)(uintptr_t)(i + 100), it->val);
+      CuAssertPtrEquals(tc, &values[i], it->val);
       it = adt_u16Map_iter_next(map2);
    }
    CuAssertPtrEquals(tc, NULL, it);
 
    adt_u16Map_destroy(map1);
    adt_u16Map_destroy(map2);
+}
+
+void test_adt_u16Map_errors(CuTest* tc){
+   adt_u16MapElem_t elem[2];
+   adt_u16Map_t map;
+   adt_u16Map_create(&map, elem, 2, NULL);
+
+   // NULL self checks
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u16Map_insert(NULL, 1, NULL));
+
+   // Normal inserts return ADT_NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u16Map_insert(&map, 10, (void*) 1));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u16Map_insert(&map, 20, (void*) 2));
+
+   // Duplicate key+val returns ADT_NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u16Map_insert(&map, 10, (void*) 1));
+
+   // Map is full (max_num_elem == 2): overflow error
+   CuAssertIntEquals(tc, ADT_OVERFLOW_ERROR, adt_u16Map_insert(&map, 30, (void*) 3));
+
+   adt_u16Map_destroy(&map);
 }
 
 CuSuite* testsuite_adt_u16Map(void)
@@ -420,6 +446,7 @@ CuSuite* testsuite_adt_u16Map(void)
    SUITE_ADD_TEST(suite, test_adt_u16Map_new_delete);
    SUITE_ADD_TEST(suite, test_adt_u16Map_largeCapacity);
 #endif
+   SUITE_ADD_TEST(suite, test_adt_u16Map_errors);
 
    return suite;
 }

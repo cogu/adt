@@ -9,7 +9,7 @@ The **adt_set** module provides a set container that stores unique 32-bit unsign
 
 Key features:
 
-* **Automatic Deduplication**: Duplicate values are silently rejected upon insertion, ensuring each integer appears at most once.
+* **Automatic Deduplication**: Duplicate values are ignored upon insertion (returning ``ADT_NO_ERROR``), ensuring each integer appears at most once.
 * **Sorted Invariant**: Elements are maintained in sorted ascending order, enabling early-exit optimizations when searching or removing elements.
 * **Dual Lifecycle Management**: Supports both stack/in-place initialization (:c:func:`adt_u32Set_create` / :c:func:`adt_u32Set_destroy`) and dynamic heap allocation (:c:func:`adt_u32Set_new` / :c:func:`adt_u32Set_delete` / :c:func:`adt_u32Set_vdelete`).
 * **Container Compatibility**: Provides :c:func:`adt_u32Set_vdelete` for seamless cleanup when sets are nested inside generic ADT pointer containers (such as :c:type:`adt_ary_t` or :c:type:`adt_hash_t`).
@@ -28,11 +28,11 @@ Code Example
        adt_u32Set_t set;
        adt_u32Set_create(&set);
 
-       // Insert values (duplicates are automatically ignored)
+       // Insert values (duplicates return ADT_NO_ERROR without adding)
        adt_u32Set_insert(&set, 42);
        adt_u32Set_insert(&set, 10);
        adt_u32Set_insert(&set, 99);
-       adt_u32Set_insert(&set, 42); // Duplicate: ignored
+       adt_u32Set_insert(&set, 42); // Duplicate: returns ADT_NO_ERROR
 
        printf("Set contains %d elements\n", adt_u32Set_length(&set)); // Prints 3
 

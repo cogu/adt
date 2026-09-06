@@ -95,9 +95,9 @@ void adt_u16Map_clear(adt_u16Map_t *self){
    }
 }
 
-void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
-   if ((self == NULL) || (self->pBegin == NULL) || (self->num_elem >= self->max_num_elem)) {
-      return;
+adt_error_t adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
+   if ((self == NULL) || (self->pBegin == NULL)) {
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
 
    uint32_t i;
@@ -113,10 +113,14 @@ void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
       while ((i < self->num_elem) && (self->pBegin[i].key == key)) {
          if (self->pBegin[i].val == val) {
             // Exact key/val duplicate already in map; ignore insert request
-            return;
+            return ADT_NO_ERROR;
          }
          i++;
       }
+   }
+
+   if (self->num_elem >= self->max_num_elem) {
+      return ADT_OVERFLOW_ERROR;
    }
 
    // Make room for elem if inserting before the end
@@ -128,6 +132,7 @@ void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
    self->pBegin[i].val = val;
    self->num_elem++;
    self->pEnd++;
+   return ADT_NO_ERROR;
 }
 
 void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){

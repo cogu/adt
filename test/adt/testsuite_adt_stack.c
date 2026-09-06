@@ -165,6 +165,25 @@ void test_adt_stack_resize(CuTest* tc)
    adt_stack_delete(pStack);
 }
 
+void test_adt_stack_errors(CuTest* tc)
+{
+   adt_stack_t *pStack = adt_stack_new(NULL);
+   CuAssertPtrNotNull(tc, pStack);
+
+   // NULL self checks
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_stack_push(NULL, (void*) 1));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_stack_reserve(NULL, 10));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_stack_resize(NULL, 10));
+
+   // Successful operations return ADT_NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_stack_reserve(pStack, 16));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_stack_resize(pStack, 8));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_stack_push(pStack, (void*) 1));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_stack_push(pStack, (void*) 2));
+
+   adt_stack_delete(pStack);
+}
+
 CuSuite* testsuite_adt_stack(void)
 {
    CuSuite* suite = CuSuiteNew();
@@ -175,6 +194,7 @@ CuSuite* testsuite_adt_stack(void)
    SUITE_ADD_TEST(suite, test_adt_stack_pop);
    SUITE_ADD_TEST(suite, test_adt_stack_reserve);
    SUITE_ADD_TEST(suite, test_adt_stack_resize);
+   SUITE_ADD_TEST(suite, test_adt_stack_errors);
 
    return suite;
 }

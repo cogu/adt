@@ -37,6 +37,7 @@ static void test_adt_u32Set_is_empty(CuTest* tc);
 static void test_adt_u32Set_vdelete(CuTest* tc);
 static void test_adt_u32Set_value_bounds(CuTest* tc);
 static void test_adt_u32Set_large(CuTest* tc);
+static void test_adt_u32Set_errors(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // GLOBAL FUNCTIONS
@@ -56,6 +57,7 @@ CuSuite* testsuite_adt_u32Set(void)
    SUITE_ADD_TEST(suite, test_adt_u32Set_vdelete);
    SUITE_ADD_TEST(suite, test_adt_u32Set_value_bounds);
    SUITE_ADD_TEST(suite, test_adt_u32Set_large);
+   SUITE_ADD_TEST(suite, test_adt_u32Set_errors);
 
    return suite;
 }
@@ -330,6 +332,31 @@ static void test_adt_u32Set_large(CuTest* tc)
       CuAssertTrue(tc, !adt_u32Set_contains(&set, val));
    }
 
+   adt_u32Set_destroy(&set);
+}
+
+static void test_adt_u32Set_errors(CuTest* tc)
+{
+   adt_u32Set_t set;
+   adt_u32Set_create(&set);
+
+   // NULL self check
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u32Set_insert(NULL, 10));
+
+   // Normal insert returns ADT_NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u32Set_insert(&set, 10));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u32Set_insert(&set, 20));
+
+   // Duplicate insert returns ADT_NO_ERROR (idempotent)
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u32Set_insert(&set, 10));
+   CuAssertIntEquals(tc, 2, adt_u32Set_length(&set));
+
+   // Overflow test: artificially set s32CurLen to INT32_MAX
+   set.s32CurLen = INT32_MAX;
+   CuAssertIntEquals(tc, ADT_OVERFLOW_ERROR, adt_u32Set_insert(&set, 99));
+
+   // Reset before destroy
+   set.s32CurLen = 2;
    adt_u32Set_destroy(&set);
 }
 

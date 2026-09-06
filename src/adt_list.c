@@ -117,95 +117,104 @@ void adt_list_destructor_enable(adt_list_t *self, bool enable){
 /**
  * inserts at end of the list
  */
-void adt_list_insert(adt_list_t *self, void *pItem)
+adt_error_t adt_list_insert(adt_list_t *self, void *pItem)
 {
-   if (self != NULL)
+   if (self == NULL)
    {
-      adt_list_elem_t *elem = adt_list_elem_new(pItem, NULL, self->pLast);
-      if (elem != NULL)
-      {
-         if (self->pLast == NULL)
-         {
-            assert(self->pFirst == NULL); //list must be empty if pLast is NULL
-            self->pLast = elem;
-            self->pFirst = elem;
-         }
-         else
-         {
-            self->pLast->pNext=elem;
-            self->pLast=elem;
-         }
-      }
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_list_elem_t *elem = adt_list_elem_new(pItem, NULL, self->pLast);
+   if (elem == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+   if (self->pLast == NULL)
+   {
+      assert(self->pFirst == NULL); //list must be empty if pLast is NULL
+      self->pLast = elem;
+      self->pFirst = elem;
+   }
+   else
+   {
+      self->pLast->pNext = elem;
+      self->pLast = elem;
+   }
+   return ADT_NO_ERROR;
 }
 
 /**
  * insert pItem before pIter
  */
-void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
+adt_error_t adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
 {
-   if( (self != NULL) && (pIter != NULL) && (pItem != NULL) )
+   if ((self == NULL) || (pIter == NULL))
    {
-      adt_list_elem_t *pElem = adt_list_elem_new(pItem,pIter, pIter->pPrev);
-      if (pElem != NULL)
-      {
-         if (pIter->pPrev != NULL)
-         {
-            pIter->pPrev->pNext = pElem;
-         }
-         pIter->pPrev = pElem;
-         //adjust pFirst if we are inserting at beginning of list
-         if (self->pFirst == pIter)
-         {
-            self->pFirst = pElem;
-         }
-      }
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_list_elem_t *pElem = adt_list_elem_new(pItem, pIter, pIter->pPrev);
+   if (pElem == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+   if (pIter->pPrev != NULL)
+   {
+      pIter->pPrev->pNext = pElem;
+   }
+   pIter->pPrev = pElem;
+   //adjust pFirst if we are inserting at beginning of list
+   if (self->pFirst == pIter)
+   {
+      self->pFirst = pElem;
+   }
+   return ADT_NO_ERROR;
 }
 
 /**
  * insert pElem after pIter
  */
-void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
+adt_error_t adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem)
 {
-   if( (self != NULL) && (pIter != NULL) && (pItem != NULL) )
+   if ((self == NULL) || (pIter == NULL))
    {
-      adt_list_elem_t *pElem = adt_list_elem_new(pItem,pIter->pNext, pIter);
-      if (pElem != NULL)
-      {
-         if (pIter->pNext != NULL)
-         {
-            pIter->pNext->pPrev = pElem;
-         }
-         pIter->pNext = pElem;
-         //adjust pLast in case we are inserting at end of list
-         if (pIter == self->pLast)
-         {
-            self->pLast = pElem;
-         }
-      }
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_list_elem_t *pElem = adt_list_elem_new(pItem, pIter->pNext, pIter);
+   if (pElem == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+   if (pIter->pNext != NULL)
+   {
+      pIter->pNext->pPrev = pElem;
+   }
+   pIter->pNext = pElem;
+   //adjust pLast in case we are inserting at end of list
+   if (pIter == self->pLast)
+   {
+      self->pLast = pElem;
+   }
+   return ADT_NO_ERROR;
 }
 
 /**
  * Same as adt_list_insert with the exception that it prevents pItem from getting added twice to the list
  */
-void adt_list_insert_unique(adt_list_t *self, void *pItem)
+adt_error_t adt_list_insert_unique(adt_list_t *self, void *pItem)
 {
-   if (self != NULL)
+   if (self == NULL)
    {
-      adt_list_elem_t *pIter = self->pFirst; //create a local iterator
-      while( pIter != NULL )
-      {
-         adt_list_elem_t *pNext = pIter->pNext;
-         if (pIter->pItem == pItem)
-         {
-            return; //pItem already in list
-         }
-         pIter=pNext;
-      }
-      adt_list_insert(self, pItem);
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_list_elem_t *pIter = self->pFirst; //create a local iterator
+   while (pIter != NULL)
+   {
+      if (pIter->pItem == pItem)
+      {
+         return ADT_NO_ERROR; //pItem already in list
+      }
+      pIter = pIter->pNext;
+   }
+   return adt_list_insert(self, pItem);
 }
 
 /**
@@ -440,67 +449,76 @@ void  adt_u32List_vdelete(void *arg)
 /**
  * inserts \param item at end of list
  */
-void adt_u32List_insert(adt_u32List_t *self, uint32_t item)
+adt_error_t adt_u32List_insert(adt_u32List_t *self, uint32_t item)
 {
-   if (self != NULL)
+   if (self == NULL)
    {
-      adt_u32List_elem_t *elem = adt_u32List_elem_new(item, NULL, self->pLast);
-      if (elem != NULL)
-      {
-         if (self->pLast == NULL)
-         {
-            assert(self->pFirst == NULL); //list must be empty if pLast is NULL
-            self->pLast = self->pFirst = elem;
-         }
-         else
-         {
-            self->pLast->pNext=elem;
-            self->pLast=elem;
-         }
-      }
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_u32List_elem_t *elem = adt_u32List_elem_new(item, NULL, self->pLast);
+   if (elem == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+   if (self->pLast == NULL)
+   {
+      assert(self->pFirst == NULL); //list must be empty if pLast is NULL
+      self->pLast = self->pFirst = elem;
+   }
+   else
+   {
+      self->pLast->pNext = elem;
+      self->pLast = elem;
+   }
+   return ADT_NO_ERROR;
 }
 
-void adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item)
+adt_error_t adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item)
 {
-   if( (self != NULL) && (pIter != NULL) )
+   if ((self == NULL) || (pIter == NULL))
    {
-      adt_u32List_elem_t *pElem = adt_u32List_elem_new(item, pIter, pIter->pPrev);
-      if (pElem != NULL)
-      {
-         if (pIter->pPrev != NULL)
-         {
-            pIter->pPrev->pNext = pElem;
-         }
-         pIter->pPrev = pElem;
-         //adjust pFirst if we are inserting at beginning of list
-         if (self->pFirst == pIter)
-         {
-            self->pFirst = pElem;
-         }
-      }
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_u32List_elem_t *pElem = adt_u32List_elem_new(item, pIter, pIter->pPrev);
+   if (pElem == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+   if (pIter->pPrev != NULL)
+   {
+      pIter->pPrev->pNext = pElem;
+   }
+   pIter->pPrev = pElem;
+   //adjust pFirst if we are inserting at beginning of list
+   if (self->pFirst == pIter)
+   {
+      self->pFirst = pElem;
+   }
+   return ADT_NO_ERROR;
 }
 
-void adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item)
+adt_error_t adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item)
 {
-   if( (self != NULL) && (pIter != NULL) )
+   if ((self == NULL) || (pIter == NULL))
    {
-      adt_u32List_elem_t *pElem = adt_u32List_elem_new(item,pIter->pNext, pIter);
-      if (pElem != NULL)
-      {
-         if (pIter->pNext != NULL)
-         {
-            pIter->pNext->pPrev = pElem;
-         }
-         pIter->pNext = pElem;
-         //adjust pLast in case we are inserting at end of list
-         if (pIter == self->pLast)
-         {
-            self->pLast = pElem;
-         }
-      }
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   adt_u32List_elem_t *pElem = adt_u32List_elem_new(item, pIter->pNext, pIter);
+   if (pElem == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+   if (pIter->pNext != NULL)
+   {
+      pIter->pNext->pPrev = pElem;
+   }
+   pIter->pNext = pElem;
+   //adjust pLast in case we are inserting at end of list
+   if (pIter == self->pLast)
+   {
+      self->pLast = pElem;
+   }
+   return ADT_NO_ERROR;
 }
 
 /**

@@ -107,46 +107,49 @@ int32_t adt_u32Set_length(adt_u32Set_t *self)
 /**
  * inserts val into the internal array. The array is automatically kept sorted.
  */
-void adt_u32Set_insert(adt_u32Set_t *self, uint32_t val)
+adt_error_t adt_u32Set_insert(adt_u32Set_t *self, uint32_t val)
 {
-   if (self != NULL)
+   if (self == NULL)
    {
-      int32_t insert_pos = 0;
-      if (adt_u32Set_find_index(self, val, &insert_pos))
-      {
-         return; // Value already exists, prevent duplicates
-      }
-
-      if (self->s32CurLen == INT32_MAX)
-      {
-         return;
-      }
-
-      if (self->s32CurLen == self->s32AllocLen)
-      {
-         int32_t new_capacity = (self->s32AllocLen < ADT_U32SET_MIN_CAPACITY) ? ADT_U32SET_MIN_CAPACITY : self->s32AllocLen * 2;
-         if (self->s32AllocLen > (INT32_MAX / 2))
-         {
-            new_capacity = INT32_MAX;
-         }
-         uint32_t *pAlloc = (uint32_t*) realloc(self->pAlloc, sizeof(uint32_t) * (size_t)new_capacity);
-         if (pAlloc == NULL)
-         {
-            return;
-         }
-         self->pAlloc = pAlloc;
-         self->s32AllocLen = new_capacity;
-      }
-
-      int32_t num_to_move = self->s32CurLen - insert_pos;
-      if (num_to_move > 0)
-      {
-         memmove(&self->pAlloc[insert_pos + 1], &self->pAlloc[insert_pos], sizeof(uint32_t) * (size_t)num_to_move);
-      }
-
-      self->pAlloc[insert_pos] = val;
-      self->s32CurLen++;
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+
+   if (self->s32CurLen == INT32_MAX)
+   {
+      return ADT_OVERFLOW_ERROR;
+   }
+
+   int32_t insert_pos = 0;
+   if (adt_u32Set_find_index(self, val, &insert_pos))
+   {
+      return ADT_NO_ERROR; // Value already exists, prevent duplicates
+   }
+
+   if (self->s32CurLen == self->s32AllocLen)
+   {
+      int32_t new_capacity = (self->s32AllocLen < ADT_U32SET_MIN_CAPACITY) ? ADT_U32SET_MIN_CAPACITY : self->s32AllocLen * 2;
+      if (self->s32AllocLen > (INT32_MAX / 2))
+      {
+         new_capacity = INT32_MAX;
+      }
+      uint32_t *pAlloc = (uint32_t*) realloc(self->pAlloc, sizeof(uint32_t) * (size_t)new_capacity);
+      if (pAlloc == NULL)
+      {
+         return ADT_MEM_ERROR;
+      }
+      self->pAlloc = pAlloc;
+      self->s32AllocLen = new_capacity;
+   }
+
+   int32_t num_to_move = self->s32CurLen - insert_pos;
+   if (num_to_move > 0)
+   {
+      memmove(&self->pAlloc[insert_pos + 1], &self->pAlloc[insert_pos], sizeof(uint32_t) * (size_t)num_to_move);
+   }
+
+   self->pAlloc[insert_pos] = val;
+   self->s32CurLen++;
+   return ADT_NO_ERROR;
 }
 
 bool adt_u32Set_remove(adt_u32Set_t *self, uint32_t val)
