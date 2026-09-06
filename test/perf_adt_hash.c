@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include "adt_hash.h"
+#include "perf_adt_ary.h"
 
 #ifndef DICTIONARY_PATH
 #define DICTIONARY_PATH "test/enable1.txt"
@@ -62,6 +63,8 @@ int main(int argc, char **argv)
    int value = 42;
    int items = 0;
    int dup = 0;
+
+   printf("=== adt_hash benchmarks ===\n");
 
    // 1. Insertion benchmark
    clock_t start = clock();
@@ -133,5 +136,8 @@ int main(int argc, char **argv)
    printf("adt_hash iteration time: %f s (count: %d)\n", elapsed_time, iter_count);
 
    adt_hash_delete(pHash);
+
+   perf_adt_ary_run(dict_path);
+
    return 0;
 }

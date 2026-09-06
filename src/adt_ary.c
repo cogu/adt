@@ -33,7 +33,14 @@
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 static void adt_block_memmove(uint8_t*pDest, uint8_t*pSrc, uint32_t u32Remain);
-static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, bool reverse);
+static adt_error_t adt_ary_introsort(void **elems, int32_t low, int32_t high, int32_t depth_limit, adt_vlt_func_t *key, bool reverse);
+static adt_error_t adt_ary_insertion_sort_range(void **elems, int32_t start, int32_t end, adt_vlt_func_t *key, bool reverse);
+static adt_error_t adt_ary_heapsort_range(void **elems, int32_t start, int32_t end, adt_vlt_func_t *key, bool reverse);
+static adt_error_t adt_ary_sift_down(void **elems, int32_t start, int32_t count, int32_t root, adt_vlt_func_t *key, bool reverse);
+static adt_error_t adt_ary_partition(void **elems, int32_t low, int32_t high, int32_t *pivot_idx, adt_vlt_func_t *key, bool reverse);
+static adt_error_t adt_ary_median_of_three(void **elems, int32_t a, int32_t b, int32_t c, adt_vlt_func_t *key, bool reverse);
+static void adt_ary_swap(void **a, void **b);
+static bool adt_ary_elem_less(const void *a, const void *b, adt_vlt_func_t *key, bool reverse, adt_error_t *err);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -510,8 +517,18 @@ adt_error_t adt_ary_sort(adt_ary_t *self, adt_vlt_func_t *key, bool reverse)
    {
       return ADT_INVALID_ARGUMENT_ERROR;
    }
-   ///TODO: For now we simply use insertion sort. Will need to implement Timsort later on.
-   return adt_ary_insertion_sort(self, key, reverse);
+   if (self->s32CurLen <= 1)
+   {
+      return ADT_NO_ERROR;
+   }
+
+   int32_t depth_limit = 0;
+   for (int32_t n = self->s32CurLen; n > 1; n >>= 1)
+   {
+      depth_limit += 2;
+   }
+
+   return adt_ary_introsort(self->pFirst, 0, self->s32CurLen - 1, depth_limit, key, reverse);
 }
 
 int adt_i32_vlt(const void *a, const void *b)
@@ -567,73 +584,216 @@ static void adt_block_memmove(uint8_t *pDest, uint8_t*pSrc, uint32_t u32Remain){
    }
 }
 
-static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, bool reverse)
-{
-   int32_t arrayLen = self->s32CurLen;
-   if (arrayLen > 1)
-   {
-      int32_t unsortedStart = 1;
+#define ADT_SORT_THRESHOLD 16
 
-      while(unsortedStart < arrayLen)
+static void adt_ary_swap(void **a, void **b)
+{
+   void *tmp = *a;
+   *a = *b;
+   *b = tmp;
+}
+
+static bool adt_ary_elem_less(const void *a, const void *b, adt_vlt_func_t *key, bool reverse, adt_error_t *err)
+{
+   int res = reverse ? key(b, a) : key(a, b);
+   if (res < 0)
+   {
+      *err = ADT_OBJECT_COMPARE_ERROR;
+      return false;
+   }
+   return (res > 0);
+}
+
+static adt_error_t adt_ary_insertion_sort_range(void **elems, int32_t start, int32_t end, adt_vlt_func_t *key, bool reverse)
+{
+   adt_error_t err = ADT_NO_ERROR;
+   for (int32_t i = start + 1; i <= end; i++)
+   {
+      void *val = elems[i];
+      int32_t j = i - 1;
+      while (j >= start)
       {
-         int result;
-         void *rhs = self->pFirst[unsortedStart];
-         void *lhs = self->pFirst[unsortedStart-1];
-         result = vlt(lhs, rhs);
-         if (result < 0)
+         bool less = adt_ary_elem_less(val, elems[j], key, reverse, &err);
+         if (err != ADT_NO_ERROR)
          {
-            return ADT_OBJECT_COMPARE_ERROR;
+            return err;
          }
-         else
+         if (!less)
          {
-            if (reverse)
-            {
-               result = !result;
-            }
-            if (result == 0)
-            {
-               int32_t i;
-               bool isHandled = false;
-               self->pFirst[unsortedStart] = lhs;
-               for(i=unsortedStart-1; i>0; i--)
-               {
-                  lhs = self->pFirst[i-1];
-                  result = vlt(lhs, rhs);
-                  if (result < 0)
-                  {
-                     return ADT_OBJECT_COMPARE_ERROR;
-                  }
-                  if (reverse)
-                  {
-                     result = !result;
-                  }
-                  if (result == 0)
-                  {
-                     self->pFirst[i] = lhs;
-                  }
-                  else
-                  {
-                     isHandled = true;
-                     self->pFirst[i] = rhs;
-                     unsortedStart++;
-                     break;
-                  }
-               }
-               if (!isHandled)
-               {
-                  assert(i == 0);
-                  self->pFirst[0] = rhs;
-                  unsortedStart++;
-               }
-            }
-            else
-            {
-               unsortedStart++; //items are already sorted
-            }
+            break;
          }
+         elems[j + 1] = elems[j];
+         j--;
+      }
+      elems[j + 1] = val;
+   }
+   return ADT_NO_ERROR;
+}
+
+static adt_error_t adt_ary_sift_down(void **elems, int32_t start, int32_t count, int32_t root, adt_vlt_func_t *key, bool reverse)
+{
+   adt_error_t err = ADT_NO_ERROR;
+   while ((2 * root + 1) < count)
+   {
+      int32_t child = 2 * root + 1;
+      if (child + 1 < count)
+      {
+         bool child_less = adt_ary_elem_less(elems[start + child], elems[start + child + 1], key, reverse, &err);
+         if (err != ADT_NO_ERROR)
+         {
+            return err;
+         }
+         if (child_less)
+         {
+            child++;
+         }
+      }
+      bool root_less = adt_ary_elem_less(elems[start + root], elems[start + child], key, reverse, &err);
+      if (err != ADT_NO_ERROR)
+      {
+         return err;
+      }
+      if (root_less)
+      {
+         adt_ary_swap(&elems[start + root], &elems[start + child]);
+         root = child;
+      }
+      else
+      {
+         break;
       }
    }
    return ADT_NO_ERROR;
+}
+
+static adt_error_t adt_ary_heapsort_range(void **elems, int32_t start, int32_t end, adt_vlt_func_t *key, bool reverse)
+{
+   int32_t count = end - start + 1;
+   adt_error_t err = ADT_NO_ERROR;
+
+   for (int32_t i = (count / 2) - 1; i >= 0; i--)
+   {
+      err = adt_ary_sift_down(elems, start, count, i, key, reverse);
+      if (err != ADT_NO_ERROR)
+      {
+         return err;
+      }
+   }
+
+   for (int32_t i = count - 1; i > 0; i--)
+   {
+      adt_ary_swap(&elems[start], &elems[start + i]);
+      err = adt_ary_sift_down(elems, start, i, 0, key, reverse);
+      if (err != ADT_NO_ERROR)
+      {
+         return err;
+      }
+   }
+   return ADT_NO_ERROR;
+}
+
+static adt_error_t adt_ary_median_of_three(void **elems, int32_t a, int32_t b, int32_t c, adt_vlt_func_t *key, bool reverse)
+{
+   adt_error_t err = ADT_NO_ERROR;
+   bool less;
+
+   less = adt_ary_elem_less(elems[b], elems[a], key, reverse, &err);
+   if (err != ADT_NO_ERROR) return err;
+   if (less) adt_ary_swap(&elems[a], &elems[b]);
+
+   less = adt_ary_elem_less(elems[c], elems[a], key, reverse, &err);
+   if (err != ADT_NO_ERROR) return err;
+   if (less) adt_ary_swap(&elems[a], &elems[c]);
+
+   less = adt_ary_elem_less(elems[c], elems[b], key, reverse, &err);
+   if (err != ADT_NO_ERROR) return err;
+   if (less) adt_ary_swap(&elems[b], &elems[c]);
+
+   return ADT_NO_ERROR;
+}
+
+static adt_error_t adt_ary_partition(void **elems, int32_t low, int32_t high, int32_t *pivot_idx, adt_vlt_func_t *key, bool reverse)
+{
+   adt_error_t err = ADT_NO_ERROR;
+   int32_t mid = low + (high - low) / 2;
+
+   err = adt_ary_median_of_three(elems, low, mid, high, key, reverse);
+   if (err != ADT_NO_ERROR)
+   {
+      return err;
+   }
+
+   void *pivot = elems[mid];
+   int32_t i = low - 1;
+   int32_t j = high + 1;
+
+   while (true)
+   {
+      do
+      {
+         i++;
+      } while (adt_ary_elem_less(elems[i], pivot, key, reverse, &err));
+      if (err != ADT_NO_ERROR)
+      {
+         return err;
+      }
+
+      do
+      {
+         j--;
+      } while (adt_ary_elem_less(pivot, elems[j], key, reverse, &err));
+      if (err != ADT_NO_ERROR)
+      {
+         return err;
+      }
+
+      if (i >= j)
+      {
+         *pivot_idx = j;
+         return ADT_NO_ERROR;
+      }
+
+      adt_ary_swap(&elems[i], &elems[j]);
+   }
+}
+
+static adt_error_t adt_ary_introsort(void **elems, int32_t low, int32_t high, int32_t depth_limit, adt_vlt_func_t *key, bool reverse)
+{
+   while ((high - low + 1) > ADT_SORT_THRESHOLD)
+   {
+      if (depth_limit <= 0)
+      {
+         return adt_ary_heapsort_range(elems, low, high, key, reverse);
+      }
+      depth_limit--;
+
+      int32_t p = 0;
+      adt_error_t err = adt_ary_partition(elems, low, high, &p, key, reverse);
+      if (err != ADT_NO_ERROR)
+      {
+         return err;
+      }
+
+      if ((p - low) < (high - (p + 1)))
+      {
+         err = adt_ary_introsort(elems, low, p, depth_limit, key, reverse);
+         if (err != ADT_NO_ERROR)
+         {
+            return err;
+         }
+         low = p + 1;
+      }
+      else
+      {
+         err = adt_ary_introsort(elems, p + 1, high, depth_limit, key, reverse);
+         if (err != ADT_NO_ERROR)
+         {
+            return err;
+         }
+         high = p;
+      }
+   }
+   return adt_ary_insertion_sort_range(elems, low, high, key, reverse);
 }
 
 
