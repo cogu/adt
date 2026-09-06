@@ -23,8 +23,8 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
-#define DATA_BLOCK_MAX 65536 	//maximum amount of bytes that can be copied in memmmove is implementation specific,
-								      //use define to control how many bytes shall be copied
+#define DATA_BLOCK_MAX 65536  //maximum amount of bytes that can be copied in memmmove is implementation specific,
+                              //use define to control how many bytes shall be copied
 
 #define ELEM_SIZE (sizeof(void*))
 #define ELEM_VALUE_IS_LESS(T) ( *((T*) a) < *((T*) b) )
@@ -42,46 +42,46 @@ static adt_error_t adt_ary_insertion_sort(adt_ary_t *self, adt_vlt_func_t *vlt, 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-adt_ary_t*	adt_ary_new(void (*pDestructor)(void*)){
-	adt_ary_t *self;
-	if((self = malloc(sizeof(adt_ary_t)))==NULL){
-		return NULL;
-	}
-	adt_ary_create(self,pDestructor);
-	return self;
+adt_ary_t* adt_ary_new(void (*pDestructor)(void*)){
+   adt_ary_t *self;
+   if((self = malloc(sizeof(adt_ary_t)))==NULL){
+      return NULL;
+   }
+   adt_ary_create(self,pDestructor);
+   return self;
 }
-adt_ary_t*	adt_ary_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*)){
-	adt_ary_t *self;
-	int32_t s32i;
-	void **ppDest,**ppSrc;
+adt_ary_t* adt_ary_make(void** ppElem, int32_t s32Len,void (*pDestructor)(void*)){
+   adt_ary_t *self;
+   int32_t s32i;
+   void **ppDest,**ppSrc;
 
-	if(s32Len>= INT32_MAX){
-		//array length too long
-		return NULL;
-	}
+   if(s32Len>= INT32_MAX){
+      //array length too long
+      return NULL;
+   }
 
-	if(ppElem == NULL){
-		return NULL;
-	}
+   if(ppElem == NULL){
+      return NULL;
+   }
 
-	self = adt_ary_new(pDestructor);
-	if(self==NULL){
-		return NULL;
-	}
-	adt_ary_extend(self,s32Len);
-	ppDest=self->pFirst;
-	assert(ppDest != NULL);
-	ppSrc=ppElem;
-	for(s32i=0;s32i<s32Len;s32i++){
-		*(ppDest++) = *(ppSrc++);
-	}
-	return self;
+   self = adt_ary_new(pDestructor);
+   if(self==NULL){
+      return NULL;
+   }
+   adt_ary_extend(self,s32Len);
+   ppDest=self->pFirst;
+   assert(ppDest != NULL);
+   ppSrc=ppElem;
+   for(s32i=0;s32i<s32Len;s32i++){
+      *(ppDest++) = *(ppSrc++);
+   }
+   return self;
 }
 void adt_ary_delete(adt_ary_t *self){
-	if(self != NULL){
-		adt_ary_destroy(self);
-		free(self);
-	}
+   if(self != NULL){
+      adt_ary_destroy(self);
+      free(self);
+   }
 }
 
 void  adt_ary_vdelete(void *arg)
@@ -110,43 +110,43 @@ bool adt_ary_destructor_is_enabled(const adt_ary_t *self){
 }
 
 //Accessors
-void**	adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem){
-	if(self == NULL){
-		return NULL;
-	}
-	if(s32Index<0){
-		s32Index = (-s32Index);
-		if(s32Index > (self->s32CurLen) ){
-			//negative index outside array bounds
-			return NULL;
-		}
-		//negative index inside array bounds
-		s32Index=self->s32CurLen-s32Index;
-	}
-	adt_ary_fill(self,((int32_t) s32Index)+1);
-	self->pFirst[s32Index]=pElem;
-	return &self->pFirst[s32Index];
+void** adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem){
+   if(self == NULL){
+      return NULL;
+   }
+   if(s32Index<0){
+      s32Index = (-s32Index);
+      if(s32Index > (self->s32CurLen) ){
+         //negative index outside array bounds
+         return NULL;
+      }
+      //negative index inside array bounds
+      s32Index=self->s32CurLen-s32Index;
+   }
+   adt_ary_fill(self,((int32_t) s32Index)+1);
+   self->pFirst[s32Index]=pElem;
+   return &self->pFirst[s32Index];
 }
 
 /**
  * This returns pointer to pointer, make sure to dereference the result.
  * It returns NULL in case a negative index is out of range
  */
-void**	adt_ary_get(adt_ary_t *self, int32_t s32Index){
-	if(self == NULL){
-		return NULL;
-	}
-	if(s32Index<0){
-		s32Index = (-s32Index);
-		if(s32Index > (self->s32CurLen) ){
-			//negative index outside array bounds
-			return NULL;
-		}
-		//negative index inside array bounds
-		s32Index=self->s32CurLen-s32Index;
-	}
-	adt_ary_fill(self,(int32_t) (s32Index+1));
-	return &self->pFirst[s32Index];
+void** adt_ary_get(adt_ary_t *self, int32_t s32Index){
+   if(self == NULL){
+      return NULL;
+   }
+   if(s32Index<0){
+      s32Index = (-s32Index);
+      if(s32Index > (self->s32CurLen) ){
+         //negative index outside array bounds
+         return NULL;
+      }
+      //negative index inside array bounds
+      s32Index=self->s32CurLen-s32Index;
+   }
+   adt_ary_fill(self,(int32_t) (s32Index+1));
+   return &self->pFirst[s32Index];
 }
 
 /**
@@ -155,14 +155,14 @@ void**	adt_ary_get(adt_ary_t *self, int32_t s32Index){
  */
 void* adt_ary_value(const adt_ary_t *self, int32_t s32Index)
 {
-	if(self == NULL){
-		return NULL;
-	}
-	if(s32Index<0){
-		//negative index inside array bounds ensured by caller
-		s32Index=self->s32CurLen+s32Index;
-	}
-	return self->pFirst[s32Index];
+   if(self == NULL){
+      return NULL;
+   }
+   if(s32Index<0){
+      //negative index inside array bounds ensured by caller
+      s32Index=self->s32CurLen+s32Index;
+   }
+   return self->pFirst[s32Index];
 }
 
 /**
@@ -189,7 +189,7 @@ adt_error_t adt_ary_remove(adt_ary_t *self, void *pElem)
 /**
  * Appends pElem to the end of the array
  */
-adt_error_t	adt_ary_push(adt_ary_t *self, void *pElem){
+adt_error_t adt_ary_push(adt_ary_t *self, void *pElem){
    if (self != NULL) {
       int32_t s32Index;
       adt_error_t result;
@@ -223,42 +223,42 @@ adt_error_t adt_ary_push_unique(adt_ary_t *self, void *pElem){
    return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-void*	adt_ary_pop(adt_ary_t *self){
-	void *pElem;
-	assert(self != NULL);
-	if(self->s32CurLen==0){
-		return NULL;
-	}
-	pElem = self->pFirst[--self->s32CurLen];
-	if(self->s32CurLen == 0){
-		//reallign pFirst with pAlloc when buffer becomes empty
-		self->pFirst = self->ppAlloc;
-	}
-	return pElem;
+void* adt_ary_pop(adt_ary_t *self){
+   void *pElem;
+   assert(self != NULL);
+   if(self->s32CurLen==0){
+      return NULL;
+   }
+   pElem = self->pFirst[--self->s32CurLen];
+   if(self->s32CurLen == 0){
+      //reallign pFirst with pAlloc when buffer becomes empty
+      self->pFirst = self->ppAlloc;
+   }
+   return pElem;
 }
 
 /**
  * Removes the first element from the array
  */
-void*	adt_ary_shift(adt_ary_t *self){
-	void *pElem;
-	assert(self != NULL);
-	if(self->s32CurLen==0){
-		return NULL;
-	}
-	pElem=*(self->pFirst++); //move pFirst forward by 1
-	self->s32CurLen--; //reduce array length by 1
-	if(self->s32CurLen == 0){
-		//reallign pFirst with pAlloc when buffer becomes empty
-		self->pFirst = self->ppAlloc;
-	}
-	return pElem;
+void* adt_ary_shift(adt_ary_t *self){
+   void *pElem;
+   assert(self != NULL);
+   if(self->s32CurLen==0){
+      return NULL;
+   }
+   pElem=*(self->pFirst++); //move pFirst forward by 1
+   self->s32CurLen--; //reduce array length by 1
+   if(self->s32CurLen == 0){
+      //reallign pFirst with pAlloc when buffer becomes empty
+      self->pFirst = self->ppAlloc;
+   }
+   return pElem;
 }
 
 /**
  * Appends pElem to the beginning of the array, shifting all other elements one step forward
  */
-adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem){
+adt_error_t adt_ary_unshift(adt_ary_t *self, void *pElem){
    if ( self != NULL ) {
       if (self->s32CurLen == INT32_MAX) {
          return ADT_LENGTH_ERROR; //cannot fit any more elements into the array
@@ -286,12 +286,12 @@ adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem){
          return result;
       }
    }
-	return ADT_INVALID_ARGUMENT_ERROR;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 
 //Utility functions
-adt_error_t	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
+adt_error_t adt_ary_extend(adt_ary_t *self, int32_t s32Len){
    if (self != NULL) {
       void **ppAlloc;
       //check if current length is greater than requested length
@@ -325,7 +325,7 @@ adt_error_t	adt_ary_extend(adt_ary_t *self, int32_t s32Len){
       }
       return ADT_NO_ERROR;
    }
-	return ADT_INVALID_ARGUMENT_ERROR;
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 adt_error_t adt_ary_fill(adt_ary_t *self, int32_t s32Len){
@@ -368,16 +368,16 @@ adt_error_t adt_ary_resize(adt_ary_t *self, int32_t s32Len)
 }
 
 void adt_ary_clear(adt_ary_t *self){
-	if(self){
-		adt_ary_destroy(self);
-	}
+   if(self){
+      adt_ary_destroy(self);
+   }
 }
 
 int32_t adt_ary_length(const adt_ary_t *self){
-	if(self){
-		return self->s32CurLen;
-	}
-	return -1;
+   if(self){
+      return self->s32CurLen;
+   }
+   return -1;
 }
 
 bool adt_ary_is_empty(const adt_ary_t* self) {
@@ -388,63 +388,63 @@ bool adt_ary_is_empty(const adt_ary_t* self) {
 }
 
 //Returns nonzero if the element exists
-int32_t	adt_ary_exists(const adt_ary_t *self, int32_t s32Index){
-	if(self == NULL){
-		return 0;
-	}
-	if(s32Index<0){
-		s32Index = (-s32Index);
-		if(s32Index > (self->s32CurLen) ){
-			//negative index outside array bounds
-			return 0;
-		}
-		//negative index inside array bounds
-		s32Index=self->s32CurLen-s32Index;
-	}
-	if(s32Index<self->s32CurLen){
-		return 1;
-	}
-	return -1;
+int32_t adt_ary_exists(const adt_ary_t *self, int32_t s32Index){
+   if(self == NULL){
+      return 0;
+   }
+   if(s32Index<0){
+      s32Index = (-s32Index);
+      if(s32Index > (self->s32CurLen) ){
+         //negative index outside array bounds
+         return 0;
+      }
+      //negative index inside array bounds
+      s32Index=self->s32CurLen-s32Index;
+   }
+   if(s32Index<self->s32CurLen){
+      return 1;
+   }
+   return -1;
 }
 
 void adt_ary_create(adt_ary_t *self,void (*pDestructor)(void*)){
-	self->ppAlloc = NULL;
-	self->pFirst = NULL;
-	self->s32AllocLen = 0;
-	self->s32CurLen = 0;
-	self->pDestructor = pDestructor;
-	self->pFillElem = NULL;
-	self->destructorEnable = true;
+   self->ppAlloc = NULL;
+   self->pFirst = NULL;
+   self->s32AllocLen = 0;
+   self->s32CurLen = 0;
+   self->pDestructor = pDestructor;
+   self->pFillElem = NULL;
+   self->destructorEnable = true;
 }
 
 void adt_ary_destroy(adt_ary_t *self){
-	int32_t s32i;
+   int32_t s32i;
 
-	void **ppElem=self->pFirst;
-	if( (self->pDestructor != NULL) && (self->destructorEnable != false) ){
-		for(s32i=0;s32i<(int32_t) self->s32CurLen;s32i++){
-			self->pDestructor(*(ppElem++));
-		}
-	}
-	if(self->ppAlloc != NULL){
-		free(self->ppAlloc);
-	}
-	self->ppAlloc = NULL;
-	self->s32AllocLen = 0;
-	self->pFirst = NULL;
-	self->s32CurLen = 0;
+   void **ppElem=self->pFirst;
+   if( (self->pDestructor != NULL) && (self->destructorEnable != false) ){
+      for(s32i=0;s32i<(int32_t) self->s32CurLen;s32i++){
+         self->pDestructor(*(ppElem++));
+      }
+   }
+   if(self->ppAlloc != NULL){
+      free(self->ppAlloc);
+   }
+   self->ppAlloc = NULL;
+   self->s32AllocLen = 0;
+   self->pFirst = NULL;
+   self->s32CurLen = 0;
 }
 
 void adt_ary_set_fill_elem(adt_ary_t *self,void* pFillElem){
-	if(self){
-		self->pFillElem = pFillElem;
-	}
+   if(self){
+      self->pFillElem = pFillElem;
+   }
 }
 void* adt_ary_get_fill_elem(const adt_ary_t *self){
-	if(self){
-		return self->pFillElem;
-	}
-	return NULL;
+   if(self){
+      return self->pFillElem;
+   }
+   return NULL;
 }
 
 /**

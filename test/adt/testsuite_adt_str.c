@@ -433,59 +433,59 @@ static void test_adt_str_append_bstr_utf8(CuTest *tc)
 }
 
 static void test_adt_str_push(CuTest* tc){
-	adt_str_t *str = adt_str_new();
-	CuAssertPtrNotNull(tc, str);
-	int i;
-	int len = 0;
-	for(i = 'A'; i <= 'Z'; i++){
-		len++;
-		adt_str_push(str,i);
-		CuAssertIntEquals(tc, len, (int) strlen(adt_str_cstr(str)));
-		CuAssertIntEquals(tc, len, adt_str_length(str));
-	}
+   adt_str_t *str = adt_str_new();
+   CuAssertPtrNotNull(tc, str);
+   int i;
+   int len = 0;
+   for(i = 'A'; i <= 'Z'; i++){
+      len++;
+      adt_str_push(str,i);
+      CuAssertIntEquals(tc, len, (int) strlen(adt_str_cstr(str)));
+      CuAssertIntEquals(tc, len, adt_str_length(str));
+   }
 
-	CuAssertStrEquals(tc,"ABCDEFGHIJKLMNOPQRSTUVWXYZ",adt_str_cstr(str));
+   CuAssertStrEquals(tc,"ABCDEFGHIJKLMNOPQRSTUVWXYZ",adt_str_cstr(str));
 
-	adt_str_delete(str);
+   adt_str_delete(str);
 }
 
 static void test_adt_str_pop(CuTest* tc){
-	adt_str_t *str = adt_str_new();
-	CuAssertPtrNotNull(tc, str);
-	int i;
-	int len = 26;
-	adt_str_set_cstr(str,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-	for(i = 'Z'; i >= 'A'; i--){
-		char c;
-		len--;
-		c = (char) adt_str_pop(str);
-		CuAssertTrue(tc,len>=0);
-		CuAssertIntEquals(tc, len, (int) strlen(adt_str_cstr(str)));
-		CuAssertIntEquals(tc, len, adt_str_length(str));
-		CuAssertIntEquals(tc, i, c);
-	}
-	CuAssertTrue(tc,len==0);
-	CuAssertStrEquals(tc,"",adt_str_cstr(str));
-	adt_str_delete(str);
+   adt_str_t *str = adt_str_new();
+   CuAssertPtrNotNull(tc, str);
+   int i;
+   int len = 26;
+   adt_str_set_cstr(str,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+   for(i = 'Z'; i >= 'A'; i--){
+      char c;
+      len--;
+      c = (char) adt_str_pop(str);
+      CuAssertTrue(tc,len>=0);
+      CuAssertIntEquals(tc, len, (int) strlen(adt_str_cstr(str)));
+      CuAssertIntEquals(tc, len, adt_str_length(str));
+      CuAssertIntEquals(tc, i, c);
+   }
+   CuAssertTrue(tc,len==0);
+   CuAssertStrEquals(tc,"",adt_str_cstr(str));
+   adt_str_delete(str);
 }
 
 
 static void test_adt_str_charAt(CuTest* tc){
-	adt_str_t *str = adt_str_new_cstr("Hello");
-	CuAssertPtrNotNull(tc, str);
-	CuAssertIntEquals(tc,'H',adt_str_charAt(str,0));
-	CuAssertIntEquals(tc,'e',adt_str_charAt(str,1));
-	CuAssertIntEquals(tc,'l',adt_str_charAt(str,2));
-	CuAssertIntEquals(tc,'l',adt_str_charAt(str,3));
-	CuAssertIntEquals(tc,'o',adt_str_charAt(str,4));
-	CuAssertIntEquals(tc,-1,adt_str_charAt(str,5));
-	CuAssertIntEquals(tc,'o',adt_str_charAt(str,-1));
-	CuAssertIntEquals(tc,'l',adt_str_charAt(str,-2));
-	CuAssertIntEquals(tc,'l',adt_str_charAt(str,-3));
-	CuAssertIntEquals(tc,'e',adt_str_charAt(str,-4));
-	CuAssertIntEquals(tc,'H',adt_str_charAt(str,-5));
-	CuAssertIntEquals(tc,-1,adt_str_charAt(str,-6));
-	adt_str_delete(str);
+   adt_str_t *str = adt_str_new_cstr("Hello");
+   CuAssertPtrNotNull(tc, str);
+   CuAssertIntEquals(tc,'H',adt_str_charAt(str,0));
+   CuAssertIntEquals(tc,'e',adt_str_charAt(str,1));
+   CuAssertIntEquals(tc,'l',adt_str_charAt(str,2));
+   CuAssertIntEquals(tc,'l',adt_str_charAt(str,3));
+   CuAssertIntEquals(tc,'o',adt_str_charAt(str,4));
+   CuAssertIntEquals(tc,-1,adt_str_charAt(str,5));
+   CuAssertIntEquals(tc,'o',adt_str_charAt(str,-1));
+   CuAssertIntEquals(tc,'l',adt_str_charAt(str,-2));
+   CuAssertIntEquals(tc,'l',adt_str_charAt(str,-3));
+   CuAssertIntEquals(tc,'e',adt_str_charAt(str,-4));
+   CuAssertIntEquals(tc,'H',adt_str_charAt(str,-5));
+   CuAssertIntEquals(tc,-1,adt_str_charAt(str,-6));
+   adt_str_delete(str);
 }
 
 static void test_adt_utf8_readCodePoint1(CuTest* tc)

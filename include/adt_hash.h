@@ -44,9 +44,9 @@
  * 3. the 9th key/value pair is now inserted into the child node which matches its hash_key & 0xF
  * 4. when one of the child nodes becomes full (8 key/value pairs) the child node splits into 16 new child nodes
  * 5. for each descendant node, the hash_key pattern is shifted 4 bits to the left:
- * 	depth 0: 0xF (root node)
- * 	depth 1: 0xF0
- * 	depth 2: 0xF00
+ *  depth 0: 0xF (root node)
+ *  depth 1: 0xF0
+ *  depth 2: 0xF00
  *  depth 3: 0xF000
  *  depth 4: 0xF0000
  *  depth 5: 0xF00000
@@ -70,38 +70,38 @@
  */
 
 typedef struct adt_hkey_tag{
-	char *key;
-	void *val;
-	struct adt_hkey_tag *next;
+ char *key;
+ void *val;
+ struct adt_hkey_tag *next;
 } adt_hkey_t;
 
 typedef struct adt_hmatch_tag{
-	uint32_t u32Hash;
-	adt_hkey_t *key;
+ uint32_t u32Hash;
+ adt_hkey_t *key;
 } adt_hmatch_t;
 
 typedef struct adt_hnode_tag{
-	uint8_t u8Width;
-	uint8_t u8Cur;
-	uint8_t u8Depth;
-	union {
-		adt_hmatch_t *match; //1,2,4 or 8 HMatch_t structures
-		struct adt_hnode_tag *node; //16 HNode_t structures
-	} child;
+ uint8_t u8Width;
+ uint8_t u8Cur;
+ uint8_t u8Depth;
+ union {
+  adt_hmatch_t *match; //1,2,4 or 8 HMatch_t structures
+  struct adt_hnode_tag *node; //16 HNode_t structures
+ } child;
 } adt_hnode_t;
 
 typedef struct adt_hit_frame_tag{
-	adt_hnode_t *pNode; //pointer to current node
-	uint8_t u8Cur;      //0-8 or 0-15 depending on node type
+ adt_hnode_t *pNode; //pointer to current node
+ uint8_t u8Cur;      //0-8 or 0-15 depending on node type
 } adt_hit_frame_t;
 
 typedef struct adt_hash_tag{
-	int32_t u32Size;		//number of elements in hash
-	adt_hnode_t *root;		//root node
-	void (*pDestructor)(void*); //element destructor
-	adt_hit_frame_t iter_frames[ADT_HASH_MAX_DEPTH + 1];
-	int8_t iter_depth;
-	adt_hkey_t *iter_hkey;
+ int32_t u32Size;  //number of elements in hash
+ adt_hnode_t *root;  //root node
+ void (*pDestructor)(void*); //element destructor
+ adt_hit_frame_t iter_frames[ADT_HASH_MAX_DEPTH + 1];
+ int8_t iter_depth;
+ adt_hkey_t *iter_hkey;
 } adt_hash_t;
 
 
@@ -283,7 +283,7 @@ bool adt_hash_exists(const adt_hash_t *self, const char *pKey);
  * \param pArray Destination array (must have no destructor enabled).
  * \return Number of keys copied (>= 0), or -1 on error.
  */
-int32_t	adt_hash_keys(adt_hash_t *self, adt_ary_t* pArray);
+int32_t adt_hash_keys(adt_hash_t *self, adt_ary_t* pArray);
 
 /**
  * \brief Collects weak references to all value pointers into the provided array.

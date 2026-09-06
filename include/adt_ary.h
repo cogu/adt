@@ -22,13 +22,13 @@
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
 typedef struct adt_ary_tag{
-	void **ppAlloc;		//array of (void*)
-	void **pFirst;		   //pointer to first array element
-	int32_t s32AllocLen;	//number of elements allocated
-	int32_t s32CurLen;	//number of elements currently in the array
-	void (*pDestructor)(void*); //optional destructor function (typically vdelete functions from other data structures)
-	void *pFillElem;            //optional fill element for new elements (defaults to NULL)
-	bool destructorEnable;      //Temporarily disables use of element pDestructor
+   void **ppAlloc;             //array of (void*)
+   void **pFirst;              //pointer to first array element
+   int32_t s32AllocLen;        //number of elements allocated
+   int32_t s32CurLen;          //number of elements currently in the array
+   void (*pDestructor)(void*); //optional destructor function (typically vdelete functions from other data structures)
+   void *pFillElem;            //optional fill element for new elements (defaults to NULL)
+   bool destructorEnable;      //Temporarily disables use of element pDestructor
 } adt_ary_t;
 
 typedef int (adt_vlt_func_t)(const void *a, const void *b); //lt = less-than
@@ -43,7 +43,7 @@ typedef int (adt_vlt_func_t)(const void *a, const void *b); //lt = less-than
  * \param pDestructor Optional element destructor function callback (e.g. free or a *_vdelete function), or NULL for non-owning references.
  * \return Pointer to newly allocated array, or NULL on failure.
  */
-adt_ary_t*	adt_ary_new(void (*pDestructor)(void*));
+adt_ary_t* adt_ary_new(void (*pDestructor)(void*));
 
 /**
  * \brief Allocates and initializes a new array containing a shallow copy of an existing pointer buffer.
@@ -53,14 +53,14 @@ adt_ary_t*	adt_ary_new(void (*pDestructor)(void*));
  * \param pDestructor Optional element destructor function callback, or NULL.
  * \return Pointer to newly allocated array, or NULL on failure.
  */
-adt_ary_t*	adt_ary_make(void** ppElem, int32_t s32Len, void (*pDestructor)(void*));
+adt_ary_t* adt_ary_make(void** ppElem, int32_t s32Len, void (*pDestructor)(void*));
 
 /**
  * \brief Destroys the array and frees the self pointer.
  *
  * \param self Pointer to the array to delete.
  */
-void	      adt_ary_delete(adt_ary_t *self);
+void adt_ary_delete(adt_ary_t *self);
 
 /**
  * \brief Type-erased destructor wrapper for adt_ary_delete.
@@ -69,7 +69,7 @@ void	      adt_ary_delete(adt_ary_t *self);
  *
  * \param arg Pointer to the array (cast to void*).
  */
-void        adt_ary_vdelete(void *arg);
+void adt_ary_vdelete(void *arg);
 
 /**
  * \brief Initializes an array instance in place (stack or embedded allocation).
@@ -77,14 +77,14 @@ void        adt_ary_vdelete(void *arg);
  * \param self Pointer to an existing adt_ary_t instance.
  * \param pDestructor Optional element destructor function callback, or NULL.
  */
-void 	      adt_ary_create(adt_ary_t *self, void (*pDestructor)(void*));
+void adt_ary_create(adt_ary_t *self, void (*pDestructor)(void*));
 
 /**
  * \brief Destroys all elements using the configured destructor and frees the internal buffer. Does not free self.
  *
  * \param self Pointer to the array to destroy.
  */
-void 	      adt_ary_destroy(adt_ary_t *self);
+void adt_ary_destroy(adt_ary_t *self);
 
 /**
  * \brief Temporarily enables or disables automatic invocation of the element destructor.
@@ -92,7 +92,7 @@ void 	      adt_ary_destroy(adt_ary_t *self);
  * \param self Pointer to the array.
  * \param enable True to enable element destructor calls, false to suspend them.
  */
-void        adt_ary_destructor_enable(adt_ary_t *self, bool enable);
+void adt_ary_destructor_enable(adt_ary_t *self, bool enable);
 
 /**
  * \brief Checks if the array has a destructor callback configured.
@@ -100,7 +100,7 @@ void        adt_ary_destructor_enable(adt_ary_t *self, bool enable);
  * \param self Pointer to the array.
  * \return True if a destructor callback is set, false if NULL or self is NULL.
  */
-bool        adt_ary_has_destructor(const adt_ary_t *self);
+bool adt_ary_has_destructor(const adt_ary_t *self);
 
 /**
  * \brief Checks if automatic invocation of the element destructor is currently active.
@@ -108,7 +108,7 @@ bool        adt_ary_has_destructor(const adt_ary_t *self);
  * \param self Pointer to the array.
  * \return True if a destructor callback is set and enabled, false otherwise or if self is NULL.
  */
-bool        adt_ary_destructor_is_enabled(const adt_ary_t *self);
+bool adt_ary_destructor_is_enabled(const adt_ary_t *self);
 
 
 //Accessors
@@ -121,7 +121,7 @@ bool        adt_ary_destructor_is_enabled(const adt_ary_t *self);
  * \param pElem Pointer value to store.
  * \return Pointer to the stored slot (void**), or NULL on out-of-bounds error.
  */
-void**      adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem);
+void** adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem);
 
 /**
  * \brief Retrieves a pointer to the slot at the given index, automatically extending the array if necessary.
@@ -130,7 +130,7 @@ void**      adt_ary_set(adt_ary_t *self, int32_t s32Index, void *pElem);
  * \param s32Index Zero-based or negative index.
  * \return Pointer to the stored slot (void**), or NULL on out-of-bounds error.
  */
-void**      adt_ary_get(adt_ary_t *self, int32_t s32Index);
+void** adt_ary_get(adt_ary_t *self, int32_t s32Index);
 
 /**
  * \brief Appends an element pointer to the end of the array.
@@ -139,7 +139,7 @@ void**      adt_ary_get(adt_ary_t *self, int32_t s32Index);
  * \param pElem Element pointer to append.
  * \return ADT_NO_ERROR on success, or an error code on failure.
  */
-adt_error_t	adt_ary_push(adt_ary_t *self, void *pElem);
+adt_error_t adt_ary_push(adt_ary_t *self, void *pElem);
 
 /**
  * \brief Appends an element pointer to the end of the array only if it is not already present.
@@ -156,7 +156,7 @@ adt_error_t adt_ary_push_unique(adt_ary_t *self, void *pElem);
  * \param self Pointer to the array.
  * \return The removed element pointer, or NULL if the array is empty.
  */
-void*	      adt_ary_pop(adt_ary_t *self);
+void* adt_ary_pop(adt_ary_t *self);
 
 /**
  * \brief Removes and returns the first element from the array without invoking its destructor.
@@ -164,7 +164,7 @@ void*	      adt_ary_pop(adt_ary_t *self);
  * \param self Pointer to the array.
  * \return The removed element pointer, or NULL if the array is empty.
  */
-void*	      adt_ary_shift(adt_ary_t *self);
+void* adt_ary_shift(adt_ary_t *self);
 
 /**
  * \brief Inserts an element pointer at the beginning of the array, shifting all existing elements forward.
@@ -173,7 +173,7 @@ void*	      adt_ary_shift(adt_ary_t *self);
  * \param pElem Element pointer to insert.
  * \return ADT_NO_ERROR on success, or an error code on failure.
  */
-adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem);
+adt_error_t adt_ary_unshift(adt_ary_t *self, void *pElem);
 
 /**
  * \brief Convenience function returning the element pointer at s32Index directly.
@@ -182,7 +182,7 @@ adt_error_t	adt_ary_unshift(adt_ary_t *self, void *pElem);
  * \param s32Index Zero-based or negative index.
  * \return The stored element pointer, or NULL if self is NULL or index is invalid.
  */
-void*       adt_ary_value(const adt_ary_t *self, int32_t s32Index);
+void* adt_ary_value(const adt_ary_t *self, int32_t s32Index);
 
 /**
  * \brief Removes the first occurrence of pElem from the array and calls its destructor if enabled.
@@ -202,7 +202,7 @@ adt_error_t adt_ary_remove(adt_ary_t *self, void *pElem);
  * \param s32Len Desired capacity.
  * \return ADT_NO_ERROR on success, or an error code on failure.
  */
-adt_error_t	adt_ary_extend(adt_ary_t *self, int32_t s32Len);
+adt_error_t adt_ary_extend(adt_ary_t *self, int32_t s32Len);
 
 /**
  * \brief Extends array to s32Len elements and populates newly allocated slots with the default fill element.
@@ -211,7 +211,7 @@ adt_error_t	adt_ary_extend(adt_ary_t *self, int32_t s32Len);
  * \param s32Len Desired length.
  * \return ADT_NO_ERROR on success, or an error code on failure.
  */
-adt_error_t	adt_ary_fill(adt_ary_t *self, int32_t s32Len);
+adt_error_t adt_ary_fill(adt_ary_t *self, int32_t s32Len);
 
 /**
  * \brief Resizes the array to exactly s32Len elements, destroying any truncated elements if shrinking.
@@ -227,7 +227,7 @@ adt_error_t adt_ary_resize(adt_ary_t *self, int32_t s32Len);
  *
  * \param self Pointer to the array.
  */
-void	      adt_ary_clear(adt_ary_t *self);
+void adt_ary_clear(adt_ary_t *self);
 
 /**
  * \brief Returns the current number of elements in the array.
@@ -235,7 +235,7 @@ void	      adt_ary_clear(adt_ary_t *self);
  * \param self Pointer to the array.
  * \return Number of elements, or -1 if self is NULL.
  */
-int32_t     adt_ary_length(const adt_ary_t *self);
+int32_t adt_ary_length(const adt_ary_t *self);
 
 /**
  * \brief Checks if the array is empty.
@@ -243,7 +243,7 @@ int32_t     adt_ary_length(const adt_ary_t *self);
  * \param self Pointer to the array.
  * \return true if length is 0 or self is NULL, false otherwise.
  */
-bool        adt_ary_is_empty(const adt_ary_t* self);
+bool adt_ary_is_empty(const adt_ary_t* self);
 
 /**
  * \brief Sets the fill element pointer used to populate uninitialized slots during fill operations.
@@ -251,7 +251,7 @@ bool        adt_ary_is_empty(const adt_ary_t* self);
  * \param self Pointer to the array.
  * \param pFillElem Default element pointer (defaults to NULL).
  */
-void 	      adt_ary_set_fill_elem(adt_ary_t *self, void* pFillElem);
+void adt_ary_set_fill_elem(adt_ary_t *self, void* pFillElem);
 
 /**
  * \brief Returns the current fill element pointer.
@@ -259,7 +259,7 @@ void 	      adt_ary_set_fill_elem(adt_ary_t *self, void* pFillElem);
  * \param self Pointer to the array.
  * \return Pointer to default fill element.
  */
-void* 	   adt_ary_get_fill_elem(const adt_ary_t *self);
+void* adt_ary_get_fill_elem(const adt_ary_t *self);
 
 /**
  * \brief Removes s32Len elements starting from s32Index, invoking destructors on removed elements.
@@ -278,7 +278,7 @@ adt_error_t adt_ary_splice(adt_ary_t *self, int32_t s32Index, int32_t s32Len);
  * \param s32Index Zero-based or negative index to check.
  * \return 1 if index exists, 0 if out of bounds, or -1 if invalid.
  */
-int32_t	   adt_ary_exists(const adt_ary_t *self, int32_t s32Index);
+int32_t adt_ary_exists(const adt_ary_t *self, int32_t s32Index);
 
 /**
  * \brief Sorts the array using the provided comparator function.

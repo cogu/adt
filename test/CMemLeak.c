@@ -2,7 +2,7 @@
 *    No Copyright - this is freeware
 ********************************************************************************
 
-     File:	CMemLeak.c
+     File: CMemLeak.c
 
      Author:    Xie Wei Bao (UK) Ltd
 
@@ -40,7 +40,7 @@ static const unsigned char xwbUninit = 0x55;
 /* Clean memory - pick a value which will cause the most problems */
 static const unsigned char xwbFreed = 0xAA;
 
-static const char xwbIMW[] = "IMW";	/* Illegal memory write */
+static const char xwbIMW[] = "IMW"; /* Illegal memory write */
 static const char xwbMLK[] = "MLK";     /* Memory leak */
 static const char xwbFNH[] = "FNH";     /* Free Non Heap memory */
 static const char xwbFMW[] = "FMW";     /* Free Memory Write */
