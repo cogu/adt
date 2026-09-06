@@ -111,3 +111,6 @@ The destination ``adt_ary_t`` must not have an active element destructor enabled
 .. doxygenfunction:: adt_hash_keys
 
 .. doxygenfunction:: adt_hash_values
+
+.. doxygenfunction:: adt_hash_get_last_error
+

@@ -127,7 +127,7 @@ Encoding & Capacity
 
 .. doxygenfunction:: adt_str_clear
 
-.. doxygenfunction:: adt_str_getLastError
+.. doxygenfunction:: adt_str_get_last_error
 
 Comparisons & Ordering
 ----------------------

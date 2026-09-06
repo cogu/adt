@@ -69,7 +69,7 @@ void adt_str_create(adt_str_t *self)
       self->s32Cur = 0;
       self->s32Size = 0;
       self->pAlloc = NULL;
-      self->lastError = ADT_NO_ERROR;
+      self->last_error = ADT_NO_ERROR;
       self->encoding = ADT_STR_ENCODING_ASCII;
    }
 }
@@ -497,6 +497,11 @@ int adt_str_pop(adt_str_t *self)
       if(self->s32Cur>0)
       {
          retval = (int) self->pAlloc[--self->s32Cur];
+         self->last_error = ADT_NO_ERROR;
+      }
+      else
+      {
+         self->last_error = ADT_UNDERFLOW_ERROR;
       }
    }
    return retval;
@@ -534,10 +539,11 @@ int adt_str_charAt(adt_str_t *self, int index)
       if (errorCode == ADT_NO_ERROR)
       {
          retval = (int) self->pAlloc[s32Index];
+         self->last_error = ADT_NO_ERROR;
       }
       else
       {
-         self->lastError = errorCode;
+         self->last_error = errorCode;
       }
    }
    return retval;
@@ -560,10 +566,11 @@ const char* adt_str_cstr(adt_str_t *self)
          assert(self->pAlloc != NULL);
          self->pAlloc[self->s32Cur] = 0u;
          retval = (const char*) self->pAlloc;
+         self->last_error = ADT_NO_ERROR;
       }
       else
       {
-         self->lastError = result;
+         self->last_error = result;
       }
    }
    return retval;
@@ -744,9 +751,18 @@ void adt_str_clear(adt_str_t *self)
    if (self != NULL)
    {
       self->s32Cur = 0;
-      self->lastError = ADT_NO_ERROR;
+      self->last_error = ADT_NO_ERROR;
       self->encoding = ADT_STR_ENCODING_ASCII;
    }
+}
+
+adt_error_t adt_str_get_last_error(const adt_str_t *self)
+{
+   if (self != NULL)
+   {
+      return self->last_error;
+   }
+   return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 bool adt_str_equal(const adt_str_t *self, const adt_str_t* other);
