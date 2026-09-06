@@ -62,6 +62,7 @@ static void test_adt_str_clear(CuTest* tc);
 static void test_adt_adding_nulls_at_end_shall_not_be_part_of_length(CuTest* tc);
 static void test_adt_str_append_bstr_containing_nulls_at_end(CuTest* tc);
 static void test_adt_str_vdelete(CuTest* tc);
+static void test_adt_str_last_error(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -108,6 +109,7 @@ CuSuite* testsuite_adt_str(void)
    SUITE_ADD_TEST(suite, test_adt_adding_nulls_at_end_shall_not_be_part_of_length);
    SUITE_ADD_TEST(suite, test_adt_str_append_bstr_containing_nulls_at_end);
    SUITE_ADD_TEST(suite, test_adt_str_vdelete);
+   SUITE_ADD_TEST(suite, test_adt_str_last_error);
 
 
    return suite;
@@ -747,5 +749,45 @@ static void test_adt_str_vdelete(CuTest* tc)
    adt_str_t *str = adt_str_new_cstr("testing vdelete");
    CuAssertPtrNotNull(tc, str);
    adt_str_vdelete((void*) str);
+}
+
+static void test_adt_str_last_error(CuTest* tc)
+{
+   adt_str_t str;
+   adt_str_create(&str);
+
+   // NULL self check
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_str_get_last_error(NULL));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_str_getLastError(NULL));
+
+   // Initial state is NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_get_last_error(&str));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_getLastError(&str));
+
+   // Pop on empty string sets ADT_UNDERFLOW_ERROR
+   CuAssertIntEquals(tc, -1, adt_str_pop(&str));
+   CuAssertIntEquals(tc, ADT_UNDERFLOW_ERROR, adt_str_get_last_error(&str));
+   CuAssertIntEquals(tc, ADT_UNDERFLOW_ERROR, adt_str_getLastError(&str));
+
+   // Push resets to NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_push(&str, 'A'));
+   CuAssertIntEquals(tc, 'A', adt_str_charAt(&str, 0));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_get_last_error(&str));
+
+   // Out-of-bounds charAt sets ADT_INDEX_OUT_OF_BOUNDS_ERROR
+   CuAssertIntEquals(tc, -1, adt_str_charAt(&str, 5));
+   CuAssertIntEquals(tc, ADT_INDEX_OUT_OF_BOUNDS_ERROR, adt_str_get_last_error(&str));
+   CuAssertIntEquals(tc, -1, adt_str_charAt(&str, -5));
+   CuAssertIntEquals(tc, ADT_INDEX_OUT_OF_BOUNDS_ERROR, adt_str_get_last_error(&str));
+
+   // Valid pop resets to NO_ERROR
+   CuAssertIntEquals(tc, 'A', adt_str_pop(&str));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_get_last_error(&str));
+
+   // Clear resets last_error
+   adt_str_clear(&str);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_str_get_last_error(&str));
+
+   adt_str_destroy(&str);
 }
 

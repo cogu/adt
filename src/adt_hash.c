@@ -88,6 +88,7 @@ void adt_hash_create(adt_hash_t *self, void (*pDestructor)(void*)){
     self->u32Size = 0;
     self->pDestructor = pDestructor;
     self->iter_depth = -1;
+    self->last_error = ADT_NO_ERROR;
     self->iter_hkey = NULL;
 }
 
@@ -111,26 +112,36 @@ void adt_hash_clear(adt_hash_t *self){
     self->root = adt_hnode_new();
     self->u32Size = 0;
     self->iter_depth = -1;
+    self->last_error = ADT_NO_ERROR;
     self->iter_hkey = NULL;
 }
 
 void adt_hash_set(adt_hash_t *self, const char *pKey, void *pVal){
-    if(self && pKey){
-        uint32_t u32HashVal = adt_hash_string(pKey);
-        if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor, true)){
-            self->u32Size++;
-        }
+    if(self == NULL) return;
+    if(pKey == NULL){
+        self->last_error = ADT_INVALID_ARGUMENT_ERROR;
+        return;
     }
+    uint32_t u32HashVal = adt_hash_string(pKey);
+    if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor, true)){
+        self->u32Size++;
+    }
+    self->last_error = ADT_NO_ERROR;
 }
 
 bool adt_hash_insert(adt_hash_t *self, const char *pKey, void *pVal){
-    if(self && pKey){
-        uint32_t u32HashVal = adt_hash_string(pKey);
-        if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor, false)){
-            self->u32Size++;
-            return true;
-        }
+    if(self == NULL) return false;
+    if(pKey == NULL){
+        self->last_error = ADT_INVALID_ARGUMENT_ERROR;
+        return false;
     }
+    uint32_t u32HashVal = adt_hash_string(pKey);
+    if(adt_hnode_set(self->root, pKey, pVal, u32HashVal, self->pDestructor, false)){
+        self->u32Size++;
+        self->last_error = ADT_NO_ERROR;
+        return true;
+    }
+    self->last_error = ADT_ALREADY_EXISTS_ERROR;
     return false;
 }
 
@@ -157,29 +168,39 @@ void*  adt_hash_value(const adt_hash_t *self, const char *pKey){
 }
 
 void*  adt_hash_remove(adt_hash_t *self, const char *pKey){
-    if(self && pKey){
-        uint32_t u32HashVal = adt_hash_string(pKey);
-        adt_hkey_t *hkey = adt_hnode_remove(self->root, pKey, u32HashVal);
-        if(hkey){
-            void *pVal = hkey->val;
-            adt_hkey_delete(hkey, NULL);
-            self->u32Size--;
-            return pVal;
-        }
+    if(self == NULL) return NULL;
+    if(pKey == NULL){
+        self->last_error = ADT_INVALID_ARGUMENT_ERROR;
+        return NULL;
     }
+    uint32_t u32HashVal = adt_hash_string(pKey);
+    adt_hkey_t *hkey = adt_hnode_remove(self->root, pKey, u32HashVal);
+    if(hkey){
+        void *pVal = hkey->val;
+        adt_hkey_delete(hkey, NULL);
+        self->u32Size--;
+        self->last_error = ADT_NO_ERROR;
+        return pVal;
+    }
+    self->last_error = ADT_NOT_FOUND_ERROR;
     return NULL;
 }
 
 bool adt_hash_erase(adt_hash_t *self, const char *pKey){
-    if(self && pKey){
-        uint32_t u32HashVal = adt_hash_string(pKey);
-        adt_hkey_t *hkey = adt_hnode_remove(self->root, pKey, u32HashVal);
-        if(hkey){
-            adt_hkey_delete(hkey, self->pDestructor);
-            self->u32Size--;
-            return true;
-        }
+    if(self == NULL) return false;
+    if(pKey == NULL){
+        self->last_error = ADT_INVALID_ARGUMENT_ERROR;
+        return false;
     }
+    uint32_t u32HashVal = adt_hash_string(pKey);
+    adt_hkey_t *hkey = adt_hnode_remove(self->root, pKey, u32HashVal);
+    if(hkey){
+        adt_hkey_delete(hkey, self->pDestructor);
+        self->u32Size--;
+        self->last_error = ADT_NO_ERROR;
+        return true;
+    }
+    self->last_error = ADT_NOT_FOUND_ERROR;
     return false;
 }
 
@@ -267,37 +288,65 @@ int32_t adt_hash_keys(adt_hash_t *self, adt_ary_t *pArray){
     const char *pKey;
     int32_t s32i = 0;
 
-    if((self == NULL) || (pArray == NULL) || adt_ary_destructor_is_enabled(pArray)) return -1;
+    if(self == NULL) return -1;
+    if((pArray == NULL) || adt_ary_destructor_is_enabled(pArray)){
+        self->last_error = ADT_INVALID_ARGUMENT_ERROR;
+        return -1;
+    }
 
-   adt_hash_iter_init(self);
-   adt_ary_clear(pArray);
-   adt_ary_extend(pArray, adt_hash_length(self));
-   do{
-      (void) adt_hash_iter_next(self, &pKey);
-      if(pKey != NULL){
-         adt_ary_set(pArray, s32i++, (void*)pKey);
-      }
-   }while(pKey);
+    adt_hash_iter_init(self);
+    adt_ary_clear(pArray);
+    adt_error_t result = adt_ary_extend(pArray, adt_hash_length(self));
+    if(result != ADT_NO_ERROR){
+        self->last_error = result;
+        return -1;
+    }
+    do{
+        (void) adt_hash_iter_next(self, &pKey);
+        if(pKey != NULL){
+            adt_ary_set(pArray, s32i++, (void*)pKey);
+        }
+    }while(pKey);
 
+    self->last_error = ADT_NO_ERROR;
     return s32i;
 }
 
 int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray)
 {
-   const char *pKey;
-   int32_t s32i = 0;
+    const char *pKey;
+    int32_t s32i = 0;
 
-   if((self == NULL) || (pArray == NULL) || adt_ary_destructor_is_enabled(pArray)) return -1;
-   adt_hash_iter_init(self);
-   adt_ary_clear(pArray);
-   adt_ary_extend(pArray, adt_hash_length(self));
-   do{
-      void **ppValue = adt_hash_iter_next(self, &pKey);
-      if(ppValue != NULL){
-         adt_ary_set(pArray, s32i++, *ppValue);
-      }
-   } while(pKey);
-   return s32i;
+    if(self == NULL) return -1;
+    if((pArray == NULL) || adt_ary_destructor_is_enabled(pArray)){
+        self->last_error = ADT_INVALID_ARGUMENT_ERROR;
+        return -1;
+    }
+    adt_hash_iter_init(self);
+    adt_ary_clear(pArray);
+    adt_error_t result = adt_ary_extend(pArray, adt_hash_length(self));
+    if(result != ADT_NO_ERROR){
+        self->last_error = result;
+        return -1;
+    }
+    do{
+        void **ppValue = adt_hash_iter_next(self, &pKey);
+        if(ppValue != NULL){
+            adt_ary_set(pArray, s32i++, *ppValue);
+        }
+    } while(pKey);
+
+    self->last_error = ADT_NO_ERROR;
+    return s32i;
+}
+
+adt_error_t adt_hash_get_last_error(const adt_hash_t *self)
+{
+    if (self != NULL)
+    {
+        return self->last_error;
+    }
+    return ADT_INVALID_ARGUMENT_ERROR;
 }
 
 

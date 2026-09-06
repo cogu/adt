@@ -466,6 +466,95 @@ void test_adt_hash_keys_values_destructor_check(CuTest* tc)
    adt_hash_delete(pHash);
 }
 
+void test_adt_hash_last_error(CuTest* tc)
+{
+   int val1 = 10;
+   int val2 = 20;
+   adt_hash_t *pHash = adt_hash_new(NULL);
+   adt_ary_t *pArrDestructor = adt_ary_new(vfree);
+   adt_ary_t *pArr = adt_ary_new(NULL);
+
+   // NULL self
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(NULL));
+
+   // Initial state
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   // Insert with NULL key
+   CuAssertTrue(tc, !adt_hash_insert(pHash, NULL, &val1));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   // Successful insert
+   CuAssertTrue(tc, adt_hash_insert(pHash, "k1", &val1));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   // Duplicate insert
+   CuAssertTrue(tc, !adt_hash_insert(pHash, "k1", &val2));
+   CuAssertIntEquals(tc, ADT_ALREADY_EXISTS_ERROR, adt_hash_get_last_error(pHash));
+
+   // Set with NULL key
+   adt_hash_set(pHash, NULL, &val1);
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   // Successful set
+   adt_hash_set(pHash, "k1", &val2);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   // Remove with NULL key
+   CuAssertPtrEquals(tc, NULL, adt_hash_remove(pHash, NULL));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   // Remove non-existent key
+   CuAssertPtrEquals(tc, NULL, adt_hash_remove(pHash, "nonexistent"));
+   CuAssertIntEquals(tc, ADT_NOT_FOUND_ERROR, adt_hash_get_last_error(pHash));
+
+   // Successful remove
+   CuAssertPtrEquals(tc, &val2, adt_hash_remove(pHash, "k1"));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   // Erase with NULL key
+   CuAssertTrue(tc, !adt_hash_erase(pHash, NULL));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   // Erase non-existent key
+   CuAssertTrue(tc, !adt_hash_erase(pHash, "nonexistent"));
+   CuAssertIntEquals(tc, ADT_NOT_FOUND_ERROR, adt_hash_get_last_error(pHash));
+
+   // Re-insert for erase test
+   CuAssertTrue(tc, adt_hash_insert(pHash, "k2", &val1));
+   CuAssertTrue(tc, adt_hash_erase(pHash, "k2"));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   // adt_hash_keys error reporting
+   CuAssertIntEquals(tc, -1, adt_hash_keys(pHash, NULL));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   CuAssertIntEquals(tc, -1, adt_hash_keys(pHash, pArrDestructor));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   // adt_hash_values error reporting
+   CuAssertIntEquals(tc, -1, adt_hash_values(pHash, NULL));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   CuAssertIntEquals(tc, -1, adt_hash_values(pHash, pArrDestructor));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_hash_get_last_error(pHash));
+
+   // Successful keys and values
+   adt_hash_set(pHash, "k3", &val1);
+   CuAssertIntEquals(tc, 1, adt_hash_keys(pHash, pArr));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+   CuAssertIntEquals(tc, 1, adt_hash_values(pHash, pArr));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   // Clear resets last_error
+   adt_hash_clear(pHash);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_hash_get_last_error(pHash));
+
+   adt_ary_delete(pArrDestructor);
+   adt_ary_delete(pArr);
+   adt_hash_delete(pHash);
+}
+
 CuSuite* testsuite_adt_hash(void)
 {
    CuSuite* suite = CuSuiteNew();
@@ -487,5 +576,6 @@ CuSuite* testsuite_adt_hash(void)
    SUITE_ADD_TEST(suite, test_adt_hash_foreach);
    SUITE_ADD_TEST(suite, test_adt_hash_insert);
    SUITE_ADD_TEST(suite, test_adt_hash_keys_values_destructor_check);
+   SUITE_ADD_TEST(suite, test_adt_hash_last_error);
    return suite;
 }

@@ -36,7 +36,7 @@ typedef struct adt_str_tag {
      int32_t s32Cur;   //Current size of the string (s32Cur<=s32Size)
      int32_t s32Size;  //Size of the allocated array
      uint8_t *pAlloc;  //Allocated array
-     adt_error_t lastError;
+     adt_error_t last_error;
      adt_str_encoding_t encoding;
 } adt_str_t;
 
@@ -352,9 +352,9 @@ void adt_str_clear(adt_str_t *self);
  * \brief Returns the most recent error recorded on this string.
  *
  * \param self Pointer to the string.
- * \return Error code.
+ * \return Error code, or ADT_INVALID_ARGUMENT_ERROR if self is NULL.
  */
-adt_error_t adt_str_getLastError(adt_str_t *self);
+adt_error_t adt_str_get_last_error(const adt_str_t *self);
 
 /**
  * \brief Compares two strings for exact equality.
@@ -408,6 +408,7 @@ int adt_str_vlt(const void *a, const void *b);
 #define adt_str_dup adt_str_new_cstr
 #define adt_str_make adt_str_new_bstr
 #define adt_str_reset adt_str_destroy
+#define adt_str_getLastError adt_str_get_last_error
 
 #ifdef UNIT_TEST
 adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t maxBufLen, int32_t *strLen);

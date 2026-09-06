@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "adt_error.h"
 #include "adt_ary.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -101,6 +102,7 @@ typedef struct adt_hash_tag{
  void (*pDestructor)(void*); //element destructor
  adt_hit_frame_t iter_frames[ADT_HASH_MAX_DEPTH + 1];
  int8_t iter_depth;
+ adt_error_t last_error;
  adt_hkey_t *iter_hkey;
 } adt_hash_t;
 
@@ -298,5 +300,13 @@ int32_t adt_hash_keys(adt_hash_t *self, adt_ary_t* pArray);
  * \return Number of values copied (>= 0), or -1 on error.
  */
 int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray);
+
+/**
+ * \brief Returns the most recent error recorded on this hash table.
+ *
+ * \param self Pointer to the hash table.
+ * \return Error code, or ADT_INVALID_ARGUMENT_ERROR if self is NULL.
+ */
+adt_error_t adt_hash_get_last_error(const adt_hash_t *self);
 
 #endif //ADT_HASH_H__
