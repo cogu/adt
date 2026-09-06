@@ -1,6 +1,6 @@
 # Doxyfile for Sphinx + Breathe integration
 PROJECT_NAME           = "ADT"
-PROJECT_NUMBER         = "0.3.3"
+PROJECT_NUMBER         = "0.3.4"
 PROJECT_BRIEF          = "Abstract Data Types in C"
 
 # Input configuration
