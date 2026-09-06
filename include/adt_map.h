@@ -15,6 +15,7 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
+#include "adt_error.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
@@ -105,8 +106,9 @@ void adt_u16Map_clear(adt_u16Map_t *self);
  * @param self Pointer to the map.
  * @param key 16-bit unsigned integer key.
  * @param val Pointer value associated with the key.
+ * @return Error code (ADT_NO_ERROR on success or duplicate, ADT_OVERFLOW_ERROR if map capacity exceeded, ADT_INVALID_ARGUMENT_ERROR if self or pBegin is NULL).
  */
-void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val);
+adt_error_t adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val);
 
 /**
  * Removes a specific element pointer from the map by shifting remaining elements left.

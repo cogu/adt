@@ -85,20 +85,27 @@ void adt_stack_clear(adt_stack_t *self){
 
 
 //Accessors
-void	adt_stack_push(adt_stack_t *self, void *pVal){
-   if(!self) return;
+adt_error_t	adt_stack_push(adt_stack_t *self, void *pVal){
+   if(self == NULL) {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
    if(self->u32CurLen==self->u32AllocLen){
+      adt_error_t result;
       if(self->u32AllocLen==0){
-         adt_stack_resize(self,self->u32MinLen);
+         result = adt_stack_resize(self,self->u32MinLen);
       }
       else{
          //default growth by doubling items available
-         adt_stack_resize(self,self->u32AllocLen*2);
+         result = adt_stack_resize(self,self->u32AllocLen*2);
+      }
+      if(result != ADT_NO_ERROR){
+         return result;
       }
    }
    assert(self->u32CurLen<self->u32AllocLen);
    assert(self->ppAlloc != NULL);
    self->ppAlloc[self->u32CurLen++] = pVal;
+   return ADT_NO_ERROR;
 }
 void* adt_stack_top(const adt_stack_t *self){
    if(self && (self->u32CurLen>0)){
@@ -117,24 +124,32 @@ void* adt_stack_pop(adt_stack_t *self){
 }
 
 //Utility functions
-void adt_stack_reserve(adt_stack_t *self,uint32_t u32Len){
-   if(self){
-      self->u32MinLen = u32Len;
-      if(self->u32AllocLen < self->u32MinLen){
-         adt_stack_resize(self,self->u32MinLen);
-      }
+adt_error_t adt_stack_reserve(adt_stack_t *self,uint32_t u32Len){
+   if(self == NULL){
+      return ADT_INVALID_ARGUMENT_ERROR;
    }
+   self->u32MinLen = u32Len;
+   if(self->u32AllocLen < self->u32MinLen){
+      return adt_stack_resize(self,self->u32MinLen);
+   }
+   return ADT_NO_ERROR;
 }
 
-void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
+adt_error_t adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
    void **ppAlloc = NULL;
-   if(!self) return;
-   if(u32Len == self->u32AllocLen) return; //nothing to do
+   if(self == NULL) {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
+   if(u32Len == self->u32AllocLen) {
+      return ADT_NO_ERROR; //nothing to do
+   }
 
    assert(self->u32AllocLen>=self->u32CurLen);
    if(u32Len>0){
       ppAlloc = (void**) malloc(u32Len * sizeof(void*));
-      assert(ppAlloc != NULL);
+      if(ppAlloc == NULL){
+         return ADT_MEM_ERROR;
+      }
    }
    if(self->ppAlloc){
       if(u32Len > self->u32AllocLen){
@@ -163,6 +178,7 @@ void adt_stack_resize(adt_stack_t *self,uint32_t u32Len){
    if (self->u32CurLen > u32Len) {
       self->u32CurLen = u32Len;
    }
+   return ADT_NO_ERROR;
 }
 uint32_t adt_stack_size(const adt_stack_t *self){
    if(self){

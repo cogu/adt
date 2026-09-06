@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "adt_error.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
@@ -98,8 +99,9 @@ void adt_u32Set_clear(adt_u32Set_t *self);
  *
  * @param self Pointer to the set.
  * @param val Value to insert.
+ * @return Error code (ADT_NO_ERROR on success or duplicate, ADT_MEM_ERROR on allocation failure, ADT_OVERFLOW_ERROR if full, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_u32Set_insert(adt_u32Set_t *self, uint32_t val);
+adt_error_t adt_u32Set_insert(adt_u32Set_t *self, uint32_t val);
 
 /**
  * Removes a 32-bit unsigned integer from the set.

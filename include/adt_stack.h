@@ -15,6 +15,7 @@
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
+#include "adt_error.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
@@ -77,8 +78,9 @@ void  adt_stack_clear(adt_stack_t *self);
  *
  * \param self Pointer to the stack.
  * \param pVal Element pointer to push.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_stack_push(adt_stack_t *self, void *pVal);
+adt_error_t adt_stack_push(adt_stack_t *self, void *pVal);
 
 /**
  * \brief Inspects the element at the top of the stack without removing it.
@@ -103,16 +105,18 @@ void* adt_stack_pop(adt_stack_t *self);
  *
  * \param self Pointer to the stack.
  * \param u32Len Desired minimum capacity.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_stack_reserve(adt_stack_t *self,uint32_t u32Len);
+adt_error_t adt_stack_reserve(adt_stack_t *self, uint32_t u32Len);
 
 /**
  * \brief Resizes the stack allocation to exactly u32Len elements, destroying truncated elements if shrinking.
  *
  * \param self Pointer to the stack.
  * \param u32Len New allocated capacity.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_stack_resize(adt_stack_t *self,uint32_t u32Len);
+adt_error_t adt_stack_resize(adt_stack_t *self, uint32_t u32Len);
 
 /**
  * \brief Returns the number of elements currently stored in the stack.

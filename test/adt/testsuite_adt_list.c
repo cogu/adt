@@ -28,6 +28,7 @@ static void test_adt_list_insert_before_after(CuTest* tc);
 static void test_adt_list_iterators_and_accessors(CuTest* tc);
 static void test_adt_list_destructor_enable(CuTest* tc);
 static void test_adt_list_vdelete(CuTest* tc);
+static void test_adt_list_errors(CuTest* tc);
 
 /**************** Private Variable Declarations *******************/
 
@@ -46,6 +47,7 @@ CuSuite* testsuite_adt_list(void)
    SUITE_ADD_TEST(suite, test_adt_list_iterators_and_accessors);
    SUITE_ADD_TEST(suite, test_adt_list_destructor_enable);
    SUITE_ADD_TEST(suite, test_adt_list_vdelete);
+   SUITE_ADD_TEST(suite, test_adt_list_errors);
 
    return suite;
 }
@@ -258,5 +260,33 @@ static void test_adt_list_vdelete(CuTest* tc)
 
    // adt_list_delete will invoke adt_list_vdelete on both inner1 and inner2
    adt_list_delete(outer);
+}
+
+static void test_adt_list_errors(CuTest* tc)
+{
+   adt_list_t *list = adt_list_new(NULL);
+   CuAssertPtrNotNull(tc, list);
+
+   // NULL self checks
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_list_insert(NULL, (void*) 1));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_list_insert_before(NULL, NULL, (void*) 1));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_list_insert_after(NULL, NULL, (void*) 1));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_list_insert_unique(NULL, (void*) 1));
+
+   // NULL iter checks for before/after
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_list_insert_before(list, NULL, (void*) 1));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_list_insert_after(list, NULL, (void*) 1));
+
+   // Successful insertions return ADT_NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_list_insert(list, (void*) 1));
+   adt_list_elem_t *elem1 = adt_list_find(list, (void*) 1);
+   CuAssertPtrNotNull(tc, elem1);
+
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_list_insert_before(list, elem1, (void*) 2));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_list_insert_after(list, elem1, (void*) 3));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_list_insert_unique(list, (void*) 4));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_list_insert_unique(list, (void*) 4));
+
+   adt_list_delete(list);
 }
 

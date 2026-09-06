@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
 #include <stdbool.h>
+#include "adt_error.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
@@ -112,8 +113,9 @@ void  adt_list_destructor_enable(adt_list_t *self, bool enable);
  *
  * \param self Pointer to the list.
  * \param pItem Element pointer to append.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_list_insert(adt_list_t *self, void *pItem);
+adt_error_t adt_list_insert(adt_list_t *self, void *pItem);
 
 /**
  * \brief Inserts an element pointer before the specified list node.
@@ -121,8 +123,9 @@ void adt_list_insert(adt_list_t *self, void *pItem);
  * \param self Pointer to the list.
  * \param pIter Pointer to existing list node to insert before.
  * \param pItem Element pointer to insert.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self or pIter is NULL).
  */
-void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
+adt_error_t adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
 
 /**
  * \brief Inserts an element pointer after the specified list node.
@@ -130,16 +133,18 @@ void adt_list_insert_before(adt_list_t *self, adt_list_elem_t *pIter, void *pIte
  * \param self Pointer to the list.
  * \param pIter Pointer to existing list node to insert after.
  * \param pItem Element pointer to insert.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self or pIter is NULL).
  */
-void adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
+adt_error_t adt_list_insert_after(adt_list_t *self, adt_list_elem_t *pIter, void *pItem);
 
 /**
  * \brief Appends an element pointer to the end of the list only if it is not already present.
  *
  * \param self Pointer to the list.
  * \param pItem Element pointer to insert.
+ * \return Error code (ADT_NO_ERROR on success or duplicate, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_list_insert_unique(adt_list_t *self, void *pItem);
+adt_error_t adt_list_insert_unique(adt_list_t *self, void *pItem);
 
 /**
  * \brief Removes the first occurrence of pItem from the list and calls its destructor if enabled.
@@ -281,8 +286,9 @@ void  adt_u32List_vdelete(void *arg);
  *
  * \param self Pointer to the list.
  * \param item Value to append.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self is NULL).
  */
-void adt_u32List_insert(adt_u32List_t *self, uint32_t item);
+adt_error_t adt_u32List_insert(adt_u32List_t *self, uint32_t item);
 
 /**
  * \brief Inserts an integer value before the specified node.
@@ -290,8 +296,9 @@ void adt_u32List_insert(adt_u32List_t *self, uint32_t item);
  * \param self Pointer to the list.
  * \param pIter Pointer to existing node to insert before.
  * \param item Value to insert.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self or pIter is NULL).
  */
-void adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item);
+adt_error_t adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item);
 
 /**
  * \brief Inserts an integer value after the specified node.
@@ -299,8 +306,9 @@ void adt_u32List_insert_before(adt_u32List_t *self, adt_u32List_elem_t *pIter, u
  * \param self Pointer to the list.
  * \param pIter Pointer to existing node to insert after.
  * \param item Value to insert.
+ * \return Error code (ADT_NO_ERROR on success, ADT_MEM_ERROR on allocation failure, ADT_INVALID_ARGUMENT_ERROR if self or pIter is NULL).
  */
-void adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item);
+adt_error_t adt_u32List_insert_after(adt_u32List_t *self, adt_u32List_elem_t *pIter, uint32_t item);
 
 /**
  * \brief Removes the specified node from the list.

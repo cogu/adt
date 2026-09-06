@@ -1,5 +1,5 @@
 Integer Key-Value Map (adt_map)
-===========================
+===============================
 
 .. c:type:: adt_u16MapElem_t
 

@@ -28,6 +28,7 @@ static void test_adt_u32List_insert_after(CuTest* tc);
 static void test_adt_u32List_find(CuTest* tc);
 static void test_adt_u32List_iter_prev(CuTest* tc);
 static void test_adt_u32List_vdelete(CuTest* tc);
+static void test_adt_u32List_errors(CuTest* tc);
 
 
 /**************** Private Variable Declarations *******************/
@@ -47,6 +48,7 @@ CuSuite* testsuite_adt_u32List(void)
    SUITE_ADD_TEST(suite, test_adt_u32List_find);
    SUITE_ADD_TEST(suite, test_adt_u32List_iter_prev);
    SUITE_ADD_TEST(suite, test_adt_u32List_vdelete);
+   SUITE_ADD_TEST(suite, test_adt_u32List_errors);
 
    return suite;
 }
@@ -332,5 +334,30 @@ static void test_adt_u32List_vdelete(CuTest* tc)
 
    // adt_list_delete will invoke adt_u32List_vdelete on both inner1 and inner2
    adt_list_delete(outer);
+}
+
+static void test_adt_u32List_errors(CuTest* tc)
+{
+   adt_u32List_t *list = adt_u32List_new();
+   CuAssertPtrNotNull(tc, list);
+
+   // NULL self checks
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u32List_insert(NULL, 10));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u32List_insert_before(NULL, NULL, 10));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u32List_insert_after(NULL, NULL, 10));
+
+   // NULL iter checks for before/after
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u32List_insert_before(list, NULL, 10));
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_u32List_insert_after(list, NULL, 10));
+
+   // Successful insertions return ADT_NO_ERROR
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u32List_insert(list, 10));
+   adt_u32List_elem_t *elem = adt_u32List_find(list, 10);
+   CuAssertPtrNotNull(tc, elem);
+
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u32List_insert_before(list, elem, 5));
+   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_u32List_insert_after(list, elem, 15));
+
+   adt_u32List_delete(list);
 }
 
