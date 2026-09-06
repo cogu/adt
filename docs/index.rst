@@ -225,3 +225,130 @@ Temporary Destructor Suspension
 -------------------------------
 
 Certain containers (such as :c:type:`adt_ary_t`) allow temporarily suspending the destructor via ``adt_ary_destructor_enable(self, false)``. This is useful when moving elements from one container to another without triggering unintended deallocations.
+
+
+.. _error-handling:
+
+Error Handling (adt_error_t)
+============================
+
+The ADT library provides a consistent, standardized error reporting architecture across all container types via the ``adt_error_t`` type defined in ``<adt_error.h>``.
+
+Error Codes
+-----------
+
+Error codes are represented as a signed 8-bit integer (``int8_t``). Standard values include:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 15 50
+
+   * - Constant
+     - Value
+     - Description
+   * - ``ADT_NO_ERROR``
+     - 0
+     - Operation completed successfully.
+   * - ``ADT_INVALID_ARGUMENT_ERROR``
+     - 1
+     - NULL pointer, invalid parameter, or conflicting arguments passed.
+   * - ``ADT_MEM_ERROR``
+     - 2
+     - Dynamic memory allocation (``malloc`` or ``realloc``) failed.
+   * - ``ADT_INDEX_OUT_OF_BOUNDS_ERROR``
+     - 3
+     - Specified element index is beyond container bounds.
+   * - ``ADT_LENGTH_ERROR``
+     - 4
+     - Requested length exceeds allowable container boundaries.
+   * - ``ADT_ARRAY_TOO_LARGE_ERROR``
+     - 5
+     - Container capacity limit exceeded.
+   * - ``ADT_NOT_IMPLEMENTED_ERROR``
+     - 6
+     - Feature or operation is not implemented.
+   * - ``ADT_UNKNOWN_ENCODING_ERROR``
+     - 7
+     - Character encoding format unrecognized.
+   * - ``ADT_OBJECT_COMPARE_ERROR``
+     - 8
+     - Comparison failure during element ordering or sorting.
+   * - ``ADT_OVERFLOW_ERROR``
+     - 9
+     - Capacity limit reached (e.g. fixed-size ring buffer or static map is full).
+   * - ``ADT_UNDERFLOW_ERROR``
+     - 10
+     - Container or buffer is empty (e.g. popping or removing from an empty container).
+   * - ``ADT_NOT_FOUND_ERROR``
+     - 11
+     - Requested key or element does not exist.
+   * - ``ADT_ALREADY_EXISTS_ERROR``
+     - 12
+     - Attempted to insert a duplicate item where uniqueness is required.
+
+Two-Tier Error Architecture
+---------------------------
+
+The library employs a two-tier strategy depending on function semantics:
+
+Tier 1: Direct Return
+~~~~~~~~~~~~~~~~~~~~~
+
+Pure mutation and action functions (such as pushing elements, resizing, or inserting items) return ``adt_error_t`` directly.
+
+.. code-block:: c
+
+   #include <stdio.h>
+   #include "adt_stack.h"
+
+   void example_direct_return(void)
+   {
+       adt_stack_t *stack = adt_stack_new(NULL);
+       if (stack == NULL) return;
+
+       adt_error_t err = adt_stack_push(stack, (void*) 42);
+       if (err != ADT_NO_ERROR)
+       {
+           fprintf(stderr, "Failed to push onto stack: %s\n", adt_error_str(err));
+       }
+
+       adt_stack_delete(stack);
+   }
+
+Tier 2: Last-Error Querying
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Functions that must return a primary payload (such as an extracted count, boolean, or data pointer) record any failure status in an instance-level ``last_error`` field. Callers can inspect the specific cause of an error using the container's getter function:
+
+* :c:func:`adt_hash_get_last_error`: Returns the last error recorded on an :c:type:`adt_hash_t` (e.g. when :c:func:`adt_hash_keys` or :c:func:`adt_hash_values` returns -1).
+* :c:func:`adt_str_get_last_error`: Returns the last error recorded on an :c:type:`adt_str_t` (e.g. when :c:func:`adt_str_pop` returns -1 on empty string).
+
+.. code-block:: c
+
+   #include <stdio.h>
+   #include "adt_hash.h"
+   #include "adt_ary.h"
+
+   void example_last_error(adt_hash_t *table)
+   {
+       adt_ary_t keys;
+       adt_ary_create(&keys, NULL);
+
+       // adt_hash_keys returns number of keys extracted, or -1 on error
+       int32_t count = adt_hash_keys(table, &keys);
+       if (count < 0)
+       {
+           adt_error_t err = adt_hash_get_last_error(table);
+           fprintf(stderr, "Failed to extract keys: %s (code %d)\n",
+                   adt_error_str(err), err);
+       }
+
+       adt_ary_destroy(&keys);
+   }
+
+Error Message Lookup
+--------------------
+
+The :c:func:`adt_error_str` function translates any ``adt_error_t`` code into a human-readable English description:
+
+.. doxygenfunction:: adt_error_str
