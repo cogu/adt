@@ -205,6 +205,15 @@ adt_error_t adt_ary_remove(adt_ary_t *self, void *pElem);
 adt_error_t adt_ary_extend(adt_ary_t *self, int32_t s32Len);
 
 /**
+ * \brief Ensures allocated capacity is at least s32Len elements without changing current length.
+ *
+ * \param self Pointer to the array.
+ * \param s32Len Desired capacity.
+ * \return ADT_NO_ERROR on success, or an error code on failure.
+ */
+adt_error_t adt_ary_reserve(adt_ary_t *self, int32_t s32Len);
+
+/**
  * \brief Extends array to s32Len elements and populates newly allocated slots with the default fill element.
  *
  * \param self Pointer to the array.
