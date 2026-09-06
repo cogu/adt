@@ -17,6 +17,10 @@
 #include <stdint.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -321,6 +325,10 @@ void adt_rbfh_clear(adt_rbfh_t* self);
 uint16_t adt_rbfh_nextLen(uint16_t wanted);
 # endif
 #endif //ADT_RBFH_ENABLE
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_RINGBUF_H__
 

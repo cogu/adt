@@ -18,6 +18,10 @@
 #include <stdbool.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -224,5 +228,9 @@ bool adt_bytearray_data_equals(const adt_bytearray_t* self, const uint8_t* data,
  * \return Pointer to newly allocated adt_bytes_t object.
  */
 struct adt_bytes_tag* adt_bytearray_bytes(const adt_bytearray_t *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_BYTEARRAY_H

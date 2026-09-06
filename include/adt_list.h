@@ -18,6 +18,10 @@
 #include <stdbool.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -381,5 +385,9 @@ int32_t adt_u32List_length(const adt_u32List_t *self);
  * \param self Pointer to the list.
  */
 void adt_u32List_clear(adt_u32List_t *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_LIST_H

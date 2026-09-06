@@ -18,6 +18,10 @@
 #include <stdbool.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -125,5 +129,9 @@ struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self);
  * \return true if contents and length match, false otherwise.
  */
 bool adt_bytes_equals(const adt_bytes_t *self, const adt_bytes_t *other);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_BYTES_H

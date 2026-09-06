@@ -18,6 +18,10 @@
 #include <stdbool.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -327,5 +331,9 @@ int adt_i32_vlt(const void *a, const void *b);
  * \return Nonzero if *a < *b, 0 otherwise.
  */
 int adt_u32_vlt(const void *a, const void *b);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_ARY_H

@@ -17,6 +17,10 @@
 #include <stdint.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -125,5 +129,9 @@ adt_error_t adt_stack_resize(adt_stack_t *self, uint32_t u32Len);
  * \return Number of elements, or 0 if self is NULL.
  */
 uint32_t adt_stack_size(const adt_stack_t *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_STACK_H__

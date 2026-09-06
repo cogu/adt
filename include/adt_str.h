@@ -19,6 +19,10 @@
 #include "adt_bytearray.h"
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -413,6 +417,10 @@ int adt_str_vlt(const void *a, const void *b);
 #ifdef UNIT_TEST
 adt_str_encoding_t adt_utf8_checkEncodingAndSize(const uint8_t *strBuf, int32_t maxBufLen, int32_t *strLen);
 int32_t adt_utf8_readCodePoint(const uint8_t *strBuf, int32_t bufLen, int *codePoint);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif //ADT_STR_H__
