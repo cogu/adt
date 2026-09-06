@@ -13,11 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include "adt_hash.h"
-#include "perf_adt_ary.h"
-
-#ifndef DICTIONARY_PATH
-#define DICTIONARY_PATH "test/enable1.txt"
-#endif
+#include "perf_adt_hash.h"
 
 static FILE *open_dictionary(const char *path)
 {
@@ -41,14 +37,13 @@ static FILE *open_dictionary(const char *path)
    return fh;
 }
 
-int main(int argc, char **argv)
+void perf_adt_hash_run(const char *dict_path)
 {
-   const char *dict_path = (argc > 1) ? argv[1] : DICTIONARY_PATH;
    FILE *fh = open_dictionary(dict_path);
    if (fh == NULL)
    {
       fprintf(stderr, "Error: Could not open dictionary file '%s'\n", dict_path);
-      return 1;
+      return;
    }
 
    adt_hash_t *pHash = adt_hash_new(NULL);
@@ -56,7 +51,7 @@ int main(int argc, char **argv)
    {
       fprintf(stderr, "Error: Failed to create adt_hash instance\n");
       fclose(fh);
-      return 1;
+      return;
    }
 
    char line[256];
@@ -97,7 +92,7 @@ int main(int argc, char **argv)
    {
       fprintf(stderr, "Error: Could not re-open dictionary file '%s'\n", dict_path);
       adt_hash_delete(pHash);
-      return 1;
+      return;
    }
 
    int count = 0;
@@ -136,8 +131,4 @@ int main(int argc, char **argv)
    printf("adt_hash iteration time: %f s (count: %d)\n", elapsed_time, iter_count);
 
    adt_hash_delete(pHash);
-
-   perf_adt_ary_run(dict_path);
-
-   return 0;
 }
