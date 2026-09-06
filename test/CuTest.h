@@ -47,9 +47,9 @@ char* CuStrCopy(const char* old);
 
 typedef struct
 {
-	int length;
-	int size;
-	char* buffer;
+    int length;
+    int size;
+    char* buffer;
 } CuString;
 
 void CuStringInit(CuString* str);
@@ -71,12 +71,12 @@ typedef void (*CuFnPtr)(void);
 
 struct CuTest
 {
-	char* name;
-	TestFunction function;
-	int failed;
-	int ran;
-	const char* message;
-	jmp_buf *jumpBuf;
+    char* name;
+    TestFunction function;
+    int failed;
+    int ran;
+    const char* message;
+    jmp_buf *jumpBuf;
 };
 
 void CuTestInit(CuTest* t, const char* name, TestFunction function);
@@ -88,11 +88,11 @@ void CuTestDelete(CuTest *t);
 CU_NORETURN void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message);
 void CuAssert_Line(CuTest* tc, const char* file, int line, const char* message, int condition);
 void CuAssertStrEquals_LineMsg(CuTest* tc,
-	const char* file, int line, const char* message,
-	const char* expected, const char* actual);
+    const char* file, int line, const char* message,
+    const char* expected, const char* actual);
 void CuAssertIntEquals_LineMsg(CuTest* tc,
-	const char* file, int line, const char* message,
-	int expected, int actual);
+    const char* file, int line, const char* message,
+    int expected, int actual);
 void CuAssertUIntEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
    unsigned int expected, unsigned int actual);
@@ -100,11 +100,11 @@ void CuAssertULIntEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
    unsigned long long int expected, unsigned long long int actual);
 void CuAssertDblEquals_LineMsg(CuTest* tc,
-	const char* file, int line, const char* message,
-	double expected, double actual, double delta);
+    const char* file, int line, const char* message,
+    double expected, double actual, double delta);
 void CuAssertPtrEquals_LineMsg(CuTest* tc,
-	const char* file, int line, const char* message,
-	void* expected, void* actual);
+    const char* file, int line, const char* message,
+    void* expected, void* actual);
 void CuAssertConstPtrEquals_LineMsg(CuTest* tc,
    const char* file, int line, const char* message,
    const void* expected, const void* actual);
@@ -118,17 +118,17 @@ void CuAssertFnPtrEquals_LineMsg(CuTest* tc,
 #define CuFail(tc, ms)                        CuFail_Line(  (tc), __FILE__, __LINE__, NULL, (ms))
 /* cogu 2026-09-05: Inlined assertion condition checks to avoid false positive null dereference warnings in static analysis */
 #define CuAssert(tc, ms, cond) \
-	do { \
-		if (!(cond)) { \
-			CuFail_Line((tc), __FILE__, __LINE__, NULL, (ms)); \
-		} \
-	} while(0)
+    do { \
+        if (!(cond)) { \
+            CuFail_Line((tc), __FILE__, __LINE__, NULL, (ms)); \
+        } \
+    } while(0)
 #define CuAssertTrue(tc, cond) \
-	do { \
-		if (!(cond)) { \
-			CuFail_Line((tc), __FILE__, __LINE__, NULL, "assert failed"); \
-		} \
-	} while(0)
+    do { \
+        if (!(cond)) { \
+            CuFail_Line((tc), __FILE__, __LINE__, NULL, "assert failed"); \
+        } \
+    } while(0)
 
 #define CuAssertStrEquals(tc,ex,ac)           CuAssertStrEquals_LineMsg((tc),__FILE__,__LINE__,NULL,(ex),(ac))
 #define CuAssertStrEquals_Msg(tc,ms,ex,ac)    CuAssertStrEquals_LineMsg((tc),__FILE__,__LINE__,(ms),(ex),(ac))
@@ -150,17 +150,17 @@ void CuAssertFnPtrEquals_LineMsg(CuTest* tc,
 
 
 #define CuAssertPtrNotNull(tc,p) \
-	do { \
-		if ((p) == NULL) { \
-			CuFail_Line((tc),__FILE__,__LINE__,NULL,"null pointer unexpected"); \
-		} \
-	} while(0)
+    do { \
+        if ((p) == NULL) { \
+            CuFail_Line((tc),__FILE__,__LINE__,NULL,"null pointer unexpected"); \
+        } \
+    } while(0)
 #define CuAssertPtrNotNullMsg(tc,msg,p) \
-	do { \
-		if ((p) == NULL) { \
-			CuFail_Line((tc),__FILE__,__LINE__,(msg),"null pointer unexpected"); \
-		} \
-	} while(0)
+    do { \
+        if ((p) == NULL) { \
+            CuFail_Line((tc),__FILE__,__LINE__,(msg),"null pointer unexpected"); \
+        } \
+    } while(0)
 
 /* CuSuite */
 
@@ -170,9 +170,9 @@ void CuAssertFnPtrEquals_LineMsg(CuTest* tc,
 
 typedef struct
 {
-	int count;
-	CuTest* list[MAX_TEST_CASES];
-	int failCount;
+    int count;
+    CuTest* list[MAX_TEST_CASES];
+    int failCount;
 
 } CuSuite;
 

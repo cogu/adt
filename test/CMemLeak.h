@@ -2,14 +2,14 @@
 *    No Copyright - this is freeware
 ********************************************************************************
 
-     File:	CMemleak.h
+     File: CMemleak.h
 
      Author:    Xie Wei Bao (UK) Ltd
 
      email:     tech@cup.btinternet.co.uk
 
      Purpose:   Detecting memory leaks
-    
+
 ********************************************************************************
 */
 #ifndef memleak_h

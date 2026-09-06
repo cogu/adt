@@ -36,38 +36,38 @@ CuSuite* testsuite_adt_bytes(void);
 
 void RunAllTests(void)
 {
-	CuString *output = CuStringNew();
-	CuSuite* suite = CuSuiteNew();
+   CuString *output = CuStringNew();
+   CuSuite* suite = CuSuiteNew();
 
-	CuSuiteAddSuite(suite, testsuite_adt_str());
-	CuSuiteAddSuite(suite, testsuite_adt_ary());
-	CuSuiteAddSuite(suite, testsuite_adt_hash());
-	CuSuiteAddSuite(suite, testsuite_adt_stack());
+   CuSuiteAddSuite(suite, testsuite_adt_str());
+   CuSuiteAddSuite(suite, testsuite_adt_ary());
+   CuSuiteAddSuite(suite, testsuite_adt_hash());
+   CuSuiteAddSuite(suite, testsuite_adt_stack());
 #if TEST_ADT_U16MAP_ENABLE
-	CuSuiteAddSuite(suite, testsuite_adt_u16Map());
+   CuSuiteAddSuite(suite, testsuite_adt_u16Map());
 #endif
-	CuSuiteAddSuite(suite, testsuite_adt_list());
-	CuSuiteAddSuite(suite, testsuite_adt_u32List());
-	CuSuiteAddSuite(suite, testsuite_adt_bytearray());
-	CuSuiteAddSuite(suite, testsuite_adt_priorityHeap());
-	CuSuiteAddSuite(suite, testsuite_adt_u32Set());
-	CuSuiteAddSuite(suite, testsuite_adt_ringbuf());
-	CuSuiteAddSuite(suite, testsuite_adt_bytes());
+   CuSuiteAddSuite(suite, testsuite_adt_list());
+   CuSuiteAddSuite(suite, testsuite_adt_u32List());
+   CuSuiteAddSuite(suite, testsuite_adt_bytearray());
+   CuSuiteAddSuite(suite, testsuite_adt_priorityHeap());
+   CuSuiteAddSuite(suite, testsuite_adt_u32Set());
+   CuSuiteAddSuite(suite, testsuite_adt_ringbuf());
+   CuSuiteAddSuite(suite, testsuite_adt_bytes());
 
 
 
 
-	CuSuiteRun(suite);
-	CuSuiteSummary(suite, output);
-	CuSuiteDetails(suite, output);
-	printf("%s\n", output->buffer);
-	CuSuiteDelete(suite);
-	CuStringDelete(output);
+   CuSuiteRun(suite);
+   CuSuiteSummary(suite, output);
+   CuSuiteDetails(suite, output);
+   printf("%s\n", output->buffer);
+   CuSuiteDelete(suite);
+   CuStringDelete(output);
 
 }
 
 int main(void)
 {
-	RunAllTests();
-	return 0;
+   RunAllTests();
+   return 0;
 }

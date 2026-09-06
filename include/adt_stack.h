@@ -21,11 +21,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 typedef struct adt_stack_tag{
-	void **ppAlloc;		//array of (void*)
-	uint32_t u32AllocLen; //number of elements allocated
-	uint32_t u32CurLen;	//number of elements currently in the stack
-	uint32_t u32MinLen; //minimum (reserved) number of items in stack
-	void (*pDestructor)(void*);
+ void **ppAlloc;  //array of (void*)
+ uint32_t u32AllocLen; //number of elements allocated
+ uint32_t u32CurLen; //number of elements currently in the stack
+ uint32_t u32MinLen; //minimum (reserved) number of items in stack
+ void (*pDestructor)(void*);
 } adt_stack_t;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -38,14 +38,14 @@ typedef struct adt_stack_tag{
  * \param pDestructor Optional destructor callback function for element cleanup, or NULL.
  * \return Pointer to newly allocated stack, or NULL on failure.
  */
-adt_stack_t*	adt_stack_new(void (*pDestructor)(void*));
+adt_stack_t* adt_stack_new(void (*pDestructor)(void*));
 
 /**
  * \brief Destroys all elements using the configured destructor, frees internal buffer, and frees self.
  *
  * \param self Pointer to the stack to delete.
  */
-void 			adt_stack_delete(adt_stack_t *self);
+void    adt_stack_delete(adt_stack_t *self);
 
 /**
  * \brief Initializes a stack instance in place (stack or embedded allocation).
@@ -53,21 +53,21 @@ void 			adt_stack_delete(adt_stack_t *self);
  * \param self Pointer to an existing adt_stack_t instance.
  * \param pDestructor Optional destructor callback function for element cleanup, or NULL.
  */
-void 	adt_stack_create(adt_stack_t *self, void (*pDestructor)(void*));
+void  adt_stack_create(adt_stack_t *self, void (*pDestructor)(void*));
 
 /**
  * \brief Destroys all elements using the configured destructor and frees the internal buffer. Does not free self.
  *
  * \param self Pointer to the stack to destroy.
  */
-void 	adt_stack_destroy(adt_stack_t *self);
+void  adt_stack_destroy(adt_stack_t *self);
 
 /**
  * \brief Destroys all elements and clears the stack.
  *
  * \param self Pointer to the stack.
  */
-void 	adt_stack_clear(adt_stack_t *self);
+void  adt_stack_clear(adt_stack_t *self);
 
 
 //Accessors
@@ -78,7 +78,7 @@ void 	adt_stack_clear(adt_stack_t *self);
  * \param self Pointer to the stack.
  * \param pVal Element pointer to push.
  */
-void	adt_stack_push(adt_stack_t *self, void *pVal);
+void adt_stack_push(adt_stack_t *self, void *pVal);
 
 /**
  * \brief Inspects the element at the top of the stack without removing it.
@@ -86,7 +86,7 @@ void	adt_stack_push(adt_stack_t *self, void *pVal);
  * \param self Pointer to the stack.
  * \return Pointer to the top element, or NULL if the stack is empty or self is NULL.
  */
-void*	adt_stack_top(const adt_stack_t *self);
+void* adt_stack_top(const adt_stack_t *self);
 
 /**
  * \brief Removes and returns the element at the top of the stack without calling its destructor.
@@ -94,7 +94,7 @@ void*	adt_stack_top(const adt_stack_t *self);
  * \param self Pointer to the stack.
  * \return Pointer to the popped element, or NULL if the stack is empty or self is NULL.
  */
-void*	adt_stack_pop(adt_stack_t *self);
+void* adt_stack_pop(adt_stack_t *self);
 
 //Utility functions
 
@@ -104,7 +104,7 @@ void*	adt_stack_pop(adt_stack_t *self);
  * \param self Pointer to the stack.
  * \param u32Len Desired minimum capacity.
  */
-void	adt_stack_reserve(adt_stack_t *self,uint32_t u32Len);
+void adt_stack_reserve(adt_stack_t *self,uint32_t u32Len);
 
 /**
  * \brief Resizes the stack allocation to exactly u32Len elements, destroying truncated elements if shrinking.
@@ -112,7 +112,7 @@ void	adt_stack_reserve(adt_stack_t *self,uint32_t u32Len);
  * \param self Pointer to the stack.
  * \param u32Len New allocated capacity.
  */
-void	adt_stack_resize(adt_stack_t *self,uint32_t u32Len);
+void adt_stack_resize(adt_stack_t *self,uint32_t u32Len);
 
 /**
  * \brief Returns the number of elements currently stored in the stack.
