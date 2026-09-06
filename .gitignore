@@ -8,6 +8,5 @@ build/
 build-*/
 
 #Other
-TODO.md
 **/CMemLeak.txt
 .venv/
