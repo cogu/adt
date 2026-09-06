@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "perf_adt_hash.h"
 #include "perf_adt_ary.h"
+#include "perf_adt_set.h"
 
 #ifndef DICTIONARY_PATH
 #define DICTIONARY_PATH "test/enable1.txt"
@@ -22,6 +23,7 @@ int main(int argc, char **argv)
 
    perf_adt_hash_run(dict_path);
    perf_adt_ary_run(dict_path);
+   perf_adt_set_run();
 
    return 0;
 }

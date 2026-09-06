@@ -35,6 +35,8 @@ static void test_adt_u32Set_contains(CuTest* tc);
 static void test_adt_u32Set_remove(CuTest* tc);
 static void test_adt_u32Set_is_empty(CuTest* tc);
 static void test_adt_u32Set_vdelete(CuTest* tc);
+static void test_adt_u32Set_value_bounds(CuTest* tc);
+static void test_adt_u32Set_large(CuTest* tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // GLOBAL FUNCTIONS
@@ -52,6 +54,8 @@ CuSuite* testsuite_adt_u32Set(void)
    SUITE_ADD_TEST(suite, test_adt_u32Set_remove);
    SUITE_ADD_TEST(suite, test_adt_u32Set_is_empty);
    SUITE_ADD_TEST(suite, test_adt_u32Set_vdelete);
+   SUITE_ADD_TEST(suite, test_adt_u32Set_value_bounds);
+   SUITE_ADD_TEST(suite, test_adt_u32Set_large);
 
    return suite;
 }
@@ -63,7 +67,11 @@ static void test_adt_u32Set_create(CuTest* tc)
 {
    adt_u32Set_t set;
    adt_u32Set_create(&set);
-   CuAssertTrue(tc, adt_u32List_is_empty(&set.list));
+   CuAssertTrue(tc, adt_u32Set_is_empty(&set));
+   CuAssertIntEquals(tc, 0, adt_u32Set_length(&set));
+   CuAssertPtrEquals(tc, NULL, set.pAlloc);
+   CuAssertIntEquals(tc, 0, set.s32AllocLen);
+   CuAssertIntEquals(tc, 0, set.s32CurLen);
    adt_u32Set_destroy(&set);
 }
 
@@ -91,7 +99,6 @@ static void test_adt_u32Set_insert_multiple_values(CuTest* tc)
 {
    //setup
    adt_u32Set_t set;
-   adt_u32List_elem_t *iter;
    adt_u32Set_create(&set);
 
    //ordered insertion
@@ -112,19 +119,12 @@ static void test_adt_u32Set_insert_multiple_values(CuTest* tc)
    adt_u32Set_insert(&set, 1);
 
    CuAssertIntEquals(tc, 5, adt_u32Set_length(&set));
-   //make sure list is sorted
-   iter = adt_u32List_iter_first(&set.list);
-   CuAssertUIntEquals(tc, 1, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 2, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 3, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 4, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 5, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, NULL, iter);
+   //make sure set is sorted
+   CuAssertUIntEquals(tc, 1, adt_u32Set_value(&set, 0));
+   CuAssertUIntEquals(tc, 2, adt_u32Set_value(&set, 1));
+   CuAssertUIntEquals(tc, 3, adt_u32Set_value(&set, 2));
+   CuAssertUIntEquals(tc, 4, adt_u32Set_value(&set, 3));
+   CuAssertUIntEquals(tc, 5, adt_u32Set_value(&set, 4));
 
    //unordered insertion
    adt_u32Set_clear(&set);
@@ -135,19 +135,12 @@ static void test_adt_u32Set_insert_multiple_values(CuTest* tc)
    adt_u32Set_insert(&set, 2);
 
    CuAssertIntEquals(tc, 5, adt_u32Set_length(&set));
-   //make sure list is still sorted
-   iter = adt_u32List_iter_first(&set.list);
-   CuAssertUIntEquals(tc, 1, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 2, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 3, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 4, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 5, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, NULL, iter);
+   //make sure set is still sorted
+   CuAssertUIntEquals(tc, 1, adt_u32Set_value(&set, 0));
+   CuAssertUIntEquals(tc, 2, adt_u32Set_value(&set, 1));
+   CuAssertUIntEquals(tc, 3, adt_u32Set_value(&set, 2));
+   CuAssertUIntEquals(tc, 4, adt_u32Set_value(&set, 3));
+   CuAssertUIntEquals(tc, 5, adt_u32Set_value(&set, 4));
 
    //cleanup
    adt_u32Set_destroy(&set);
@@ -157,7 +150,6 @@ static void test_adt_u32Set_insert_duplicates(CuTest* tc)
 {
    //setup
    adt_u32Set_t set;
-   adt_u32List_elem_t *iter;
    adt_u32Set_create(&set);
 
    adt_u32Set_insert(&set, 3);
@@ -170,18 +162,11 @@ static void test_adt_u32Set_insert_duplicates(CuTest* tc)
    adt_u32Set_insert(&set, 3);
    adt_u32Set_insert(&set, 2);
    CuAssertIntEquals(tc, 5, adt_u32Set_length(&set));
-   iter = adt_u32List_iter_first(&set.list);
-   CuAssertUIntEquals(tc, 1, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 2, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 3, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 4, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertUIntEquals(tc, 5, iter->item);
-   iter = adt_u32List_iter_next(iter);
-   CuAssertPtrEquals(tc, NULL, iter);
+   CuAssertUIntEquals(tc, 1, adt_u32Set_value(&set, 0));
+   CuAssertUIntEquals(tc, 2, adt_u32Set_value(&set, 1));
+   CuAssertUIntEquals(tc, 3, adt_u32Set_value(&set, 2));
+   CuAssertUIntEquals(tc, 4, adt_u32Set_value(&set, 3));
+   CuAssertUIntEquals(tc, 5, adt_u32Set_value(&set, 4));
 
    //cleanup
    adt_u32Set_destroy(&set);
@@ -293,5 +278,58 @@ static void test_adt_u32Set_vdelete(CuTest* tc)
    CuAssertPtrNotNull(tc, set);
    adt_u32Set_insert(set, 123);
    adt_u32Set_vdelete((void*) set);
+}
+
+static void test_adt_u32Set_value_bounds(CuTest* tc)
+{
+   adt_u32Set_t set;
+   adt_u32Set_create(&set);
+
+   CuAssertUIntEquals(tc, 0, adt_u32Set_value(&set, 0));
+   CuAssertUIntEquals(tc, 0, adt_u32Set_value(&set, -1));
+   CuAssertUIntEquals(tc, 0, adt_u32Set_value(NULL, 0));
+
+   adt_u32Set_insert(&set, 42);
+   CuAssertUIntEquals(tc, 42, adt_u32Set_value(&set, 0));
+   CuAssertUIntEquals(tc, 0, adt_u32Set_value(&set, 1));
+   CuAssertUIntEquals(tc, 0, adt_u32Set_value(&set, -1));
+
+   adt_u32Set_destroy(&set);
+}
+
+static void test_adt_u32Set_large(CuTest* tc)
+{
+   adt_u32Set_t set;
+   adt_u32Set_create(&set);
+
+   const int count = 500;
+   uint32_t seed = 42;
+   for (int i = 0; i < count; i++)
+   {
+      seed = seed * 1103515245 + 12345;
+      uint32_t val = seed % 200;
+      adt_u32Set_insert(&set, val);
+   }
+
+   int32_t len = adt_u32Set_length(&set);
+   CuAssertTrue(tc, len > 0 && len <= 200);
+
+   for (int32_t i = 0; i < len - 1; i++)
+   {
+      uint32_t a = adt_u32Set_value(&set, i);
+      uint32_t b = adt_u32Set_value(&set, i + 1);
+      CuAssertTrue(tc, a < b);
+      CuAssertTrue(tc, adt_u32Set_contains(&set, a));
+      CuAssertTrue(tc, adt_u32Set_contains(&set, b));
+   }
+
+   for (int32_t i = len - 1; i >= 0; i -= 2)
+   {
+      uint32_t val = adt_u32Set_value(&set, i);
+      CuAssertTrue(tc, adt_u32Set_remove(&set, val));
+      CuAssertTrue(tc, !adt_u32Set_contains(&set, val));
+   }
+
+   adt_u32Set_destroy(&set);
 }
 

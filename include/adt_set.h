@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
 #include <stdbool.h>
-#include "adt_list.h"
+#include <stddef.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
@@ -25,12 +25,13 @@
 /**
  * Set container for 32-bit unsigned integers (uint32_t).
  *
- * Stores unique values in sorted ascending order.
+ * Stores unique values in sorted ascending order in a contiguous dynamic array.
  */
 typedef struct adt_u32Set_tag
 {
-   ///TODO: Investigate if another data structure can be used for increased performance
-   adt_u32List_t list; /**< Internal backing list storing elements */
+   uint32_t *pAlloc;    /**< Dynamic array of unique sorted uint32_t elements */
+   int32_t s32AllocLen; /**< Allocated capacity */
+   int32_t s32CurLen;   /**< Current number of elements */
 } adt_u32Set_t;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -125,6 +126,15 @@ bool adt_u32Set_contains(adt_u32Set_t *self, uint32_t val);
  * @return true if empty (length == 0), false otherwise.
  */
 bool adt_u32Set_is_empty(const adt_u32Set_t *self);
+
+/**
+ * Returns the element at the specified index in the sorted set.
+ *
+ * @param self Pointer to the set.
+ * @param index 0-based index.
+ * @return Value at index, or 0 if index is out of range.
+ */
+uint32_t adt_u32Set_value(const adt_u32Set_t *self, int32_t index);
 
 #endif //ADT_SET_H
 
