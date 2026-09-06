@@ -13,22 +13,20 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "adt_u16Map.h"
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stddef.h>
 #include <stdbool.h>
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
-// PRIVATE CONSTANTS AND DATA TYPES
-//////////////////////////////////////////////////////////////////////////////
-#define MAX_NUM_TRANSFER 20
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
-static adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16MapElem_t *pEnd, uint16_t key);
+static uint32_t adt_u16Map_lower_bound(const adt_u16MapElem_t *pBegin, uint32_t num_elem, uint16_t key);
+static adt_u16MapElem_t *adt_u16Map_binary_search(adt_u16MapElem_t *pBegin, adt_u16MapElem_t *pEnd, uint16_t key);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -37,9 +35,8 @@ static adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, ad
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint16_t max_num_elem, void (*pDestructor)(void*)){
+void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint32_t max_num_elem, void (*pDestructor)(void*)){
    if(self != NULL){
-      assert(max_num_elem<65535); //temporary fix for a design-flaw found in the code
       self->pBegin = pArray;
       self->pEnd = pArray;
       self->pIter = NULL;
@@ -54,7 +51,7 @@ void adt_u16Map_destroy(adt_u16Map_t *self){
    adt_u16Map_clear(self);
 }
 
-adt_u16Map_t *adt_u16Map_new(uint16_t max_num_elem, void (*pDestructor)(void*)){
+adt_u16Map_t *adt_u16Map_new(uint32_t max_num_elem, void (*pDestructor)(void*)){
    adt_u16Map_t *self = (adt_u16Map_t*) malloc(sizeof(adt_u16Map_t));
    if(self != NULL){
       adt_u16MapElem_t *elem = (adt_u16MapElem_t*) malloc(sizeof(adt_u16MapElem_t) * max_num_elem);
@@ -95,40 +92,36 @@ void adt_u16Map_clear(adt_u16Map_t *self){
 }
 
 void adt_u16Map_insert(adt_u16Map_t *self, uint16_t key, void *val){
-   uint16_t i;
-   adt_u16MapElem_t *elem;
-   if(self->pBegin == NULL){
+   if ((self == NULL) || (self->pBegin == NULL) || (self->num_elem >= self->max_num_elem)) {
       return;
    }
-   elem = self->pBegin;
-   if(self->num_elem >= self->max_num_elem){
-      //new item won't fit in map
-      return;
+
+   uint32_t i;
+
+   // Fast path for append: map is empty or key is strictly greater than the last key
+   if ((self->num_elem == 0) || (key > self->pBegin[self->num_elem - 1].key)) {
+      i = self->num_elem;
    }
-   for(i=0;i < self->num_elem; i++){
-      if(elem->key == key){
-         if(elem->val == val){
-            //element already in map, ignore insert request
+   else {
+      // Find first occurrence with elem->key >= key using lower_bound
+      uint32_t low = adt_u16Map_lower_bound(self->pBegin, self->num_elem, key);
+      i = low;
+      while ((i < self->num_elem) && (self->pBegin[i].key == key)) {
+         if (self->pBegin[i].val == val) {
+            // Exact key/val duplicate already in map; ignore insert request
             return;
          }
+         i++;
       }
-      else if(elem->key > key){
-         break;
-      }
-      elem++;
    }
-   if(i < self->num_elem){
-      uint16_t j;
-      //make room for elem
-      for(j=self->num_elem;j > i ; j--){
-         self->pBegin[j]=self->pBegin[j-1];
-      }
-      assert(i==j);
+
+   // Make room for elem if inserting before the end
+   if (i < self->num_elem) {
+      memmove(&self->pBegin[i + 1], &self->pBegin[i], (size_t)(self->num_elem - i) * sizeof(adt_u16MapElem_t));
    }
-   assert(i<self->max_num_elem);
-   assert(&self->pBegin[i] == elem);
-   elem->key = key;
-   elem->val = val;
+
+   self->pBegin[i].key = key;
+   self->pBegin[i].val = val;
    self->num_elem++;
    self->pEnd++;
 }
@@ -138,22 +131,19 @@ void adt_u16Map_remove(adt_u16Map_t *self, const adt_u16MapElem_t *pElem){
       return;
    }
    if( (pElem >= self->pBegin) && (pElem < self->pEnd) ){
-      uint32_t i;
-      uint32_t j;
-      i = (uint32_t) (pElem-self->pBegin);
+      uint32_t i = (uint32_t) (pElem - self->pBegin);
       assert( i < self->num_elem);
-      //remove element by copy data left
-      for(j=i+1;j < self->num_elem ; j++){
-         self->pBegin[j-1]=self->pBegin[j];
+      uint32_t num_to_move = self->num_elem - (i + 1);
+      if (num_to_move > 0) {
+         memmove(&self->pBegin[i], &self->pBegin[i + 1], (size_t)num_to_move * sizeof(adt_u16MapElem_t));
       }
-      assert(j == self->num_elem);
       self->num_elem--;
       self->pEnd--;
    }
 }
 
 adt_u16MapElem_t* adt_u16Map_find(adt_u16Map_t *self, uint16_t key){
-   adt_u16MapElem_t *it = adt_u16Map_binarySearchDup(self->pBegin,self->pEnd, key);
+   adt_u16MapElem_t *it = adt_u16Map_binary_search(self->pBegin,self->pEnd, key);
    if(it != NULL){
       (void) adt_u16Map_iter_init(self,it);
    }
@@ -174,7 +164,7 @@ adt_u16MapElem_t* adt_u16Map_find_exact(adt_u16Map_t *self, uint16_t key, const 
    return NULL;
 }
 
-uint16_t adt_u16Map_size(const adt_u16Map_t *self){
+uint32_t adt_u16Map_size(const adt_u16Map_t *self){
    if(self != NULL){
       return self->num_elem;
    }
@@ -207,132 +197,85 @@ adt_u16MapElem_t* adt_u16Map_iter_next(adt_u16Map_t *self){
 /**
  * move all items matching key \param key from \param src to \param dest
  */
-uint16_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key){
-   adt_u16MapElem_t *itemsToMove[MAX_NUM_TRANSFER];
-   adt_u16MapElem_t dataToMove[MAX_NUM_TRANSFER];
-   adt_u16MapElem_t **pCursor;
-   adt_u16MapElem_t *pData;
-   uint16_t numItems = 0;
-   uint16_t totalItems = 0;
-
+uint32_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key){
    if( (dest == NULL) || (dest->pBegin == NULL) || (src == NULL) || (src->pBegin == NULL) ){
       return 0;
    }
 
-   while(1){
-      adt_u16MapElem_t *it;
-      pCursor = itemsToMove;
-      pData = dataToMove;
-      it = adt_u16Map_find(src,key);
-      if(it != NULL){
-         it=adt_u16Map_iter_init(src,it);
-         while(numItems < MAX_NUM_TRANSFER){
-            if( (it == NULL) || (it->key != key) ){
-               break; //no more items
-            }
-            else{
-               //mark items for removal, copy data
-               *(pCursor++) = it;
-               *(pData++) = *it;
-               numItems++;
-            }
-            it = adt_u16Map_iter_next(src);
-         }
-         pData = dataToMove;
-         totalItems+=numItems;
-         while(numItems){
-            //All iterators with higher address will be destroyed when item is removed.
-            //Therefore we remove items in reverse order (higher address to lower).
-            //Data is added in sorted order (more efficient inserts).
-            it = *(--pCursor);
-            adt_u16Map_remove(src,it);
-            adt_u16Map_insert(dest,pData->key, pData->val);
-            pData++;
-            numItems--;
-         }
-      }
-      else{
-         return totalItems; //done
-      }
+   uint32_t start = adt_u16Map_lower_bound(src->pBegin, src->num_elem, key);
+   if ((start >= src->num_elem) || (src->pBegin[start].key != key)) {
+      return 0;
    }
-   return 0;
+
+   uint32_t end = start;
+   while ((end < src->num_elem) && (src->pBegin[end].key == key)) {
+      end++;
+   }
+
+   uint32_t num_items = end - start;
+
+   for (uint32_t i = start; i < end; i++) {
+      adt_u16Map_insert(dest, src->pBegin[i].key, src->pBegin[i].val);
+   }
+
+   uint32_t remaining = src->num_elem - end;
+   if (remaining > 0) {
+      memmove(&src->pBegin[start], &src->pBegin[end], (size_t)remaining * sizeof(adt_u16MapElem_t));
+   }
+   src->num_elem -= num_items;
+   src->pEnd -= num_items;
+
+   return num_items;
 }
 
 void adt_u16Map_remove_val(adt_u16Map_t *self, const void *val){
-   uint16_t tmp[MAX_NUM_TRANSFER];
-   uint16_t tmpLen = 0;
-   adt_u16MapElem_t *it;
-   while(1){
-      tmpLen = 0;
-      it = adt_u16Map_iter_init(self,0);
-      while((tmpLen < MAX_NUM_TRANSFER) && it){
-         if(it->val == val){
-            tmp[tmpLen++] = it->key;
+   if ((self == NULL) || (self->pBegin == NULL) || (self->num_elem == 0)) {
+      return;
+   }
+
+   uint32_t write_idx = 0;
+   for (uint32_t read_idx = 0; read_idx < self->num_elem; read_idx++) {
+      if (self->pBegin[read_idx].val != val) {
+         if (write_idx != read_idx) {
+            self->pBegin[write_idx] = self->pBegin[read_idx];
          }
-         it = adt_u16Map_iter_next(self);
-      }
-      if(tmpLen>0){
-         uint16_t i;
-         for(i=0;i<tmpLen;i++){
-            it = adt_u16Map_find_exact(self,tmp[i],val);
-            if(it){
-               adt_u16Map_remove(self,it);
-            }
-         }
-         if(tmpLen < MAX_NUM_TRANSFER){
-            //last loop
-            break;
-         }
-      }
-      else{
-         //no items to delete
-         break;
+         write_idx++;
       }
    }
+
+   self->num_elem = write_idx;
+   self->pEnd = self->pBegin + write_idx;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-adt_u16MapElem_t *adt_u16Map_binarySearchDup(adt_u16MapElem_t *pBegin, adt_u16MapElem_t *pEnd, uint16_t key){
-   adt_u16MapElem_t *pMid;
-   adt_u16MapElem_t *pLow = pBegin;
-   adt_u16MapElem_t *pHigh = pEnd;
+static uint32_t adt_u16Map_lower_bound(const adt_u16MapElem_t *pBegin, uint32_t num_elem, uint16_t key)
+{
+   uint32_t low = 0;
+   uint32_t high = num_elem;
 
-   uint32_t num_elem;
-   while(1){
-      assert(pHigh >= pLow);
-      num_elem = (uint32_t)(pHigh - pLow);
-      //perform a linear search if there is 3 items or less
-      if(num_elem <= 3){
-         uint32_t i;
-         for(i=0;i<num_elem;i++){
-            if (pLow[i].key == key) {
-               if(i==0){
-                  //decrease pointer if key is duplicated
-                  while((pLow>pBegin) && (pLow[-1].key == key)) pLow--;
-                  return pLow;
-               }
-               return &pLow[i];
-            }
-         }
-         break;
+   while (low < high) {
+      uint32_t mid = low + ((high - low) / 2);
+      if (pBegin[mid].key < key) {
+         low = mid + 1;
       }
-      else{
-         pMid = pLow+(num_elem/2);
-         assert( (pMid>=pLow) && (pMid<pHigh));
-         if(pMid->key < key){
-            pLow = pMid;
-         }
-         else if(pMid->key > key){
-            pHigh = pMid;
-         }
-         else{
-            pLow = pMid;
-            pHigh = pMid+1;
-         }
+      else {
+         high = mid;
       }
+   }
+   return low;
+}
+
+static adt_u16MapElem_t *adt_u16Map_binary_search(adt_u16MapElem_t *pBegin, adt_u16MapElem_t *pEnd, uint16_t key){
+   if ((pBegin == NULL) || (pEnd <= pBegin)) {
+      return NULL;
+   }
+   uint32_t num_elem = (uint32_t)(pEnd - pBegin);
+   uint32_t idx = adt_u16Map_lower_bound(pBegin, num_elem, key);
+   if ((idx < num_elem) && (pBegin[idx].key == key)) {
+      return &pBegin[idx];
    }
    return NULL;
 }
