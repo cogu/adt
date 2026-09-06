@@ -51,6 +51,12 @@ static void test_adt_ary_sort_array_with_one_item(CuTest *tc);
 static void test_adt_ary_sort_array_with_seven_items(CuTest *tc);
 static void test_adt_ary_reverse_sort_array_with_seven_items(CuTest *tc);
 static void test_adt_ary_sort_strings_array_with_four_items(CuTest *tc);
+static void test_adt_ary_sort_with_duplicates(CuTest *tc);
+static void test_adt_ary_sort_all_identical(CuTest *tc);
+static void test_adt_ary_sort_already_sorted(CuTest *tc);
+static void test_adt_ary_sort_reversed_input(CuTest *tc);
+static void test_adt_ary_sort_large_array(CuTest *tc);
+static void test_adt_ary_sort_compare_error(CuTest *tc);
 static void test_adt_ary_index_of(CuTest *tc);
 static void test_adt_ary_destructor_enable(CuTest *tc);
 static void test_adt_ary_vdelete(CuTest *tc);
@@ -85,6 +91,12 @@ CuSuite *testsuite_adt_ary(void) {
   SUITE_ADD_TEST(suite, test_adt_ary_sort_array_with_seven_items);
   SUITE_ADD_TEST(suite, test_adt_ary_reverse_sort_array_with_seven_items);
   SUITE_ADD_TEST(suite, test_adt_ary_sort_strings_array_with_four_items);
+  SUITE_ADD_TEST(suite, test_adt_ary_sort_with_duplicates);
+  SUITE_ADD_TEST(suite, test_adt_ary_sort_all_identical);
+  SUITE_ADD_TEST(suite, test_adt_ary_sort_already_sorted);
+  SUITE_ADD_TEST(suite, test_adt_ary_sort_reversed_input);
+  SUITE_ADD_TEST(suite, test_adt_ary_sort_large_array);
+  SUITE_ADD_TEST(suite, test_adt_ary_sort_compare_error);
   SUITE_ADD_TEST(suite, test_adt_ary_index_of);
   SUITE_ADD_TEST(suite, test_adt_ary_destructor_enable);
   SUITE_ADD_TEST(suite, test_adt_ary_vdelete);
@@ -476,6 +488,152 @@ static void test_adt_ary_sort_strings_array_with_four_items(CuTest *tc) {
                     adt_str_cstr((adt_str_t *)adt_ary_value(array, 2)));
   CuAssertStrEquals(tc, "purple",
                     adt_str_cstr((adt_str_t *)adt_ary_value(array, 3)));
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_sort_with_duplicates(CuTest *tc) {
+  int32_t values[] = {5, 1, 3, 5, 2, 1, 4, 3};
+  int32_t count = sizeof(values) / sizeof(values[0]);
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int32_t i = 0; i < count; i++) {
+    adt_ary_push(array, &values[i]);
+  }
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+  CuAssertIntEquals(tc, 1, *((int32_t *)adt_ary_value(array, 0)));
+  CuAssertIntEquals(tc, 1, *((int32_t *)adt_ary_value(array, 1)));
+  CuAssertIntEquals(tc, 2, *((int32_t *)adt_ary_value(array, 2)));
+  CuAssertIntEquals(tc, 3, *((int32_t *)adt_ary_value(array, 3)));
+  CuAssertIntEquals(tc, 3, *((int32_t *)adt_ary_value(array, 4)));
+  CuAssertIntEquals(tc, 4, *((int32_t *)adt_ary_value(array, 5)));
+  CuAssertIntEquals(tc, 5, *((int32_t *)adt_ary_value(array, 6)));
+  CuAssertIntEquals(tc, 5, *((int32_t *)adt_ary_value(array, 7)));
+
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, true));
+  CuAssertIntEquals(tc, 5, *((int32_t *)adt_ary_value(array, 0)));
+  CuAssertIntEquals(tc, 5, *((int32_t *)adt_ary_value(array, 1)));
+  CuAssertIntEquals(tc, 4, *((int32_t *)adt_ary_value(array, 2)));
+  CuAssertIntEquals(tc, 3, *((int32_t *)adt_ary_value(array, 3)));
+  CuAssertIntEquals(tc, 3, *((int32_t *)adt_ary_value(array, 4)));
+  CuAssertIntEquals(tc, 2, *((int32_t *)adt_ary_value(array, 5)));
+  CuAssertIntEquals(tc, 1, *((int32_t *)adt_ary_value(array, 6)));
+  CuAssertIntEquals(tc, 1, *((int32_t *)adt_ary_value(array, 7)));
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_sort_all_identical(CuTest *tc) {
+  int32_t val = 42;
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int32_t i = 0; i < 20; i++) {
+    adt_ary_push(array, &val);
+  }
+  CuAssertIntEquals(tc, 20, adt_ary_length(array));
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+  for (int32_t i = 0; i < 20; i++) {
+    CuAssertIntEquals(tc, 42, *((int32_t *)adt_ary_value(array, i)));
+  }
+
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, true));
+  for (int32_t i = 0; i < 20; i++) {
+    CuAssertIntEquals(tc, 42, *((int32_t *)adt_ary_value(array, i)));
+  }
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_sort_already_sorted(CuTest *tc) {
+  int32_t values[] = {10, 20, 30, 40, 50, 60, 70, 80};
+  int32_t count = sizeof(values) / sizeof(values[0]);
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int32_t i = 0; i < count; i++) {
+    adt_ary_push(array, &values[i]);
+  }
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+  for (int32_t i = 0; i < count; i++) {
+    CuAssertIntEquals(tc, values[i], *((int32_t *)adt_ary_value(array, i)));
+  }
+
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, true));
+  for (int32_t i = 0; i < count; i++) {
+    CuAssertIntEquals(tc, values[count - 1 - i], *((int32_t *)adt_ary_value(array, i)));
+  }
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_sort_reversed_input(CuTest *tc) {
+  int32_t values[] = {80, 70, 60, 50, 40, 30, 20, 10};
+  int32_t count = sizeof(values) / sizeof(values[0]);
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int32_t i = 0; i < count; i++) {
+    adt_ary_push(array, &values[i]);
+  }
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+  for (int32_t i = 0; i < count; i++) {
+    CuAssertIntEquals(tc, (i + 1) * 10, *((int32_t *)adt_ary_value(array, i)));
+  }
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_sort_large_array(CuTest *tc) {
+  const int32_t count = 250;
+  int32_t values[250];
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  // Pseudo-random distribution
+  uint32_t seed = 12345;
+  for (int32_t i = 0; i < count; i++) {
+    seed = seed * 1103515245 + 12345;
+    values[i] = (int32_t)(seed % 1000);
+    adt_ary_push(array, &values[i]);
+  }
+  CuAssertIntEquals(tc, count, adt_ary_length(array));
+
+  // Ascending sort
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, false));
+  for (int32_t i = 0; i < count - 1; i++) {
+    int32_t a = *((int32_t *)adt_ary_value(array, i));
+    int32_t b = *((int32_t *)adt_ary_value(array, i + 1));
+    CuAssertTrue(tc, a <= b);
+  }
+
+  // Descending sort
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_sort(array, adt_i32_vlt, true));
+  for (int32_t i = 0; i < count - 1; i++) {
+    int32_t a = *((int32_t *)adt_ary_value(array, i));
+    int32_t b = *((int32_t *)adt_ary_value(array, i + 1));
+    CuAssertTrue(tc, a >= b);
+  }
+
+  adt_ary_delete(array);
+}
+
+static int mock_failing_comparator(const void *a, const void *b) {
+  (void)a;
+  (void)b;
+  return -1;
+}
+
+static void test_adt_ary_sort_compare_error(CuTest *tc) {
+  int32_t values[] = {3, 1, 2};
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int32_t i = 0; i < 3; i++) {
+    adt_ary_push(array, &values[i]);
+  }
+  CuAssertIntEquals(tc, ADT_OBJECT_COMPARE_ERROR, adt_ary_sort(array, mock_failing_comparator, false));
+
   adt_ary_delete(array);
 }
 
