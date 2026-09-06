@@ -1,8 +1,8 @@
 /*****************************************************************************
-* \file      perf_adt_u16map.c
+* \file      perf_adt_map.c
 * \author    Conny Gustafsson
 * \date      2026-09-06
-* \brief     Performance benchmark for adt_u16Map_t
+* \brief     Performance benchmark for adt_map
 *
 * Copyright (c) 2026 Conny Gustafsson
 * SPDX-License-Identifier: MIT
@@ -12,10 +12,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-#include "adt_u16Map.h"
-#include "perf_adt_u16map.h"
+#include "adt_map.h"
+#include "perf_adt_map.h"
 
-void perf_adt_u16map_run(void)
+void perf_adt_map_run(void)
 {
    printf("\n=== adt_u16Map benchmarks ===\n");
 

@@ -25,7 +25,7 @@ Online documentation and API reference: **[c-adt.readthedocs.io](https://c-adt.r
 | `adt_bytes_t` | `adt_bytes.h` | Bytes (`uint8_t`) | Yes | Immutable byte array |
 | `adt_str_t` | `adt_str.h` | Characters (`char*`) | Yes | Dynamic UTF-8 / ASCII string container |
 | `adt_hash_t` | `adt_hash.h` | Objects (`void*`) | Yes | Hash table with string keys |
-| `adt_u16Map_t` | `adt_u16Map.h` | Objects (`void*`) | No | Sorted-array map for `uint16_t` keys |
+| `adt_u16Map_t` | `adt_map.h` | Objects (`void*`) | No | Sorted-array map for `uint16_t` keys |
 | `adt_list_t` | `adt_list.h` | Objects (`void*`) | Yes | Doubly-linked list for mid-sequence edits |
 | `adt_u32List_t` | `adt_list.h` | Values (`uint32_t`) | Yes | Specialized linked list for 32-bit integers |
 | `adt_stack_t` | `adt_stack.h` | Objects (`void*`) | Yes | LIFO stack for generic pointers |

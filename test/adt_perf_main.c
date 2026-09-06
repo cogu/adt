@@ -13,7 +13,7 @@
 #include "perf_adt_ary.h"
 #include "perf_adt_set.h"
 #if defined(ADT_U16MAP_ENABLE) && ADT_U16MAP_ENABLE
-#include "perf_adt_u16map.h"
+#include "perf_adt_map.h"
 #endif
 
 #ifndef DICTIONARY_PATH
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
    perf_adt_ary_run(dict_path);
    perf_adt_set_run();
 #if defined(ADT_U16MAP_ENABLE) && ADT_U16MAP_ENABLE
-   perf_adt_u16map_run();
+   perf_adt_map_run();
 #endif
 
    return 0;

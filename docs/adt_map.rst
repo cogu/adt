@@ -1,5 +1,5 @@
-U16 Key-Value Map (adt_u16Map)
-==============================
+Integer Key-Value Map (adt_map)
+===========================
 
 .. c:type:: adt_u16MapElem_t
 
@@ -9,7 +9,7 @@ U16 Key-Value Map (adt_u16Map)
 
    Sorted-array key/value map container. Maintains its elements in ascending sorted order by key.
 
-The **adt_u16Map** module provides a compact, cache-friendly key-value dictionary using a contiguous sorted array as its underlying storage. It is indexed by 16-bit unsigned integer keys (``uint16_t``) and stores generic object pointers (``void*``).
+The **adt_map** module provides a compact, cache-friendly key-value dictionary using a contiguous sorted array as its underlying storage. It is indexed by 16-bit unsigned integer keys (``uint16_t``) and stores generic object pointers (``void*``).
 
 Key features:
 
@@ -46,7 +46,7 @@ Example 1: Static Lookup Table (Zero Heap)
 
    #include <stdio.h>
    #include <stdint.h>
-   #include "adt_u16Map.h"
+   #include "adt_map.h"
 
    #define MAX_ENTRIES 10
 
@@ -90,7 +90,7 @@ Example 2: Dynamic Allocation with Destructors
    #include <stdio.h>
    #include <stdlib.h>
    #include "adt_str.h"
-   #include "adt_u16Map.h"
+   #include "adt_map.h"
 
    void example_dynamic_map(void)
    {

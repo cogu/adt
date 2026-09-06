@@ -1,5 +1,5 @@
 /*****************************************************************************
-* \file      adt_u16Map.h
+* \file      adt_map.h
 * \author    Conny Gustafsson
 * \date      2013-10-01
 * \brief     key/value map table using a sorted array as storage container
@@ -8,8 +8,8 @@
 * SPDX-License-Identifier: MIT
 * See LICENSE in project root for full license terms.
 ******************************************************************************/
-#ifndef ADT_U16MAP_H
-#define ADT_U16MAP_H
+#ifndef ADT_MAP_H
+#define ADT_MAP_H
 
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
@@ -183,5 +183,5 @@ uint32_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t ke
  */
 void adt_u16Map_remove_val(adt_u16Map_t *self, const void *val);
 
-#endif //ADT_U16MAP_H
+#endif //ADT_MAP_H
 

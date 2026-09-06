@@ -1,5 +1,5 @@
 /*****************************************************************************
-* \file      adt_u16Map.c
+* \file      adt_map.c
 * \author    Conny Gustafsson
 * \date      2013-10-01
 * \brief     key/value map table using a sorted array as storage container
@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // INCLUDES
 //////////////////////////////////////////////////////////////////////////////
-#include "adt_u16Map.h"
+#include "adt_map.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
