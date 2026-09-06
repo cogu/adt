@@ -23,8 +23,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
-#define DATA_BLOCK_MAX 65536  //maximum amount of bytes that can be copied in memmmove is implementation specific,
-                              //use define to control how many bytes shall be copied
 
 #define ELEM_SIZE (sizeof(void*))
 #define ELEM_VALUE_IS_LESS(T) ( *((T*) a) < *((T*) b) )
@@ -33,7 +31,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
-static void adt_block_memmove(uint8_t*pDest, uint8_t*pSrc, uint32_t u32Remain);
 static adt_error_t adt_ary_introsort(void **elems, int32_t low, int32_t high, int32_t depth_limit, adt_vlt_func_t *key, bool reverse);
 static adt_error_t adt_ary_insertion_sort_range(void **elems, int32_t start, int32_t end, adt_vlt_func_t *key, bool reverse);
 static adt_error_t adt_ary_heapsort_range(void **elems, int32_t start, int32_t end, adt_vlt_func_t *key, bool reverse);
@@ -572,15 +569,9 @@ adt_error_t adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
             self->pDestructor(self->pFirst[s32Destination+i]);
          }
       }
-      s32ElemsRemain = self->s32CurLen-s32Source;
+      s32ElemsRemain = self->s32CurLen - s32Source;
       if (s32ElemsRemain > 0) {
-         uint32_t u32BytesRemain;
-         uint8_t* pDest;
-         uint8_t* pSrc;
-         pDest = (uint8_t*) &self->pFirst[s32Destination];
-         pSrc = (uint8_t*) &self->pFirst[s32Source];
-         u32BytesRemain = ((uint32_t)s32ElemsRemain) * ((uint32_t) ELEM_SIZE);
-         adt_block_memmove(pDest, pSrc, u32BytesRemain);
+         memmove(&self->pFirst[s32Destination], &self->pFirst[s32Source], sizeof(void*) * (size_t)s32ElemsRemain);
       }
       self->s32CurLen-=s32Len;
       if (self->s32CurLen == 0) {
@@ -656,19 +647,6 @@ int32_t adt_ary_index_of(adt_ary_t *self, void *pElem)
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-/**
- * CG: I had some serious issues with some Microsoft compilers not handling large memmoves.
- * To mitigate this potential problem I use this function to transform one large memmoves into a series of smaller memmoves.
- */
-static void adt_block_memmove(uint8_t *pDest, uint8_t*pSrc, uint32_t u32Remain){
-   while(u32Remain>0){
-      uint32_t u32Size = (u32Remain>DATA_BLOCK_MAX)? DATA_BLOCK_MAX : u32Remain;
-      memmove(pDest, pSrc, u32Size);
-      u32Remain-=u32Size;
-      pDest+=u32Size;
-      pSrc+=u32Size;
-   }
-}
 
 #define ADT_SORT_THRESHOLD 16
 
