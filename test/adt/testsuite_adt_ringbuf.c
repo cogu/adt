@@ -26,7 +26,9 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
-#if (ADT_RBFH_ENABLE)
+static void test_adt_rbfs_basic(CuTest* tc);
+static void test_adt_rbfu16_basic(CuTest* tc);
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 static void test_adt_rbfh_nextLen(CuTest* tc);
 static void test_adt_rbfh_insert_then_grow(CuTest* tc);
 static void test_adt_rbfh_insert_then_grow2(CuTest* tc);
@@ -47,7 +49,9 @@ CuSuite* testsuite_adt_ringbuf(void)
 {
    CuSuite* suite = CuSuiteNew();
 
-#if (ADT_RBFH_ENABLE)
+   SUITE_ADD_TEST(suite, test_adt_rbfs_basic);
+   SUITE_ADD_TEST(suite, test_adt_rbfu16_basic);
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
    SUITE_ADD_TEST(suite, test_adt_rbfh_nextLen);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_grow);
    SUITE_ADD_TEST(suite, test_adt_rbfh_insert_then_grow2);
@@ -63,7 +67,121 @@ CuSuite* testsuite_adt_ringbuf(void)
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-#if (ADT_RBFH_ENABLE)
+static void test_adt_rbfs_basic(CuTest* tc)
+{
+   uint32_t raw_buf[5];
+   adt_rbfs_t rbf;
+   uint8_t res = adt_rbfs_create(&rbf, (uint8_t*)raw_buf, 5, sizeof(uint32_t));
+   CuAssertIntEquals(tc, BUF_E_OK, res);
+   CuAssertUIntEquals(tc, 0, adt_rbfs_size(&rbf));
+   CuAssertUIntEquals(tc, 5, adt_rbfs_free(&rbf));
+
+   // Underflow on empty
+   uint32_t val = 0;
+   CuAssertIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfs_remove(&rbf, (uint8_t*)&val));
+   CuAssertIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfs_peek(&rbf, (uint8_t*)&val));
+
+   // Fill buffer (1..5)
+   for (uint32_t i = 1; i <= 5; i++) {
+      CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_insert(&rbf, (const uint8_t*)&i));
+   }
+   CuAssertUIntEquals(tc, 5, adt_rbfs_size(&rbf));
+   CuAssertUIntEquals(tc, 0, adt_rbfs_free(&rbf));
+
+   // Overflow
+   val = 99;
+   CuAssertIntEquals(tc, BUF_E_OVERFLOW, adt_rbfs_insert(&rbf, (const uint8_t*)&val));
+
+   // Peek
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_peek(&rbf, (uint8_t*)&val));
+   CuAssertUIntEquals(tc, 1, val);
+
+   // Remove 2 elements (1, 2)
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_remove(&rbf, (uint8_t*)&val));
+   CuAssertUIntEquals(tc, 1, val);
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_remove(&rbf, (uint8_t*)&val));
+   CuAssertUIntEquals(tc, 2, val);
+   CuAssertUIntEquals(tc, 3, adt_rbfs_size(&rbf));
+   CuAssertUIntEquals(tc, 2, adt_rbfs_free(&rbf));
+
+   // Insert 2 elements (6, 7) - triggers wrap-around
+   val = 6;
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_insert(&rbf, (const uint8_t*)&val));
+   val = 7;
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_insert(&rbf, (const uint8_t*)&val));
+   CuAssertUIntEquals(tc, 5, adt_rbfs_size(&rbf));
+
+   // Remove remaining elements: should be 3, 4, 5, 6, 7
+   uint32_t expected[] = {3, 4, 5, 6, 7};
+   for (int i = 0; i < 5; i++) {
+      CuAssertIntEquals(tc, BUF_E_OK, adt_rbfs_remove(&rbf, (uint8_t*)&val));
+      CuAssertUIntEquals(tc, expected[i], val);
+   }
+   CuAssertUIntEquals(tc, 0, adt_rbfs_size(&rbf));
+   CuAssertIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfs_remove(&rbf, (uint8_t*)&val));
+
+   // Test clear
+   val = 100;
+   adt_rbfs_insert(&rbf, (const uint8_t*)&val);
+   CuAssertUIntEquals(tc, 1, adt_rbfs_size(&rbf));
+   adt_rbfs_clear(&rbf);
+   CuAssertUIntEquals(tc, 0, adt_rbfs_size(&rbf));
+}
+
+static void test_adt_rbfu16_basic(CuTest* tc)
+{
+   uint16_t raw_buf[5];
+   adt_rbfu16_t rbf;
+
+   // Error handling on invalid create
+   CuAssertIntEquals(tc, BUF_E_NOT_OK, adt_rbfu16_create(NULL, raw_buf, 5));
+   CuAssertIntEquals(tc, BUF_E_NOT_OK, adt_rbfu16_create(&rbf, NULL, 5));
+   CuAssertIntEquals(tc, BUF_E_NOT_OK, adt_rbfu16_create(&rbf, raw_buf, 0));
+
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_create(&rbf, raw_buf, 5));
+   CuAssertUIntEquals(tc, 0, adt_rbfu16_length(&rbf));
+
+   // Underflow
+   uint16_t val = 0;
+   CuAssertIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfu16_remove(&rbf, &val));
+   CuAssertIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfu16_peek(&rbf, &val));
+
+   // Insert 5 elements (10, 20, 30, 40, 50)
+   for (uint16_t i = 1; i <= 5; i++) {
+      CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_insert(&rbf, (uint16_t)(i * 10)));
+   }
+   CuAssertUIntEquals(tc, 5, adt_rbfu16_length(&rbf));
+
+   // Overflow
+   CuAssertIntEquals(tc, BUF_E_OVERFLOW, adt_rbfu16_insert(&rbf, 60));
+
+   // Peek
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_peek(&rbf, &val));
+   CuAssertUIntEquals(tc, 10, val);
+
+   // Remove 2 elements (10, 20)
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_remove(&rbf, &val));
+   CuAssertUIntEquals(tc, 10, val);
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_remove(&rbf, &val));
+   CuAssertUIntEquals(tc, 20, val);
+   CuAssertUIntEquals(tc, 3, adt_rbfu16_length(&rbf));
+
+   // Insert 2 elements (60, 70) - wrap around
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_insert(&rbf, 60));
+   CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_insert(&rbf, 70));
+   CuAssertUIntEquals(tc, 5, adt_rbfu16_length(&rbf));
+
+   // Read back remaining: 30, 40, 50, 60, 70
+   uint16_t expected[] = {30, 40, 50, 60, 70};
+   for (int i = 0; i < 5; i++) {
+      CuAssertIntEquals(tc, BUF_E_OK, adt_rbfu16_remove(&rbf, &val));
+      CuAssertUIntEquals(tc, expected[i], val);
+   }
+   CuAssertUIntEquals(tc, 0, adt_rbfu16_length(&rbf));
+   CuAssertIntEquals(tc, BUF_E_UNDERFLOW, adt_rbfu16_remove(&rbf, &val));
+}
+
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 static void test_adt_rbfh_nextLen(CuTest* tc)
 {
    CuAssertUIntEquals(tc, 10u, adt_rbfh_nextLen(1));

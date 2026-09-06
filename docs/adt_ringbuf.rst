@@ -26,7 +26,9 @@ The **adt_ringbuf** module provides three distinct circular FIFO (First-In First
 CMake Configuration & Zero-Heap Embedded Support
 ------------------------------------------------
 
-By default, ``adt_ringbuf.c`` does not compile any ringbuffer variants unless explicitly activated via CMake options:
+By default, all ringbuffer variants (:c:type:`adt_rbfs_t`, :c:type:`adt_rbfu16_t`, and :c:type:`adt_rbfh_t`) are compiled.
+
+For small embedded systems or safety-critical software where dynamic memory allocation is restricted or prohibited, configure with ``ADT_NO_HEAP_MEM``:
 
 .. list-table::
    :header-rows: 1
@@ -36,25 +38,15 @@ By default, ``adt_ringbuf.c`` does not compile any ringbuffer variants unless ex
      - Usage
      - Storage / Memory
      - Description
-   * - ``ADT_RBFS_ENABLE``
-     - ``-DADT_RBFS_ENABLE=ON``
+   * - ``ADT_NO_HEAP_MEM``
+     - ``-DADT_NO_HEAP_MEM=ON``
      - Static (zero heap)
-     - Enables :c:type:`adt_rbfs_t` and its API
-   * - ``ADT_RBFU16_ENABLE``
-     - ``-DADT_RBFU16_ENABLE=ON``
-     - Static (zero heap)
-     - Enables :c:type:`adt_rbfu16_t` and its API
-   * - ``ADT_RBFH_ENABLE``
-     - ``-DADT_RBFH_ENABLE=ON``
-     - Heap (dynamic)
-     - Enables :c:type:`adt_rbfh_t` and its API
+     - Disables heap-dependent :c:type:`adt_rbfh_t`; keeps static :c:type:`adt_rbfs_t` and :c:type:`adt_rbfu16_t`.
 
 .. note::
 
-   The primary reason for separate CMake options is to allow embedded targets to enable :c:type:`adt_rbfs_t` and :c:type:`adt_rbfu16_t` without enabling,
-   linking, or requiring heap memory functions (``malloc`` and ``free``).
-   In resource-constrained microcontrollers or safety-critical software where dynamic memory allocation is restricted or prohibited,
-   these static buffers guarantee deterministic ``O(1)`` performance and bounded memory usage.
+   When ``ADT_NO_HEAP_MEM`` is enabled, :c:type:`adt_rbfs_t` and :c:type:`adt_rbfu16_t` operate completely without linking or calling ``malloc`` and ``free``.
+   These static buffers guarantee deterministic ``O(1)`` performance and bounded memory usage on resource-constrained targets.
 
 Status & Error Codes
 --------------------

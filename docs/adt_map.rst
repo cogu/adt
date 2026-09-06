@@ -19,22 +19,21 @@ Key features:
 * **Duplicate Key Support**: Multiple entries with identical keys but different values can coexist within the map.
 * **Memory Ownership & Destructors**: Integrates with the ADT destructor pattern to automatically clean up dynamically allocated values when entries are removed or the map is destroyed.
 
-CMake Configuration
--------------------
+CMake Configuration & Zero-Heap Embedded Support
+------------------------------------------------
 
-``adt_u16Map_t`` is an optional component and is disabled by default to minimize the compiled footprint of the library on small targets.
+The ``adt_map`` component is included in the library by default.
 
-To enable it in your build:
+For small embedded systems or environments without a heap, configure with ``ADT_NO_HEAP_MEM``:
 
 .. code-block:: sh
 
-   cmake -B build -DADT_U16MAP_ENABLE=ON
+   cmake -B build -DADT_NO_HEAP_MEM=ON
 
-In your ``CMakeLists.txt``:
+When ``ADT_NO_HEAP_MEM`` is active:
 
-.. code-block:: cmake
-
-   set(ADT_U16MAP_ENABLE ON CACHE BOOL "Enable ADT U16 Map" FORCE)
+* The heap functions :c:func:`adt_u16Map_new` and :c:func:`adt_u16Map_delete` are excluded from compilation.
+* All zero-heap functions (:c:func:`adt_u16Map_create`, :c:func:`adt_u16Map_destroy`, :c:func:`adt_u16Map_insert`, :c:func:`adt_u16Map_find`, etc.) remain available with zero dynamic memory allocation.
 
 Code Examples
 -------------

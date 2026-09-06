@@ -290,6 +290,18 @@ void test_adt_u16Map_move(CuTest* tc){
    CuAssertIntEquals(tc,7,adt_u16Map_size(pList1));
 }
 
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
+void test_adt_u16Map_new_delete(CuTest* tc){
+   adt_u16Map_t *map = adt_u16Map_new(10, NULL);
+   CuAssertPtrNotNull(tc, map);
+   adt_u16Map_insert(map, 42, (void*) "Answer");
+   CuAssertUIntEquals(tc, 1, adt_u16Map_size(map));
+   adt_u16MapElem_t *elem = adt_u16Map_find(map, 42);
+   CuAssertPtrNotNull(tc, elem);
+   CuAssertPtrEquals(tc, (void*) "Answer", elem->val);
+   adt_u16Map_delete(map);
+}
+
 void test_adt_u16Map_largeCapacity(CuTest* tc){
    adt_u16Map_t *map = adt_u16Map_new(65536, NULL);
    CuAssertPtrNotNull(tc, map);
@@ -311,48 +323,55 @@ void test_adt_u16Map_largeCapacity(CuTest* tc){
 
    adt_u16Map_delete(map);
 }
+#endif
 
 void test_adt_u16Map_remove_val(CuTest* tc){
-   adt_u16Map_t *map = adt_u16Map_new(10, NULL);
-   CuAssertPtrNotNull(tc, map);
+   adt_u16MapElem_t elems[10];
+   adt_u16Map_t map;
+   adt_u16Map_create(&map, elems, 10, NULL);
+   CuAssertUIntEquals(tc, 0, adt_u16Map_size(&map));
 
-   adt_u16Map_insert(map, 10, (void*) "A");
-   adt_u16Map_insert(map, 20, (void*) "B");
-   adt_u16Map_insert(map, 30, (void*) "A");
-   adt_u16Map_insert(map, 40, (void*) "C");
-   adt_u16Map_insert(map, 50, (void*) "A");
-   CuAssertUIntEquals(tc, 5, adt_u16Map_size(map));
+   adt_u16Map_insert(&map, 10, (void*) "A");
+   adt_u16Map_insert(&map, 20, (void*) "B");
+   adt_u16Map_insert(&map, 30, (void*) "A");
+   adt_u16Map_insert(&map, 40, (void*) "C");
+   adt_u16Map_insert(&map, 50, (void*) "A");
+   CuAssertUIntEquals(tc, 5, adt_u16Map_size(&map));
 
    // Remove all entries with val == "A"
-   adt_u16Map_remove_val(map, (void*) "A");
-   CuAssertUIntEquals(tc, 2, adt_u16Map_size(map));
+   adt_u16Map_remove_val(&map, (void*) "A");
+   CuAssertUIntEquals(tc, 2, adt_u16Map_size(&map));
 
    // Remaining elements should be 20 ("B") and 40 ("C")
-   adt_u16MapElem_t *elem20 = adt_u16Map_find(map, 20);
+   adt_u16MapElem_t *elem20 = adt_u16Map_find(&map, 20);
    CuAssertPtrNotNull(tc, elem20);
    CuAssertPtrEquals(tc, (void*) "B", elem20->val);
 
-   adt_u16MapElem_t *elem40 = adt_u16Map_find(map, 40);
+   adt_u16MapElem_t *elem40 = adt_u16Map_find(&map, 40);
    CuAssertPtrNotNull(tc, elem40);
    CuAssertPtrEquals(tc, (void*) "C", elem40->val);
 
-   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map, 10));
-   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map, 30));
-   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map, 50));
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(&map, 10));
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(&map, 30));
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(&map, 50));
 
    // Removing non-existent value should be a no-op
-   adt_u16Map_remove_val(map, (void*) "Z");
-   CuAssertUIntEquals(tc, 2, adt_u16Map_size(map));
+   adt_u16Map_remove_val(&map, (void*) "Z");
+   CuAssertUIntEquals(tc, 2, adt_u16Map_size(&map));
 
-   adt_u16Map_delete(map);
+   adt_u16Map_destroy(&map);
 }
 
 void test_adt_u16Map_move_large(CuTest* tc){
    const uint32_t count = 50;
-   adt_u16Map_t *map1 = adt_u16Map_new(100, NULL);
-   adt_u16Map_t *map2 = adt_u16Map_new(100, NULL);
-   CuAssertPtrNotNull(tc, map1);
-   CuAssertPtrNotNull(tc, map2);
+   adt_u16MapElem_t elems1[100];
+   adt_u16MapElem_t elems2[100];
+   adt_u16Map_t map1_obj;
+   adt_u16Map_t map2_obj;
+   adt_u16Map_t *map1 = &map1_obj;
+   adt_u16Map_t *map2 = &map2_obj;
+   adt_u16Map_create(map1, elems1, 100, NULL);
+   adt_u16Map_create(map2, elems2, 100, NULL);
 
    adt_u16Map_insert(map1, 10, (void*) 1);
    for (uint32_t i = 0; i < count; i++) {
@@ -381,8 +400,8 @@ void test_adt_u16Map_move_large(CuTest* tc){
    }
    CuAssertPtrEquals(tc, NULL, it);
 
-   adt_u16Map_delete(map1);
-   adt_u16Map_delete(map2);
+   adt_u16Map_destroy(map1);
+   adt_u16Map_destroy(map2);
 }
 
 CuSuite* testsuite_adt_u16Map(void)
@@ -395,9 +414,12 @@ CuSuite* testsuite_adt_u16Map(void)
    SUITE_ADD_TEST(suite, test_adt_u16Map_find_exact);
    SUITE_ADD_TEST(suite, test_adt_u16Map_move);
    SUITE_ADD_TEST(suite, test_adt_u16Map_find_rand_set);
-   SUITE_ADD_TEST(suite, test_adt_u16Map_largeCapacity);
    SUITE_ADD_TEST(suite, test_adt_u16Map_remove_val);
    SUITE_ADD_TEST(suite, test_adt_u16Map_move_large);
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
+   SUITE_ADD_TEST(suite, test_adt_u16Map_new_delete);
+   SUITE_ADD_TEST(suite, test_adt_u16Map_largeCapacity);
+#endif
 
    return suite;
 }

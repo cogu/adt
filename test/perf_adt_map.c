@@ -15,6 +15,7 @@
 #include "adt_map.h"
 #include "perf_adt_map.h"
 
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 void perf_adt_map_run(void)
 {
    printf("\n=== adt_u16Map benchmarks ===\n");
@@ -117,3 +118,8 @@ void perf_adt_map_run(void)
    adt_u16Map_delete(map);
    free(rand_keys);
 }
+#else
+void perf_adt_map_run(void)
+{
+}
+#endif

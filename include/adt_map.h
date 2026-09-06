@@ -63,6 +63,7 @@ void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint32_t ma
  */
 void adt_u16Map_destroy(adt_u16Map_t *self);
 
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 /**
  * Dynamically allocates and initializes a new u16Map on the heap.
  *
@@ -78,6 +79,7 @@ adt_u16Map_t *adt_u16Map_new(uint32_t max_num_elem, void (*pDestructor)(void*));
  * @param self Pointer to map previously created with adt_u16Map_new.
  */
 void adt_u16Map_delete(adt_u16Map_t *self);
+#endif
 
 /**
  * Enables or disables automatic destructor invocation when removing elements or destroying the map.

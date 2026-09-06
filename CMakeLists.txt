@@ -32,10 +32,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 include(CMakeDependentOption)
 
-option(ADT_RBFU16_ENABLE "ADT U16 Ringbuffer" OFF)
-option(ADT_RBFS_ENABLE "ADT Statically allocated Ringbuffer" OFF)
-option(ADT_RBFH_ENABLE "ADT Heap-managed Ringbuffer" OFF)
-option(ADT_U16MAP_ENABLE "ADT U16 Map" OFF)
+option(ADT_NO_HEAP_MEM "Disable heap memory allocation (zero-heap mode)" OFF)
 set(ADT_SANITIZERS "" CACHE STRING "Comma-separated sanitizers to enable (for example: address,undefined or thread)")
 set_property(CACHE ADT_SANITIZERS PROPERTY STRINGS "" "address" "address,undefined" "thread")
 
@@ -65,6 +62,7 @@ set (ADT_HEADER_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_hash.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_heap.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_list.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_ringbuf.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_set.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_stack.h
@@ -78,6 +76,7 @@ set (ADT_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_hash.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_heap.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_list.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_map.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_ringbuf.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_set.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_stack.c
@@ -96,28 +95,9 @@ if (LEAK_CHECK)
     target_compile_definitions(adt PRIVATE MEM_LEAK_CHECK)
 endif()
 
-if(ADT_RBFU16_ENABLE)
-    message(STATUS "ADT_RBFU16_ENABLE=1")
-    target_compile_definitions(adt PUBLIC ADT_RBFU16_ENABLE=1)
-endif()
-
-if(ADT_RBFS_ENABLE)
-    message(STATUS "ADT_RBFS_ENABLE=1")
-    target_compile_definitions(adt PUBLIC ADT_RBFS_ENABLE=1)
-endif()
-
-if(ADT_RBFH_ENABLE)
-    message(STATUS "ADT_RBFH_ENABLE=1")
-    target_compile_definitions(adt PUBLIC ADT_RBFH_ENABLE=1)
-endif()
-
-if(ADT_U16MAP_ENABLE)
-    message(STATUS "ADT_U16MAP_ENABLE=1")
-    target_sources(adt PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_map.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_map.c
-    )
-    target_compile_definitions(adt PUBLIC ADT_U16MAP_ENABLE=1)
+if(ADT_NO_HEAP_MEM)
+    message(STATUS "ADT_NO_HEAP_MEM=1")
+    target_compile_definitions(adt PUBLIC ADT_NO_HEAP_MEM=1)
 endif()
 
 ###
@@ -138,11 +118,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                 test/adt/testsuite_adt_str.c
                 test/adt/testsuite_adt_u32List.c
                 test/adt/testsuite_adt_u32Set.c
+                test/adt/testsuite_adt_u16map.c
         )
-
-        if(ADT_U16MAP_ENABLE)
-            list(APPEND ADT_TEST_SUITE_LIST test/adt/testsuite_adt_u16map.c)
-        endif()
 
         set(ADT_LIB_EXTRA)
         if (LEAK_CHECK)
@@ -159,9 +136,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                                 "${CMAKE_CURRENT_SOURCE_DIR}/test"
                                 )
         target_compile_definitions(adt_unit PRIVATE UNIT_TEST)
-        if(ADT_U16MAP_ENABLE)
-            target_compile_definitions(adt_unit PRIVATE TEST_ADT_U16MAP_ENABLE=1)
-        endif()
         if (LEAK_CHECK)
             target_compile_definitions(adt_unit PRIVATE MEM_LEAK_CHECK)
         endif()
@@ -174,10 +148,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         )
 
         ### Benchmark / Performance Test
-        set(ADT_PERF_SRCS test/adt_perf_main.c test/perf_adt_hash.c test/perf_adt_ary.c test/perf_adt_set.c)
-        if(ADT_U16MAP_ENABLE)
-            list(APPEND ADT_PERF_SRCS test/perf_adt_map.c)
-        endif()
+        set(ADT_PERF_SRCS
+            test/adt_perf_main.c
+            test/perf_adt_hash.c
+            test/perf_adt_ary.c
+            test/perf_adt_set.c
+            test/perf_adt_map.c
+        )
         add_executable(adt_perf ${ADT_PERF_SRCS} ${ADT_LIB_EXTRA})
         target_link_libraries(adt_perf PRIVATE adt)
         target_include_directories(adt_perf PRIVATE

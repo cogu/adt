@@ -43,19 +43,6 @@
  */
 typedef uint8_t adt_buf_err_t;
 
-#ifndef ADT_RBFS_ENABLE
-#define ADT_RBFS_ENABLE 0
-#endif
-
-#ifndef ADT_RBFU16_ENABLE
-#define ADT_RBFU16_ENABLE 0
-#endif
-
-#ifndef ADT_RBFH_ENABLE
-#define ADT_RBFH_ENABLE 0
-#endif
-
-#if(ADT_RBFS_ENABLE)
 /**
  * Static circular FIFO ring buffer for elements of fixed byte size.
  * Operates on caller-supplied memory with zero dynamic heap allocation.
@@ -69,9 +56,7 @@ typedef struct adt_rbfs_tag
    uint16_t u16NumElem;    /**< Current number of elements stored */
    uint8_t u8ElemSize;     /**< Size of each element in bytes */
 } adt_rbfs_t;
-#endif
 
-#if (ADT_RBFU16_ENABLE)
 /**
  * Specialized embedded circular FIFO ring buffer for uint16_t values.
  * Operates on caller-supplied uint16_t array with zero dynamic heap allocation.
@@ -84,9 +69,8 @@ typedef struct adt_rbfu16_tag
    uint16_t u16MaxNumElem; /**< Maximum number of uint16_t elements buffer can hold */
    uint16_t u16NumElem;    /**< Current number of uint16_t elements stored */
 } adt_rbfu16_t;
-#endif
 
-#if(ADT_RBFH_ENABLE)
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 
 #define ADT_RBFSH_MIN_NUM_ELEMS_DEFAULT 10   /**< Default initial element capacity (1-65535) */
 #define ADT_RBFSH_MAX_NUM_ELEM_DEFAULT 65535 /**< Default maximum element capacity (1-65535) */
@@ -109,7 +93,6 @@ typedef struct adt_rbfh_tag
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
-#if(ADT_RBFS_ENABLE)
 /**
  * Initializes a static element ring buffer with caller-provided storage.
  *
@@ -176,9 +159,7 @@ uint16_t adt_rbfs_free(const adt_rbfs_t* rbf);
  * @param rbf Pointer to the ring buffer.
  */
 void adt_rbfs_clear(adt_rbfs_t* rbf);
-#endif //ADT_RBFS_ENABLE
 
-#if(ADT_RBFU16_ENABLE)
 /**
  * Initializes an embedded uint16_t ring buffer with caller-provided storage.
  *
@@ -223,9 +204,8 @@ uint8_t adt_rbfu16_peek(const adt_rbfu16_t* rbf, uint16_t* u16Data);
  * @return Number of stored elements.
  */
 uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf);
-#endif //ADT_RBFU16_ENABLE
 
-#if(ADT_RBFH_ENABLE)
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 /**
  * Initializes a heap-managed ring buffer with default capacity limits.
  *
