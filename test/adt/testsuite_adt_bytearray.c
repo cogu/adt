@@ -26,7 +26,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
-#define ARRAY_GROW_LEN 128
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
@@ -36,7 +35,8 @@ static void test_adt_bytearray_resize(CuTest* tc);
 static void test_adt_bytearray_make(CuTest* tc);
 static void test_adt_bytearray_make_cstr(CuTest* tc);
 static void test_adt_bytearray_equals(CuTest* tc);
-static void test_adt_bytearray_manual_grow(CuTest* tc);
+static void test_adt_bytearray_geometric_growth(CuTest* tc);
+static void test_adt_bytearray_set_growth_size(CuTest* tc);
 static void test_adt_bytearray_manual_shrink(CuTest* tc);
 static void test_adt_bytearray_bytes(CuTest* tc);
 static void test_adt_bytearray_bytearray_clone(CuTest* tc);
@@ -61,7 +61,8 @@ CuSuite* testsuite_adt_bytearray(void)
    SUITE_ADD_TEST(suite, test_adt_bytearray_make);
    SUITE_ADD_TEST(suite, test_adt_bytearray_make_cstr);
    SUITE_ADD_TEST(suite, test_adt_bytearray_equals);
-   SUITE_ADD_TEST(suite, test_adt_bytearray_manual_grow);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_geometric_growth);
+   SUITE_ADD_TEST(suite, test_adt_bytearray_set_growth_size);
    SUITE_ADD_TEST(suite, test_adt_bytearray_manual_shrink);
    SUITE_ADD_TEST(suite, test_adt_bytearray_bytes);
    SUITE_ADD_TEST(suite, test_adt_bytearray_bytearray_clone);
@@ -77,39 +78,41 @@ CuSuite* testsuite_adt_bytearray(void)
 //////////////////////////////////////////////////////////////////////////////
 static void test_adt_bytearray_new(CuTest* tc)
 {
-   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTEARRAY_DEFAULT_GROW_SIZE);
+   adt_bytearray_t *pArray = adt_bytearray_new();
    CuAssertPtrNotNull(tc, pArray);
    CuAssertPtrEquals(tc, NULL, pArray->pData);
-   CuAssertIntEquals(tc, 0,pArray->u32CurLen);
-   CuAssertIntEquals(tc, 0,pArray->u32AllocLen);
-   CuAssertIntEquals(tc, ADT_BYTEARRAY_DEFAULT_GROW_SIZE,pArray->u32GrowSize);
+   CuAssertIntEquals(tc, 0, pArray->u32CurLen);
+   CuAssertIntEquals(tc, 0, pArray->u32AllocLen);
+   CuAssertIntEquals(tc, 0u, pArray->u32GrowSize);
    adt_bytearray_delete(pArray);
 }
 
 static void test_adt_bytearray_resize(CuTest* tc)
 {
-   int8_t result;
-   adt_bytearray_t *pArray = adt_bytearray_new(4096);
-   result = adt_bytearray_resize(pArray, 1132);
-   CuAssertIntEquals(tc,0,result);
-   CuAssertIntEquals(tc,1132,pArray->u32CurLen);
+   adt_bytearray_t *pArray = adt_bytearray_new();
+   adt_error_t result = adt_bytearray_resize(pArray, 1132);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, result);
+   CuAssertIntEquals(tc, 1132, pArray->u32CurLen);
+   CuAssertTrue(tc, pArray->u32AllocLen >= 1132);
    adt_bytearray_delete(pArray);
 }
 
 static void test_adt_bytearray_make(CuTest* tc)
 {
    adt_bytearray_t *pArray;
-   const uint8_t data[] = {100,240,127,0,5};
-   pArray = adt_bytearray_make(data, 5, ADT_BYTEARRAY_DEFAULT_GROW_SIZE);
+   const uint8_t data[] = {100, 240, 127, 0, 5};
+   pArray = adt_bytearray_make(data, 5);
    CuAssertPtrNotNull(tc, pArray);
+   CuAssertIntEquals(tc, 5, pArray->u32CurLen);
+   CuAssertIntEquals(tc, 0, memcmp(data, pArray->pData, 5));
    adt_bytearray_delete(pArray);
 }
 
 static void test_adt_bytearray_make_cstr(CuTest* tc)
 {
    adt_bytearray_t *pArray;
-   const char* cstr= "Test1";
-   pArray = adt_bytearray_make_cstr(cstr, ADT_BYTEARRAY_NO_GROWTH);
+   const char* cstr = "Test1";
+   pArray = adt_bytearray_make_cstr(cstr);
    CuAssertPtrNotNull(tc, pArray);
    CuAssertIntEquals(tc, 5, pArray->u32CurLen);
    CuAssertIntEquals(tc, 0, memcmp(cstr, pArray->pData, 5));
@@ -122,13 +125,13 @@ static void test_adt_bytearray_equals(CuTest* tc)
    adt_bytearray_t *pArray2;
    adt_bytearray_t *pArray3;
    adt_bytearray_t *pArray4;
-   const uint8_t data1[] = {100,240,127,0,5};
-   const uint8_t data2[] = {100,240,128,0,5};
-   const uint8_t data3[] = {100,240,127};
-   pArray1 = adt_bytearray_make(data1, 5, ARRAY_GROW_LEN);
-   pArray2 = adt_bytearray_make(data1, 5, ARRAY_GROW_LEN);
-   pArray3 = adt_bytearray_make(data2, 5, ARRAY_GROW_LEN);
-   pArray4 = adt_bytearray_make(data3, 3, ARRAY_GROW_LEN);
+   const uint8_t data1[] = {100, 240, 127, 0, 5};
+   const uint8_t data2[] = {100, 240, 128, 0, 5};
+   const uint8_t data3[] = {100, 240, 127};
+   pArray1 = adt_bytearray_make(data1, 5);
+   pArray2 = adt_bytearray_make(data1, 5);
+   pArray3 = adt_bytearray_make(data2, 5);
+   pArray4 = adt_bytearray_make(data3, 3);
    CuAssertPtrNotNull(tc, pArray1);
    CuAssertPtrNotNull(tc, pArray2);
    CuAssertPtrNotNull(tc, pArray3);
@@ -142,38 +145,77 @@ static void test_adt_bytearray_equals(CuTest* tc)
    adt_bytearray_delete(pArray4);
 }
 
-static void test_adt_bytearray_manual_grow(CuTest* tc)
+static void test_adt_bytearray_geometric_growth(CuTest* tc)
 {
-   const uint8_t data[] = {100, 240, 127, 0, 5};
-   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTEARRAY_NO_GROWTH);
-   CuAssertIntEquals(tc, 0u, pArray->u32CurLen);
+   adt_bytearray_t *pArray = adt_bytearray_new();
+   CuAssertPtrNotNull(tc, pArray);
    CuAssertIntEquals(tc, 0u, pArray->u32AllocLen);
+
+   // Pushing 1st byte triggers base capacity (16 bytes)
+   adt_error_t err = adt_bytearray_push(pArray, 0xAA);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, err);
+   CuAssertIntEquals(tc, 1u, pArray->u32CurLen);
+   CuAssertIntEquals(tc, 16u, pArray->u32AllocLen);
+
+   // Fill up to 16 bytes
+   for (uint8_t i = 1; i < 16; i++)
+   {
+      err = adt_bytearray_push(pArray, i);
+      CuAssertIntEquals(tc, ADT_NO_ERROR, err);
+   }
+   CuAssertIntEquals(tc, 16u, pArray->u32CurLen);
+   CuAssertIntEquals(tc, 16u, pArray->u32AllocLen);
+
+   // Pushing 17th byte triggers doubling to 32
+   err = adt_bytearray_push(pArray, 0xFF);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, err);
+   CuAssertIntEquals(tc, 17u, pArray->u32CurLen);
+   CuAssertIntEquals(tc, 32u, pArray->u32AllocLen);
+
+   // Reserving 100 bytes triggers doubling: 32 -> 64 -> 128
+   err = adt_bytearray_reserve(pArray, 100);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, err);
+   CuAssertIntEquals(tc, 128u, pArray->u32AllocLen);
+   CuAssertIntEquals(tc, 17u, pArray->u32CurLen);
+
+   adt_bytearray_delete(pArray);
+}
+
+static void test_adt_bytearray_set_growth_size(CuTest* tc)
+{
+   adt_bytearray_t *pArray = adt_bytearray_new();
+   adt_bytearray_set_growth_size(pArray, 64u);
+   CuAssertIntEquals(tc, 64u, pArray->u32GrowSize);
+
+   adt_error_t err = adt_bytearray_push(pArray, 1);
+   CuAssertIntEquals(tc, ADT_NO_ERROR, err);
+   CuAssertIntEquals(tc, 64u, pArray->u32AllocLen);
+
+   // Revert to geometric growth by setting to 0
+   adt_bytearray_set_growth_size(pArray, 0u);
    CuAssertIntEquals(tc, 0u, pArray->u32GrowSize);
-   adt_bytearray_append(pArray, &data[0], (uint32_t) sizeof(data));
-   CuAssertIntEquals(tc, 5u, pArray->u32CurLen);
-   CuAssertIntEquals(tc, 5u, pArray->u32AllocLen);
-   CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytearray_data(pArray), 5u));
+
    adt_bytearray_delete(pArray);
 }
 
 static void test_adt_bytearray_manual_shrink(CuTest* tc)
 {
    const uint8_t data[] = {100, 240, 127, 0, 5};
-   adt_bytearray_t *pArray = adt_bytearray_new(ADT_BYTEARRAY_NO_GROWTH);
+   adt_bytearray_t *pArray = adt_bytearray_new();
    adt_bytearray_append(pArray, &data[0], (uint32_t) sizeof(data));
    CuAssertIntEquals(tc, 5u, pArray->u32CurLen);
-   CuAssertIntEquals(tc, 5u, pArray->u32AllocLen);
+   CuAssertIntEquals(tc, 16u, pArray->u32AllocLen);
    CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytearray_data(pArray), 5u));
    adt_bytearray_resize(pArray, 2u);
    CuAssertIntEquals(tc, 2u, pArray->u32CurLen);
-   CuAssertIntEquals(tc, 2u, pArray->u32AllocLen);
+   CuAssertIntEquals(tc, 16u, pArray->u32AllocLen);
    CuAssertIntEquals(tc, 0, memcmp(&data[0], adt_bytearray_data(pArray), 2u));
    adt_bytearray_delete(pArray);
 }
 
 static void test_adt_bytearray_bytes(CuTest* tc)
 {
-   adt_bytearray_t *array = adt_bytearray_new(128u);
+   adt_bytearray_t *array = adt_bytearray_new();
    adt_bytearray_push(array, 17);
    adt_bytearray_push(array, 255);
    adt_bytearray_push(array, 93);
@@ -190,31 +232,29 @@ static void test_adt_bytearray_bytes(CuTest* tc)
 
    adt_bytes_delete(bytes);
    adt_bytearray_delete(array);
-
 }
 
 static void test_adt_bytearray_bytearray_clone(CuTest* tc)
 {
-   adt_bytearray_t *array1 = adt_bytearray_new(16u);
+   adt_bytearray_t *array1 = adt_bytearray_new();
    adt_bytearray_push(array1, 1);
    adt_bytearray_push(array1, 2);
    adt_bytearray_push(array1, 3);
    adt_bytearray_push(array1, 4);
    adt_bytearray_push(array1, 5);
-   adt_bytearray_t *array2 = adt_bytearray_clone(array1, ADT_BYTEARRAY_NO_GROWTH);
+   adt_bytearray_t *array2 = adt_bytearray_clone(array1);
    CuAssertPtrNotNull(tc, array2);
    CuAssertUIntEquals(tc, 5, adt_bytearray_length(array2));
    CuAssertTrue(tc, adt_bytearray_equals(array1, array2));
 
    adt_bytearray_delete(array1);
    adt_bytearray_delete(array2);
-
 }
 
 static void test_adt_bytearray_trim_left(CuTest* tc)
 {
    const char *orig = "Hello, World!";
-   adt_bytearray_t *array = adt_bytearray_make_cstr(orig, ADT_BYTEARRAY_NO_GROWTH);
+   adt_bytearray_t *array = adt_bytearray_make_cstr(orig);
    CuAssertPtrNotNull(tc, array);
    CuAssertUIntEquals(tc, 13, adt_bytearray_length(array));
 
@@ -239,7 +279,7 @@ static void test_adt_bytearray_trim_left(CuTest* tc)
 static void test_adt_bytearray_trim_left_bounds(CuTest* tc)
 {
    const char *orig = "Hello, World!";
-   adt_bytearray_t *array = adt_bytearray_make_cstr(orig, ADT_BYTEARRAY_NO_GROWTH);
+   adt_bytearray_t *array = adt_bytearray_make_cstr(orig);
    CuAssertPtrNotNull(tc, array);
    CuAssertUIntEquals(tc, 13, adt_bytearray_length(array));
 
@@ -265,8 +305,8 @@ static void test_adt_bytearray_trim_left_bounds(CuTest* tc)
 static void test_adt_bytearray_vdelete(CuTest* tc)
 {
    adt_ary_t *outer = adt_ary_new(adt_bytearray_vdelete);
-   adt_bytearray_t *inner1 = adt_bytearray_make_cstr("inner1_bytes", ADT_BYTEARRAY_NO_GROWTH);
-   adt_bytearray_t *inner2 = adt_bytearray_make_cstr("inner2_bytes", ADT_BYTEARRAY_NO_GROWTH);
+   adt_bytearray_t *inner1 = adt_bytearray_make_cstr("inner1_bytes");
+   adt_bytearray_t *inner2 = adt_bytearray_make_cstr("inner2_bytes");
 
    adt_ary_push(outer, inner1);
    adt_ary_push(outer, inner2);

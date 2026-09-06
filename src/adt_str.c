@@ -589,7 +589,7 @@ adt_bytearray_t *adt_str_bytearray(adt_str_t *self)
    adt_bytearray_t *retval = NULL;
    if (self != NULL)
    {
-      retval = adt_bytearray_new(ADT_BYTEARRAY_NO_GROWTH);
+      retval = adt_bytearray_new();
       if (retval != NULL)
       {
          adt_error_t result;

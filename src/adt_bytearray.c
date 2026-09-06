@@ -24,11 +24,14 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
+#define ADT_BYTEARRAY_MIN_CAPACITY 16u
+#define ADT_BYTEARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewLen);
+static uint32_t adt_bytearray_next_capacity(uint32_t current_capacity, uint32_t min_needed);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -38,38 +41,44 @@ static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewL
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
-void adt_bytearray_create(adt_bytearray_t *self,uint32_t u32GrowSize){
-   if(self){
+void adt_bytearray_create(adt_bytearray_t *self)
+{
+   if (self != NULL)
+   {
       self->pData = NULL;
-      self->u32AllocLen = 0;
-      self->u32CurLen = 0;
-      adt_bytearray_set_growth_size(self, u32GrowSize);
+      self->u32AllocLen = 0u;
+      self->u32CurLen = 0u;
+      self->u32GrowSize = 0u;
    }
 }
 
-void adt_bytearray_destroy(adt_bytearray_t *self){
-   if(self){
-      if(self->pData != NULL){
+void adt_bytearray_destroy(adt_bytearray_t *self)
+{
+   if (self != NULL)
+   {
+      if (self->pData != NULL)
+      {
          free(self->pData);
          self->pData = NULL;
       }
    }
 }
 
-adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize)
+adt_bytearray_t *adt_bytearray_new(void)
 {
    adt_bytearray_t *self = (adt_bytearray_t*) malloc(sizeof(adt_bytearray_t));
-   if(self != NULL){
-      adt_bytearray_create(self,u32GrowSize);
+   if (self != NULL)
+   {
+      adt_bytearray_create(self);
    }
    return self;
 }
 
-adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, uint32_t u32GrowSize)
+adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen)
 {
    if (pData != NULL)
    {
-      adt_bytearray_t *self = adt_bytearray_new(u32GrowSize);
+      adt_bytearray_t *self = adt_bytearray_new();
       if (self != NULL)
       {
          adt_error_t errorCode = adt_bytearray_append(self, pData, u32DataLen);
@@ -84,21 +93,26 @@ adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, u
    return NULL;
 }
 
-adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr, uint32_t u32GrowSize)
+adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr)
 {
    if (cstr != NULL)
    {
       size_t len = strlen(cstr);
-      return adt_bytearray_make((const uint8_t*) cstr, (uint32_t) len, u32GrowSize);
+      return adt_bytearray_make((const uint8_t*) cstr, (uint32_t) len);
    }
    return NULL;
 }
 
-adt_bytearray_t *adt_bytearray_clone(const adt_bytearray_t *other, uint32_t u32GrowSize)
+adt_bytearray_t *adt_bytearray_clone(const adt_bytearray_t *other)
 {
    if (other != NULL)
    {
-      return adt_bytearray_make(other->pData, other->u32CurLen, u32GrowSize);
+      adt_bytearray_t *clone = adt_bytearray_make(other->pData, other->u32CurLen);
+      if ((clone != NULL) && (other->u32GrowSize > 0u))
+      {
+         clone->u32GrowSize = other->u32GrowSize;
+      }
+      return clone;
    }
    return NULL;
 }
@@ -117,13 +131,13 @@ void adt_bytearray_vdelete(void *arg)
    adt_bytearray_delete((adt_bytearray_t*) arg);
 }
 
-void adt_bytearray_set_growth_size(adt_bytearray_t *self,uint32_t u32GrowSize)
+void adt_bytearray_set_growth_size(adt_bytearray_t *self, uint32_t u32GrowSize)
 {
    if (self != NULL)
    {
-      if ( u32GrowSize > ADT_BYTEARRAY_MAX_GROW_SIZE )
+      if (u32GrowSize > ADT_BYTEARRAY_MAX_GROW_SIZE)
       {
-         u32GrowSize = ADT_BYTEARRAY_DEFAULT_GROW_SIZE;
+         u32GrowSize = ADT_BYTEARRAY_MAX_GROW_SIZE;
       }
       self->u32GrowSize = u32GrowSize;
    }
@@ -193,20 +207,31 @@ adt_error_t adt_bytearray_trim_left(adt_bytearray_t *self, const uint8_t *pSrc){
 }
 
 /**
- * grows byte array by a predefined size
+ * grows byte array using geometric growth (or fixed chunks if u32GrowSize > 0)
  */
-adt_error_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen){
-   if( self != NULL ){
-      if (u32MinLen > self->u32AllocLen) {
-         uint32_t u32NewLen = self->u32AllocLen;
-         if (self->u32GrowSize > 0){
-            while(u32NewLen<u32MinLen){
+adt_error_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen)
+{
+   if (self != NULL)
+   {
+      if (u32MinLen > self->u32AllocLen)
+      {
+         uint32_t u32NewLen;
+         if (self->u32GrowSize > 0u)
+         {
+            u32NewLen = self->u32AllocLen;
+            while (u32NewLen < u32MinLen)
+            {
+               if (u32NewLen > (UINT32_MAX - self->u32GrowSize))
+               {
+                  u32NewLen = UINT32_MAX;
+                  break;
+               }
                u32NewLen += self->u32GrowSize;
             }
          }
          else
          {
-            u32NewLen = u32MinLen;
+            u32NewLen = adt_bytearray_next_capacity(self->u32AllocLen, u32MinLen);
          }
          return adt_bytearray_realloc(self, u32NewLen);
       }
@@ -215,26 +240,23 @@ adt_error_t adt_bytearray_grow(adt_bytearray_t *self, uint32_t u32MinLen){
    return ADT_INVALID_ARGUMENT_ERROR;
 }
 
-
-
 /**
  * resizes bytearray to newLen
  */
 adt_error_t adt_bytearray_resize(adt_bytearray_t *self, uint32_t u32NewLen)
 {
-   if(self != NULL)
+   if (self != NULL)
    {
-      adt_error_t errorCode;
-      if ( (self->u32GrowSize == ADT_BYTEARRAY_NO_GROWTH) && (u32NewLen < self->u32CurLen) ) {
-         errorCode = adt_bytearray_realloc(self, u32NewLen); //reduce allocated array
+      if (u32NewLen > self->u32AllocLen)
+      {
+         adt_error_t errorCode = adt_bytearray_grow(self, u32NewLen);
+         if (errorCode != ADT_NO_ERROR)
+         {
+            return errorCode;
+         }
       }
-      else {
-         errorCode = adt_bytearray_grow(self, u32NewLen);
-      }
-      if (errorCode == ADT_NO_ERROR) {
-         self->u32CurLen = u32NewLen;
-      }
-      return errorCode;
+      self->u32CurLen = u32NewLen;
+      return ADT_NO_ERROR;
    }
    return ADT_INVALID_ARGUMENT_ERROR;
 }
@@ -369,4 +391,33 @@ static adt_error_t adt_bytearray_realloc(adt_bytearray_t *self, uint32_t u32NewL
       return ADT_NO_ERROR;
    }
    return ADT_INVALID_ARGUMENT_ERROR;
+}
+
+static uint32_t adt_bytearray_next_capacity(uint32_t current_capacity, uint32_t min_needed)
+{
+   uint32_t new_capacity = (current_capacity < ADT_BYTEARRAY_MIN_CAPACITY) ? ADT_BYTEARRAY_MIN_CAPACITY : current_capacity;
+   while (new_capacity < min_needed)
+   {
+      if (new_capacity >= ADT_BYTEARRAY_MAX_GROW_SIZE)
+      {
+         if (new_capacity > (UINT32_MAX - ADT_BYTEARRAY_MAX_GROW_SIZE))
+         {
+            new_capacity = UINT32_MAX;
+            break;
+         }
+         new_capacity += ADT_BYTEARRAY_MAX_GROW_SIZE;
+      }
+      else
+      {
+         if (new_capacity > (ADT_BYTEARRAY_MAX_GROW_SIZE / 2u))
+         {
+            new_capacity = ADT_BYTEARRAY_MAX_GROW_SIZE;
+         }
+         else
+         {
+            new_capacity *= 2u;
+         }
+      }
+   }
+   return new_capacity;
 }

@@ -130,11 +130,11 @@ const uint8_t* adt_bytes_const_data(const adt_bytes_t *self)
    return NULL;
 }
 
-struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self, uint32_t u32GrowSize)
+struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self)
 {
    if (self != NULL)
    {
-      return adt_bytearray_make(self->dataBuf, self->dataLen, u32GrowSize);
+      return adt_bytearray_make(self->dataBuf, self->dataLen);
    }
    return NULL;
 }
