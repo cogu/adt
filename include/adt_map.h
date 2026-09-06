@@ -17,6 +17,10 @@
 #include <stdint.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -186,6 +190,10 @@ uint32_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t ke
  * @param val Value pointer to remove.
  */
 void adt_u16Map_remove_val(adt_u16Map_t *self, const void *val);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_MAP_H
 

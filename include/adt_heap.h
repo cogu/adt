@@ -17,6 +17,10 @@
 #include <stdint.h>
 #include "adt_ary.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -104,5 +108,9 @@ void adt_heap_sortUp(adt_ary_t *heap, int32_t childIndex, adt_heap_family heapFa
  * \param heapFamily Ordering policy (ADT_MIN_HEAP or ADT_MAX_HEAP).
  */
 void adt_heap_sortDown(adt_ary_t *heap, int32_t parentIndex, adt_heap_family heapFamily);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_PQ_H

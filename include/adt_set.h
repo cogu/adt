@@ -19,6 +19,10 @@
 #include <stddef.h>
 #include "adt_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -137,6 +141,10 @@ bool adt_u32Set_is_empty(const adt_u32Set_t *self);
  * @return Value at index, or 0 if index is out of range.
  */
 uint32_t adt_u32Set_value(const adt_u32Set_t *self, int32_t index);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_SET_H
 

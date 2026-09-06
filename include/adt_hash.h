@@ -20,6 +20,10 @@
 #include "adt_error.h"
 #include "adt_ary.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
@@ -308,5 +312,9 @@ int32_t adt_hash_values(adt_hash_t *self, adt_ary_t* pArray);
  * \return Error code, or ADT_INVALID_ARGUMENT_ERROR if self is NULL.
  */
 adt_error_t adt_hash_get_last_error(const adt_hash_t *self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ADT_HASH_H__
