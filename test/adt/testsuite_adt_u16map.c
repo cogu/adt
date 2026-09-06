@@ -292,13 +292,14 @@ void test_adt_u16Map_move(CuTest* tc){
 
 #if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 void test_adt_u16Map_new_delete(CuTest* tc){
+   const char *valAnswer = "Answer";
    adt_u16Map_t *map = adt_u16Map_new(10, NULL);
    CuAssertPtrNotNull(tc, map);
-   adt_u16Map_insert(map, 42, (void*) "Answer");
+   adt_u16Map_insert(map, 42, (void*) valAnswer);
    CuAssertUIntEquals(tc, 1, adt_u16Map_size(map));
    adt_u16MapElem_t *elem = adt_u16Map_find(map, 42);
    CuAssertPtrNotNull(tc, elem);
-   CuAssertPtrEquals(tc, (void*) "Answer", elem->val);
+   CuAssertPtrEquals(tc, (void*) valAnswer, elem->val);
    adt_u16Map_delete(map);
 }
 
@@ -328,35 +329,40 @@ void test_adt_u16Map_largeCapacity(CuTest* tc){
 void test_adt_u16Map_remove_val(CuTest* tc){
    adt_u16MapElem_t elems[10];
    adt_u16Map_t map;
+   const char *valA = "A";
+   const char *valB = "B";
+   const char *valC = "C";
+   const char *valZ = "Z";
+
    adt_u16Map_create(&map, elems, 10, NULL);
    CuAssertUIntEquals(tc, 0, adt_u16Map_size(&map));
 
-   adt_u16Map_insert(&map, 10, (void*) "A");
-   adt_u16Map_insert(&map, 20, (void*) "B");
-   adt_u16Map_insert(&map, 30, (void*) "A");
-   adt_u16Map_insert(&map, 40, (void*) "C");
-   adt_u16Map_insert(&map, 50, (void*) "A");
+   adt_u16Map_insert(&map, 10, (void*) valA);
+   adt_u16Map_insert(&map, 20, (void*) valB);
+   adt_u16Map_insert(&map, 30, (void*) valA);
+   adt_u16Map_insert(&map, 40, (void*) valC);
+   adt_u16Map_insert(&map, 50, (void*) valA);
    CuAssertUIntEquals(tc, 5, adt_u16Map_size(&map));
 
-   // Remove all entries with val == "A"
-   adt_u16Map_remove_val(&map, (void*) "A");
+   // Remove all entries with val == valA
+   adt_u16Map_remove_val(&map, (void*) valA);
    CuAssertUIntEquals(tc, 2, adt_u16Map_size(&map));
 
    // Remaining elements should be 20 ("B") and 40 ("C")
    adt_u16MapElem_t *elem20 = adt_u16Map_find(&map, 20);
    CuAssertPtrNotNull(tc, elem20);
-   CuAssertPtrEquals(tc, (void*) "B", elem20->val);
+   CuAssertPtrEquals(tc, (void*) valB, elem20->val);
 
    adt_u16MapElem_t *elem40 = adt_u16Map_find(&map, 40);
    CuAssertPtrNotNull(tc, elem40);
-   CuAssertPtrEquals(tc, (void*) "C", elem40->val);
+   CuAssertPtrEquals(tc, (void*) valC, elem40->val);
 
    CuAssertPtrEquals(tc, NULL, adt_u16Map_find(&map, 10));
    CuAssertPtrEquals(tc, NULL, adt_u16Map_find(&map, 30));
    CuAssertPtrEquals(tc, NULL, adt_u16Map_find(&map, 50));
 
    // Removing non-existent value should be a no-op
-   adt_u16Map_remove_val(&map, (void*) "Z");
+   adt_u16Map_remove_val(&map, (void*) valZ);
    CuAssertUIntEquals(tc, 2, adt_u16Map_size(&map));
 
    adt_u16Map_destroy(&map);
