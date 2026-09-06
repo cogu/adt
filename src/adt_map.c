@@ -13,7 +13,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "adt_map.h"
 #include <assert.h>
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 #include <stdlib.h>
+#endif
 #include <string.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -51,6 +53,7 @@ void adt_u16Map_destroy(adt_u16Map_t *self){
    adt_u16Map_clear(self);
 }
 
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 adt_u16Map_t *adt_u16Map_new(uint32_t max_num_elem, void (*pDestructor)(void*)){
    adt_u16Map_t *self = (adt_u16Map_t*) malloc(sizeof(adt_u16Map_t));
    if(self != NULL){
@@ -71,6 +74,7 @@ void adt_u16Map_delete(adt_u16Map_t *self){
       free(self);
    }
 }
+#endif
 
 void adt_u16Map_destructor_enable(adt_u16Map_t *self,uint8_t enable){
    if(self != NULL){

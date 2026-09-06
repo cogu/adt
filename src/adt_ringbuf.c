@@ -14,7 +14,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stddef.h>
-#if(ADT_RBFH_ENABLE)
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 #include <malloc.h>
 #include <limits.h>
 #endif
@@ -45,7 +45,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
-#if(ADT_RBFH_ENABLE)
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self);
 static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_t newAllocLen);
 DYN_STATIC  uint16_t adt_rbfh_nextLen(uint16_t wanted);
@@ -62,7 +62,6 @@ DYN_STATIC  uint16_t adt_rbfh_nextLen(uint16_t wanted);
 // PUBLIC FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
 
-#if(ADT_RBFS_ENABLE)
 //returns 0 on success
 uint8_t adt_rbfs_create(adt_rbfs_t* u8Rbf, uint8_t* u8Buffer, uint16_t u16NumElem, uint8_t u8ElemSize)
 {
@@ -167,10 +166,6 @@ void adt_rbfs_clear(adt_rbfs_t* rbf)
    rbf->u16NumElem = 0;
 }
 
-#endif
-
-
-#if(ADT_RBFU16_ENABLE)
 uint8_t adt_rbfu16_create(adt_rbfu16_t* rbf, uint16_t* u16Buffer, uint16_t u16NumElem){
    if ((rbf != NULL) && (u16Buffer != NULL) && (u16NumElem > 0)){
       rbf->u16Buffer = u16Buffer;
@@ -239,9 +234,8 @@ uint16_t adt_rbfu16_length(const adt_rbfu16_t* rbf){
    }
    return 0;
 }
-#endif
 
-#if(ADT_RBFH_ENABLE)
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 /**
  * Creates new heap-managed ringbuffer containing elements of fixed size (u8ElemSize)
  */
@@ -443,7 +437,7 @@ void adt_rbfh_clear(adt_rbfh_t* self)
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
 
-#if(ADT_RBFH_ENABLE)
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 static adt_buf_err_t adt_rbfh_grow(adt_rbfh_t* self)
 {
    if (self->u16AllocLen == USHRT_MAX)

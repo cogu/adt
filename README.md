@@ -104,7 +104,7 @@ ctest --test-dir build-test --output-on-failure
 Configure with `--coverage` compiler and linker flags:
 
 ```sh
-cmake -S . -B build-cov -DUNIT_TEST=ON -DADT_U16MAP_ENABLE=ON -DADT_RBFH_ENABLE=ON \
+cmake -S . -B build-cov -DUNIT_TEST=ON \
   -DCMAKE_C_FLAGS="--coverage" \
   -DCMAKE_EXE_LINKER_FLAGS="--coverage"
 ```
@@ -152,11 +152,20 @@ CMake options can be set from command line or using a CMake GUI tool (such as cc
 |-------------------|----------------------------------------|--------------------------------------------------|
 | LEAK_CHECK        | -DLEAK_CHECK=ON                        | Enables memory leak check detection              |
 | UNIT_TEST         | -DUNIT_TEST=ON                         | Activates UNIT_TEST preprocessor define          |
+| ADT_NO_HEAP_MEM   | -DADT_NO_HEAP_MEM=ON                   | Disable heap memory allocation (zero-heap mode)  |
 | ADT_SANITIZERS    | -DADT_SANITIZERS="address,undefined"   | Enables sanitizers for GCC or Clang              |
 
-#### ADT Hash Performance Benchmark
+#### Embedded & Zero-Heap Support (`ADT_NO_HEAP_MEM`)
 
-When `-DUNIT_TEST=ON` is set, a dedicated benchmark executable `adt_perf` is built. It benchmarks insertion and lookup performance across ~22,000 dictionary words using [test/3esl.txt](file:///home/cogu/repo/c-apx/adt/test/3esl.txt).
+By default, all data structures (including `adt_ringbuf.c` and `adt_map.c`) are compiled into the ADT library with dynamic heap features enabled.
+
+For small embedded microcontrollers or safety-critical software where dynamic heap allocation (`malloc`/`free`) is prohibited:
+- Pass `-DADT_NO_HEAP_MEM=ON` in CMake (or define `ADT_NO_HEAP_MEM=1` when compiling individual source files).
+- This strips out all heap-dependent APIs (`adt_rbfh_*`, `adt_u16Map_new`, `adt_u16Map_delete`) while keeping all zero-heap containers and functions (`adt_rbfs_*`, `adt_rbfu16_*`, `adt_u16Map_create`, etc.) fully functional with zero dynamic allocation.
+
+#### ADT Benchmarks
+
+When `-DUNIT_TEST=ON` is set, a dedicated benchmark executable `adt_perf` is built. It benchmarks insertion, lookup, and sorting across `adt_hash`, `adt_ary`, `adt_set`, and `adt_map`.
 
 Run directly:
 
@@ -168,34 +177,4 @@ Or run via CTest:
 
 ```sh
 ctest --test-dir build-test -L benchmark --output-on-failure --verbose
-```
-
-#### ADT Ringbuffer
-
-By default, `adt_ringbuf.c` will not compile anything unless you explicitly enable it using CMake options. This allows embedded targets to enable `adt_rbfs_t` (static buffer) and `adt_rbfu16_t` (embedded `uint16_t` buffer) without enabling or linking heap memory.
-
-| CMake Option      | Usage                  | Storage / Memory   | Description                      |
-|-------------------|------------------------|--------------------|----------------------------------|
-| ADT_RBFS_ENABLE   | -DADT_RBFS_ENABLE=ON   | Static (zero heap) | Enables adt_rbfs_t and its API   |
-| ADT_RBFU16_ENABLE | -DADT_RBFU16_ENABLE=ON | Static (zero heap) | Enables adt_rbfu16_t and its API |
-| ADT_RBFH_ENABLE   | -DADT_RBFH_ENABLE=ON   | Heap (dynamic)     | Enables adt_rbfh_t and its API   |
-
-#### ADT U16Map
-
-`adt_u16Map_t` is optional and disabled by default. Enable it via CMake:
-
-| CMake Option      | Usage                  | Description                      |
-|-------------------|------------------------|----------------------------------|
-| ADT_U16MAP_ENABLE | -DADT_U16MAP_ENABLE=ON | Enables adt_u16Map_t and its API |
-
-
-#### Unit testing all data structures
-
-
-Command to build unit test with all optional data structures enabled:
-
-```sh
-cmake -S . -B build-test -GNinja -DUNIT_TEST=ON -DADT_RBFS_ENABLE=ON -DADT_RBFU16_ENABLE=ON -DADT_RBFH_ENABLE=ON -DADT_U16MAP_ENABLE=ON
-cmake --build build-test
-ctest --test-dir build-test --output-on-failure
 ```

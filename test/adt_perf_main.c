@@ -12,7 +12,7 @@
 #include "perf_adt_hash.h"
 #include "perf_adt_ary.h"
 #include "perf_adt_set.h"
-#if defined(ADT_U16MAP_ENABLE) && ADT_U16MAP_ENABLE
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
 #include "perf_adt_map.h"
 #endif
 
@@ -27,7 +27,7 @@ int main(int argc, char **argv)
    perf_adt_hash_run(dict_path);
    perf_adt_ary_run(dict_path);
    perf_adt_set_run();
-#if defined(ADT_U16MAP_ENABLE) && ADT_U16MAP_ENABLE
+#if (!defined(ADT_NO_HEAP_MEM) || (ADT_NO_HEAP_MEM == 0))
    perf_adt_map_run();
 #endif
 

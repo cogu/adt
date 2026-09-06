@@ -38,11 +38,7 @@
       "inherits": "clang-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "UNIT_TEST": true,
-        "ADT_RBFH_ENABLE": true,
-        "ADT_RBFS_ENABLE": true,
-        "ADT_RBFU16_ENABLE": true,
-        "ADT_U16MAP_ENABLE": true
+        "UNIT_TEST": true
       }
     },
     {
