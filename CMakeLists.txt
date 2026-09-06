@@ -114,8 +114,8 @@ endif()
 if(ADT_U16MAP_ENABLE)
     message(STATUS "ADT_U16MAP_ENABLE=1")
     target_sources(adt PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_u16Map.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_u16Map.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_map.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_map.c
     )
     target_compile_definitions(adt PUBLIC ADT_U16MAP_ENABLE=1)
 endif()
@@ -176,7 +176,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         ### Benchmark / Performance Test
         set(ADT_PERF_SRCS test/adt_perf_main.c test/perf_adt_hash.c test/perf_adt_ary.c test/perf_adt_set.c)
         if(ADT_U16MAP_ENABLE)
-            list(APPEND ADT_PERF_SRCS test/perf_adt_u16map.c)
+            list(APPEND ADT_PERF_SRCS test/perf_adt_map.c)
         endif()
         add_executable(adt_perf ${ADT_PERF_SRCS} ${ADT_LIB_EXTRA})
         target_link_libraries(adt_perf PRIVATE adt)

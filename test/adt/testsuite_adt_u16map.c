@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test_common.h"
-#include "adt_u16Map.h"
+#include "adt_map.h"
 #ifdef MEM_LEAK_CHECK
 #include "CMemLeak.h"
 #endif

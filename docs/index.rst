@@ -19,7 +19,7 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_list
    adt_heap
    adt_ringbuf
-   adt_u16Map
+   adt_map
    adt_set
 
 
@@ -62,8 +62,8 @@ Below is a summary of all data structures provided by the ADT library:
      - Objects (``void*``)
      - Yes
      - Hash table mapping null-terminated string keys to generic pointers.
-   * - :doc:`adt_u16Map <adt_u16Map>`
-     - ``adt_u16Map.h``
+   * - :doc:`adt_u16Map_t <adt_map>`
+     - ``adt_map.h``
      - Objects (``void*``)
      - No
      - Sorted-array key/value map using 16-bit integer keys.
