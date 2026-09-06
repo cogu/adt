@@ -9,10 +9,10 @@ Byte Array (adt_bytearray)
 Growth Policies
 ---------------
 
-When initializing or constructing an ``adt_bytearray_t``, the ``u32GrowSize`` argument controls allocation behavior:
+By default, ``adt_bytearray_t`` uses **geometric growth** (doubling capacity starting from 16 bytes up to a 32 MB step cap), guaranteeing amortized :math:`O(1)` push and append operations:
 
-* **``0`` (or ``ADT_BYTEARRAY_NO_GROWTH``)**: The array allocates exactly the number of bytes currently required.
-* **``> 0``**: When more capacity is needed, the array expands in chunks of ``u32GrowSize`` bytes (default: ``8192`` bytes) to minimize heap reallocations.
+* **Geometric Doubling (default)**: When additional capacity is required, the array doubles its allocated size (16, 32, 64, 128 bytes, etc.) until reaching 32 MB. Above 32 MB, capacity expands linearly in chunks of 32 MB to prevent excessive memory overhead.
+* **Custom Linear Growth**: Callers requiring fixed-size chunk allocation (e.g. 4096-byte pages) can explicitly configure the growth increment after creation via :c:func:`adt_bytearray_set_growth_size`.
 
 Memory Management
 -----------------
@@ -37,7 +37,7 @@ Example:
    void example_stack(void)
    {
        adt_bytearray_t array;
-       adt_bytearray_create(&array, ADT_BYTEARRAY_DEFAULT_GROW_SIZE);
+       adt_bytearray_create(&array);
 
        adt_bytearray_push(&array, 0x42);
 

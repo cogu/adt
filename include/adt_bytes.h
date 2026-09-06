@@ -113,10 +113,9 @@ const uint8_t* adt_bytes_const_data(const adt_bytes_t *self);
  * \brief Converts the immutable bytes object into a mutable adt_bytearray_t on the heap.
  *
  * \param self Pointer to the bytes object.
- * \param u32GrowSize Growth chunk size for the newly created byte array.
  * \return Pointer to newly allocated adt_bytearray_t, or NULL on failure.
  */
-struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self, uint32_t u32GrowSize);
+struct adt_bytearray_tag *adt_bytes_bytearray(const adt_bytes_t *self);
 
 /**
  * \brief Compares two bytes objects for equality (equal length and identical byte content).

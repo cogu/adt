@@ -32,22 +32,17 @@ typedef struct adt_bytearray_tag
    uint32_t u32GrowSize;
 } adt_bytearray_t;
 
-#define ADT_BYTEARRAY_NO_GROWTH 0u  //will malloc exactly the number of bytes it currently needs
-#define ADT_BYTEARRAY_DEFAULT_GROW_SIZE ((uint32_t)8192u)
-#define ADT_BYTEARRAY_MAX_GROW_SIZE ((uint32_t)32u*1024u*1024u)
-
 
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
 
 /**
- * \brief Initializes a byte array instance.
+ * \brief Initializes a byte array instance with default geometric growth.
  *
  * \param self Pointer to an existing adt_bytearray_t instance.
- * \param u32GrowSize Growth chunk size in bytes (0 for exact allocation).
  */
-void adt_bytearray_create(adt_bytearray_t *self, uint32_t u32GrowSize);
+void adt_bytearray_create(adt_bytearray_t *self);
 
 /**
  * \brief Frees the internal buffer allocated by the byte array. Does not free the self pointer itself.
@@ -57,40 +52,36 @@ void adt_bytearray_create(adt_bytearray_t *self, uint32_t u32GrowSize);
 void adt_bytearray_destroy(adt_bytearray_t *self);
 
 /**
- * \brief Allocates and initializes a new byte array on the heap.
+ * \brief Allocates and initializes a new empty byte array on the heap.
  *
- * \param u32GrowSize Growth chunk size in bytes (0 for exact allocation).
  * \return Pointer to newly allocated byte array, or NULL on allocation failure.
  */
-adt_bytearray_t *adt_bytearray_new(uint32_t u32GrowSize);
+adt_bytearray_t *adt_bytearray_new(void);
 
 /**
  * \brief Creates a new heap-allocated byte array initialized with a copy of raw data.
  *
  * \param pData Pointer to source byte buffer.
  * \param u32DataLen Number of bytes to copy.
- * \param u32GrowSize Growth chunk size in bytes.
  * \return Newly allocated byte array, or NULL on failure.
  */
-adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen, uint32_t u32GrowSize);
+adt_bytearray_t *adt_bytearray_make(const uint8_t *pData, uint32_t u32DataLen);
 
 /**
  * \brief Creates a new heap-allocated byte array initialized with the contents of a null-terminated C string (excluding the null terminator).
  *
  * \param cstr Source null-terminated C string.
- * \param u32GrowSize Growth chunk size in bytes.
  * \return Newly allocated byte array, or NULL on failure.
  */
-adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr, uint32_t u32GrowSize);
+adt_bytearray_t *adt_bytearray_make_cstr(const char *cstr);
 
 /**
  * \brief Creates an independent duplicate of an existing byte array.
  *
  * \param other Pointer to byte array to clone.
- * \param u32GrowSize Growth chunk size for the clone.
  * \return Newly allocated duplicate byte array, or NULL on failure.
  */
-adt_bytearray_t *adt_bytearray_clone(const adt_bytearray_t *other, uint32_t u32GrowSize);
+adt_bytearray_t *adt_bytearray_clone(const adt_bytearray_t *other);
 
 /**
  * \brief Destroys the internal buffer and frees the self pointer.
@@ -109,10 +100,13 @@ void adt_bytearray_delete(adt_bytearray_t *self);
 void adt_bytearray_vdelete(void *arg);
 
 /**
- * \brief Updates the growth chunk size for subsequent allocations.
+ * \brief Updates the growth policy for subsequent allocations.
+ *
+ * Set to 0 to use the default geometric growth policy. If set to a value > 0,
+ * the array grows in fixed linear increments of u32GrowSize bytes (capped at 32 MB).
  *
  * \param self Pointer to the byte array.
- * \param u32GrowSize Growth chunk size in bytes (maximum allowed is 32 MB).
+ * \param u32GrowSize Growth chunk size in bytes (0 for geometric growth, maximum allowed is 32 MB).
  */
 void adt_bytearray_set_growth_size(adt_bytearray_t *self, uint32_t u32GrowSize);
 

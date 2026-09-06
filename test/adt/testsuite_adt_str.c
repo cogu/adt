@@ -645,7 +645,7 @@ static void test_adt_str_new_byterray(CuTest* tc)
    adt_bytearray_t *tmpArray;
    adt_str_t *str;
 
-   tmpArray = adt_bytearray_make_cstr(cstr, ADT_BYTEARRAY_NO_GROWTH);
+   tmpArray = adt_bytearray_make_cstr(cstr);
 
    CuAssertPtrNotNull(tc, tmpArray);
 
