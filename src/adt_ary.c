@@ -28,6 +28,7 @@
 
 #define ELEM_SIZE (sizeof(void*))
 #define ELEM_VALUE_IS_LESS(T) ( *((T*) a) < *((T*) b) )
+#define ADT_ARY_MIN_CAPACITY 4
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
@@ -193,20 +194,88 @@ adt_error_t adt_ary_remove(adt_ary_t *self, void *pElem)
    return ADT_INVALID_ARGUMENT_ERROR;
 }
 
+static int32_t adt_ary_next_capacity(int32_t current_capacity, int32_t min_needed)
+{
+   int32_t new_capacity = (current_capacity < ADT_ARY_MIN_CAPACITY) ? ADT_ARY_MIN_CAPACITY : current_capacity;
+   while (new_capacity < min_needed)
+   {
+      if (new_capacity > (INT32_MAX / 2))
+      {
+         new_capacity = INT32_MAX;
+         break;
+      }
+      new_capacity *= 2;
+   }
+   return new_capacity;
+}
+
+adt_error_t adt_ary_reserve(adt_ary_t *self, int32_t s32Len)
+{
+   if ((self == NULL) || (s32Len < 0))
+   {
+      return ADT_INVALID_ARGUMENT_ERROR;
+   }
+   if (s32Len <= self->s32AllocLen)
+   {
+      return ADT_NO_ERROR;
+   }
+   if (s32Len >= INT32_MAX)
+   {
+      return ADT_LENGTH_ERROR;
+   }
+
+   void **ppAlloc = (void**) malloc(sizeof(void*) * (size_t)s32Len);
+   if (ppAlloc == NULL)
+   {
+      return ADT_MEM_ERROR;
+   }
+
+   if (self->s32CurLen > 0)
+   {
+      memcpy(ppAlloc, self->pFirst, sizeof(void*) * (size_t)self->s32CurLen);
+   }
+
+   if (self->ppAlloc != NULL)
+   {
+      free(self->ppAlloc);
+   }
+
+   self->ppAlloc = ppAlloc;
+   self->pFirst = ppAlloc;
+   self->s32AllocLen = s32Len;
+   return ADT_NO_ERROR;
+}
+
 /**
  * Appends pElem to the end of the array
  */
 adt_error_t adt_ary_push(adt_ary_t *self, void *pElem){
    if (self != NULL) {
-      int32_t s32Index;
-      adt_error_t result;
-      s32Index = self->s32CurLen;
-      assert(self->s32CurLen < INT32_MAX);
-      result = adt_ary_extend(self,((int32_t) s32Index+1));
-      if (result == ADT_NO_ERROR) {
-         self->pFirst[s32Index]=pElem;
+      if (self->s32CurLen == INT32_MAX) {
+         return ADT_LENGTH_ERROR;
       }
-      return result;
+
+      int32_t offset = (int32_t)(self->pFirst - self->ppAlloc);
+      if (offset + self->s32CurLen < self->s32AllocLen) {
+         self->pFirst[self->s32CurLen++] = pElem;
+         return ADT_NO_ERROR;
+      }
+
+      if (self->s32CurLen < self->s32AllocLen) {
+         memmove(self->ppAlloc, self->pFirst, sizeof(void*) * (size_t)self->s32CurLen);
+         self->pFirst = self->ppAlloc;
+         self->pFirst[self->s32CurLen++] = pElem;
+         return ADT_NO_ERROR;
+      }
+
+      int32_t new_capacity = adt_ary_next_capacity(self->s32AllocLen, self->s32CurLen + 1);
+      adt_error_t result = adt_ary_reserve(self, new_capacity);
+      if (result != ADT_NO_ERROR) {
+         return result;
+      }
+
+      self->pFirst[self->s32CurLen++] = pElem;
+      return ADT_NO_ERROR;
    }
    return ADT_INVALID_ARGUMENT_ERROR;
 }
@@ -277,20 +346,34 @@ adt_error_t adt_ary_unshift(adt_ary_t *self, void *pElem){
          return ADT_NO_ERROR;
       }
       else {
-         //no room at beginning of array, move all array data forward by one
-         uint8_t *pBegin,*pEnd;
-         adt_error_t result;
-         uint32_t u32ElemSize = sizeof(void**);
-         result = adt_ary_extend(self,(int32_t) (self->s32CurLen+1));
-         if (result == ADT_NO_ERROR) {
-            uint32_t u32Remain;
-            pBegin = (uint8_t*) self->pFirst+u32ElemSize;
-            pEnd = ((uint8_t*) &self->pFirst[self->s32CurLen]);
-            u32Remain = (uint32_t) (pEnd-pBegin);
-            adt_block_memmove(pBegin, (uint8_t*) self->pFirst, u32Remain);
-            self->pFirst[0]=pElem;
+         if (self->s32CurLen < self->s32AllocLen) {
+            memmove(self->ppAlloc + 1, self->ppAlloc, sizeof(void*) * (size_t)self->s32CurLen);
+            self->ppAlloc[0] = pElem;
+            self->pFirst = self->ppAlloc;
+            self->s32CurLen++;
+            return ADT_NO_ERROR;
          }
-         return result;
+
+         int32_t new_capacity = adt_ary_next_capacity(self->s32AllocLen, self->s32CurLen + 1);
+         void **ppAlloc = (void**) malloc(sizeof(void*) * (size_t)new_capacity);
+         if (ppAlloc == NULL) {
+            return ADT_MEM_ERROR;
+         }
+
+         ppAlloc[0] = pElem;
+         if (self->s32CurLen > 0) {
+            memcpy(ppAlloc + 1, self->pFirst, sizeof(void*) * (size_t)self->s32CurLen);
+         }
+
+         if (self->ppAlloc != NULL) {
+            free(self->ppAlloc);
+         }
+
+         self->ppAlloc = ppAlloc;
+         self->pFirst = ppAlloc;
+         self->s32AllocLen = new_capacity;
+         self->s32CurLen++;
+         return ADT_NO_ERROR;
       }
    }
    return ADT_INVALID_ARGUMENT_ERROR;
@@ -500,6 +583,9 @@ adt_error_t adt_ary_splice(adt_ary_t *self,int32_t s32Index, int32_t s32Len){
          adt_block_memmove(pDest, pSrc, u32BytesRemain);
       }
       self->s32CurLen-=s32Len;
+      if (self->s32CurLen == 0) {
+         self->pFirst = self->ppAlloc;
+      }
       return ADT_NO_ERROR;
    }
    return ADT_INVALID_ARGUMENT_ERROR;

@@ -61,6 +61,10 @@ static void test_adt_ary_index_of(CuTest *tc);
 static void test_adt_ary_destructor_enable(CuTest *tc);
 static void test_adt_ary_vdelete(CuTest *tc);
 static void test_adt_ary_destructor_query(CuTest *tc);
+static void test_adt_ary_push_growth(CuTest *tc);
+static void test_adt_ary_push_shift_compaction(CuTest *tc);
+static void test_adt_ary_reserve(CuTest *tc);
+static void test_adt_ary_unshift_growth(CuTest *tc);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -101,6 +105,10 @@ CuSuite *testsuite_adt_ary(void) {
   SUITE_ADD_TEST(suite, test_adt_ary_destructor_enable);
   SUITE_ADD_TEST(suite, test_adt_ary_vdelete);
   SUITE_ADD_TEST(suite, test_adt_ary_destructor_query);
+  SUITE_ADD_TEST(suite, test_adt_ary_push_growth);
+  SUITE_ADD_TEST(suite, test_adt_ary_push_shift_compaction);
+  SUITE_ADD_TEST(suite, test_adt_ary_reserve);
+  SUITE_ADD_TEST(suite, test_adt_ary_unshift_growth);
 
   return suite;
 }
@@ -318,7 +326,7 @@ static void test_adt_ary_remove(CuTest *tc) {
   CuAssertPtrEquals(tc, b, adt_ary_value(pArray, 0));
   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_remove(pArray, b));
   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
-  CuAssertIntEquals(tc, 3, pArray->s32AllocLen);
+  CuAssertIntEquals(tc, 4, pArray->s32AllocLen);
   adt_ary_delete(pArray);
 }
 
@@ -763,4 +771,116 @@ static void test_adt_ary_destructor_query(CuTest *tc) {
   CuAssertTrue(tc, adt_ary_destructor_is_enabled(array_with_destructor));
 
   adt_ary_delete(array_with_destructor);
+}
+
+static void test_adt_ary_push_growth(CuTest *tc) {
+  const int count = 1000;
+  int values[1000];
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int i = 0; i < count; i++) {
+    values[i] = i;
+    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &values[i]));
+  }
+  CuAssertIntEquals(tc, count, adt_ary_length(array));
+  CuAssertTrue(tc, array->s32AllocLen >= count);
+  // With min capacity 4 and doubling, 1000 elements results in capacity 1024
+  CuAssertIntEquals(tc, 1024, array->s32AllocLen);
+
+  for (int i = 0; i < count; i++) {
+    CuAssertIntEquals(tc, i, *((int *)adt_ary_value(array, i)));
+  }
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_push_shift_compaction(CuTest *tc) {
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int i = 0; i < 4; i++) {
+    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[i]));
+  }
+  CuAssertIntEquals(tc, 4, array->s32AllocLen);
+  CuAssertIntEquals(tc, 4, adt_ary_length(array));
+
+  // Shift 2 elements off the front
+  void *elem0 = adt_ary_shift(array);
+  void *elem1 = adt_ary_shift(array);
+  CuAssertPtrEquals(tc, &m_numbers[0], elem0);
+  CuAssertPtrEquals(tc, &m_numbers[1], elem1);
+  CuAssertIntEquals(tc, 2, adt_ary_length(array));
+  CuAssertIntEquals(tc, 4, array->s32AllocLen);
+
+  // Pushing one element triggers shift compaction because back is full, but front has 2 free slots
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[4]));
+  CuAssertIntEquals(tc, 3, adt_ary_length(array));
+  // Capacity remains 4 (no reallocation!)
+  CuAssertIntEquals(tc, 4, array->s32AllocLen);
+  CuAssertPtrEquals(tc, array->ppAlloc, array->pFirst);
+
+  CuAssertPtrEquals(tc, &m_numbers[2], adt_ary_value(array, 0));
+  CuAssertPtrEquals(tc, &m_numbers[3], adt_ary_value(array, 1));
+  CuAssertPtrEquals(tc, &m_numbers[4], adt_ary_value(array, 2));
+
+  // Push another element to fill capacity 4
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[5]));
+  CuAssertIntEquals(tc, 4, array->s32AllocLen);
+
+  // Push 5th element: now buffer is truly full, grows to 8
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[6]));
+  CuAssertIntEquals(tc, 5, adt_ary_length(array));
+  CuAssertIntEquals(tc, 8, array->s32AllocLen);
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_reserve(CuTest *tc) {
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  CuAssertIntEquals(tc, 0, array->s32AllocLen);
+  CuAssertIntEquals(tc, 0, adt_ary_length(array));
+
+  // Preallocate capacity
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_reserve(array, 100));
+  CuAssertIntEquals(tc, 100, array->s32AllocLen);
+  CuAssertIntEquals(tc, 0, adt_ary_length(array));
+
+  // Reserving smaller or equal capacity is a no-op
+  CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_reserve(array, 50));
+  CuAssertIntEquals(tc, 100, array->s32AllocLen);
+
+  // Push elements into reserved capacity
+  for (int i = 0; i < 50; i++) {
+    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(array, &m_numbers[i % 10]));
+  }
+  CuAssertIntEquals(tc, 50, adt_ary_length(array));
+  CuAssertIntEquals(tc, 100, array->s32AllocLen);
+
+  // Invalid arguments
+  CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_ary_reserve(NULL, 10));
+  CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_ary_reserve(array, -1));
+
+  adt_ary_delete(array);
+}
+
+static void test_adt_ary_unshift_growth(CuTest *tc) {
+  adt_ary_t *array = adt_ary_new(NULL);
+  CuAssertPtrNotNull(tc, array);
+
+  for (int i = 0; i < 10; i++) {
+    CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_unshift(array, &m_numbers[i]));
+  }
+  CuAssertIntEquals(tc, 10, adt_ary_length(array));
+  CuAssertTrue(tc, array->s32AllocLen >= 10);
+  CuAssertIntEquals(tc, 16, array->s32AllocLen);
+
+  // Elements should be in reverse order
+  for (int i = 0; i < 10; i++) {
+    CuAssertPtrEquals(tc, &m_numbers[9 - i], adt_ary_value(array, i));
+  }
+
+  adt_ary_delete(array);
 }
