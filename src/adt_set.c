@@ -14,6 +14,8 @@
 #include <assert.h>
 #include <malloc.h>
 #include <stddef.h>
+#include <string.h>
+#include <limits.h>
 #include "adt_set.h"
 #ifdef MEM_LEAK_CHECK
 # include "CMemLeak.h"
@@ -23,10 +25,12 @@
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
+#define ADT_U32SET_MIN_CAPACITY 4
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////////
+static bool adt_u32Set_find_index(const adt_u32Set_t *self, uint32_t val, int32_t *out_index);
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE VARIABLES
@@ -39,7 +43,9 @@ void adt_u32Set_create(adt_u32Set_t *self)
 {
    if (self != NULL)
    {
-      adt_u32List_create(&self->list);
+      self->pAlloc = NULL;
+      self->s32AllocLen = 0;
+      self->s32CurLen = 0;
    }
 }
 
@@ -47,7 +53,13 @@ void adt_u32Set_destroy(adt_u32Set_t *self)
 {
    if (self != NULL)
    {
-      adt_u32List_destroy(&self->list);
+      if (self->pAlloc != NULL)
+      {
+         free(self->pAlloc);
+      }
+      self->pAlloc = NULL;
+      self->s32AllocLen = 0;
+      self->s32CurLen = 0;
    }
 }
 
@@ -79,7 +91,7 @@ void adt_u32Set_clear(adt_u32Set_t *self)
 {
    if (self != NULL)
    {
-      adt_u32List_clear(&self->list);
+      self->s32CurLen = 0;
    }
 }
 
@@ -87,126 +99,136 @@ int32_t adt_u32Set_length(adt_u32Set_t *self)
 {
    if (self != NULL)
    {
-      return adt_u32List_length(&self->list);
+      return self->s32CurLen;
    }
    return -1;
 }
 
 /**
- * inserts val into the internal list. The internal list is automatically sorted
+ * inserts val into the internal array. The array is automatically kept sorted.
  */
 void adt_u32Set_insert(adt_u32Set_t *self, uint32_t val)
 {
    if (self != NULL)
    {
-      adt_u32List_elem_t *iter = adt_u32List_iter_last(&self->list);
-      if ( (iter == NULL) ||  (val > iter->item) )
+      int32_t insert_pos = 0;
+      if (adt_u32Set_find_index(self, val, &insert_pos))
       {
-         adt_u32List_insert(&self->list, val);
+         return; // Value already exists, prevent duplicates
       }
-      else if (val != iter->item)
+
+      if (self->s32CurLen == INT32_MAX)
       {
-         iter = adt_u32List_iter_first(&self->list);
-         while (iter != NULL)
+         return;
+      }
+
+      if (self->s32CurLen == self->s32AllocLen)
+      {
+         int32_t new_capacity = (self->s32AllocLen < ADT_U32SET_MIN_CAPACITY) ? ADT_U32SET_MIN_CAPACITY : self->s32AllocLen * 2;
+         if (self->s32AllocLen > (INT32_MAX / 2))
          {
-            if (val == iter->item)
-            {
-               break; //prevent duplicate
-            }
-            else if (val < iter->item)
-            {
-               adt_u32List_insert_before(&self->list, iter, val);
-               break;
-            }
-            iter = adt_u32List_iter_next(iter);
+            new_capacity = INT32_MAX;
          }
+         uint32_t *pAlloc = (uint32_t*) realloc(self->pAlloc, sizeof(uint32_t) * (size_t)new_capacity);
+         if (pAlloc == NULL)
+         {
+            return;
+         }
+         self->pAlloc = pAlloc;
+         self->s32AllocLen = new_capacity;
       }
+
+      int32_t num_to_move = self->s32CurLen - insert_pos;
+      if (num_to_move > 0)
+      {
+         memmove(&self->pAlloc[insert_pos + 1], &self->pAlloc[insert_pos], sizeof(uint32_t) * (size_t)num_to_move);
+      }
+
+      self->pAlloc[insert_pos] = val;
+      self->s32CurLen++;
    }
 }
 
 bool adt_u32Set_remove(adt_u32Set_t *self, uint32_t val)
 {
-   bool retval = false;
-   if (self != NULL)
+   if ((self != NULL) && (self->s32CurLen > 0))
    {
-      adt_u32List_elem_t *iter = adt_u32List_iter_last(&self->list);
-      if (iter != NULL)
+      int32_t remove_pos = 0;
+      if (adt_u32Set_find_index(self, val, &remove_pos))
       {
-         if ( val == iter->item )
+         int32_t num_to_move = self->s32CurLen - 1 - remove_pos;
+         if (num_to_move > 0)
          {
-            retval = true;
+            memmove(&self->pAlloc[remove_pos], &self->pAlloc[remove_pos + 1], sizeof(uint32_t) * (size_t)num_to_move);
          }
-         else if (val < iter->item)
-         {
-            iter = adt_u32List_iter_first(&self->list);
-            while (iter != NULL)
-            {
-               if ( val == iter->item )
-               {
-                  retval = true;
-                  break;
-               }
-               else if (val < iter->item)
-               {
-                  break;
-               }
-               iter = adt_u32List_iter_next(iter);
-            }
-         }
-      }
-      if (retval == true)
-      {
-         adt_u32List_erase(&self->list, iter);
+         self->s32CurLen--;
+         return true;
       }
    }
-   return retval;
+   return false;
 }
 
 bool adt_u32Set_contains(adt_u32Set_t *self, uint32_t val)
 {
-   bool retval = false;
-   if (self != NULL)
+   if ((self != NULL) && (self->s32CurLen > 0))
    {
-      adt_u32List_elem_t *iter = adt_u32List_iter_last(&self->list);
-      if (iter != NULL)
-      {
-         if ( val == iter->item )
-         {
-            retval = true;
-         }
-         else if (val < iter->item)
-         {
-            iter = adt_u32List_iter_first(&self->list);
-            while (iter != NULL)
-            {
-               if ( val == iter->item )
-               {
-                  retval = true;
-                  break;
-               }
-               else if (val < iter->item)
-               {
-                  break;
-               }
-               iter = adt_u32List_iter_next(iter);
-            }
-         }
-      }
+      return adt_u32Set_find_index(self, val, NULL);
    }
-   return retval;
+   return false;
 }
 
 bool adt_u32Set_is_empty(const adt_u32Set_t *self)
 {
    if (self != NULL)
    {
-      return adt_u32List_is_empty(&self->list);
+      return self->s32CurLen == 0;
    }
    return false;
+}
+
+uint32_t adt_u32Set_value(const adt_u32Set_t *self, int32_t index)
+{
+   if ((self != NULL) && (index >= 0) && (index < self->s32CurLen))
+   {
+      return self->pAlloc[index];
+   }
+   return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 //////////////////////////////////////////////////////////////////////////////
+static bool adt_u32Set_find_index(const adt_u32Set_t *self, uint32_t val, int32_t *out_index)
+{
+   int32_t left = 0;
+   int32_t right = self->s32CurLen - 1;
 
+   while (left <= right)
+   {
+      int32_t mid = left + (right - left) / 2;
+      uint32_t mid_val = self->pAlloc[mid];
 
+      if (mid_val == val)
+      {
+         if (out_index != NULL)
+         {
+            *out_index = mid;
+         }
+         return true;
+      }
+      else if (mid_val < val)
+      {
+         left = mid + 1;
+      }
+      else
+      {
+         right = mid - 1;
+      }
+   }
+
+   if (out_index != NULL)
+   {
+      *out_index = left;
+   }
+   return false;
+}
