@@ -290,6 +290,101 @@ void test_adt_u16Map_move(CuTest* tc){
    CuAssertIntEquals(tc,7,adt_u16Map_size(pList1));
 }
 
+void test_adt_u16Map_largeCapacity(CuTest* tc){
+   adt_u16Map_t *map = adt_u16Map_new(65536, NULL);
+   CuAssertPtrNotNull(tc, map);
+   CuAssertUIntEquals(tc, 0, adt_u16Map_size(map));
+
+   adt_u16Map_insert(map, 0, (void*) 1);
+   adt_u16Map_insert(map, 65535, (void*) 2);
+   CuAssertUIntEquals(tc, 2, adt_u16Map_size(map));
+
+   adt_u16MapElem_t *elem0 = adt_u16Map_find(map, 0);
+   CuAssertPtrNotNull(tc, elem0);
+   CuAssertIntEquals(tc, 0, elem0->key);
+   CuAssertPtrEquals(tc, (void*) 1, elem0->val);
+
+   adt_u16MapElem_t *elemMax = adt_u16Map_find(map, 65535);
+   CuAssertPtrNotNull(tc, elemMax);
+   CuAssertIntEquals(tc, 65535, elemMax->key);
+   CuAssertPtrEquals(tc, (void*) 2, elemMax->val);
+
+   adt_u16Map_delete(map);
+}
+
+void test_adt_u16Map_remove_val(CuTest* tc){
+   adt_u16Map_t *map = adt_u16Map_new(10, NULL);
+   CuAssertPtrNotNull(tc, map);
+
+   adt_u16Map_insert(map, 10, (void*) "A");
+   adt_u16Map_insert(map, 20, (void*) "B");
+   adt_u16Map_insert(map, 30, (void*) "A");
+   adt_u16Map_insert(map, 40, (void*) "C");
+   adt_u16Map_insert(map, 50, (void*) "A");
+   CuAssertUIntEquals(tc, 5, adt_u16Map_size(map));
+
+   // Remove all entries with val == "A"
+   adt_u16Map_remove_val(map, (void*) "A");
+   CuAssertUIntEquals(tc, 2, adt_u16Map_size(map));
+
+   // Remaining elements should be 20 ("B") and 40 ("C")
+   adt_u16MapElem_t *elem20 = adt_u16Map_find(map, 20);
+   CuAssertPtrNotNull(tc, elem20);
+   CuAssertPtrEquals(tc, (void*) "B", elem20->val);
+
+   adt_u16MapElem_t *elem40 = adt_u16Map_find(map, 40);
+   CuAssertPtrNotNull(tc, elem40);
+   CuAssertPtrEquals(tc, (void*) "C", elem40->val);
+
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map, 10));
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map, 30));
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map, 50));
+
+   // Removing non-existent value should be a no-op
+   adt_u16Map_remove_val(map, (void*) "Z");
+   CuAssertUIntEquals(tc, 2, adt_u16Map_size(map));
+
+   adt_u16Map_delete(map);
+}
+
+void test_adt_u16Map_move_large(CuTest* tc){
+   const uint32_t count = 50;
+   adt_u16Map_t *map1 = adt_u16Map_new(100, NULL);
+   adt_u16Map_t *map2 = adt_u16Map_new(100, NULL);
+   CuAssertPtrNotNull(tc, map1);
+   CuAssertPtrNotNull(tc, map2);
+
+   adt_u16Map_insert(map1, 10, (void*) 1);
+   for (uint32_t i = 0; i < count; i++) {
+      adt_u16Map_insert(map1, 50, (void*)(uintptr_t)(i + 100));
+   }
+   adt_u16Map_insert(map1, 90, (void*) 2);
+   CuAssertUIntEquals(tc, count + 2, adt_u16Map_size(map1));
+
+   uint32_t moved = adt_u16Map_move_elem(map2, map1, 50);
+   CuAssertUIntEquals(tc, count, moved);
+   CuAssertUIntEquals(tc, 2, adt_u16Map_size(map1));
+   CuAssertUIntEquals(tc, count, adt_u16Map_size(map2));
+
+   // Verify map1 has key 10 and 90 remaining
+   CuAssertPtrNotNull(tc, adt_u16Map_find(map1, 10));
+   CuAssertPtrNotNull(tc, adt_u16Map_find(map1, 90));
+   CuAssertPtrEquals(tc, NULL, adt_u16Map_find(map1, 50));
+
+   // Verify map2 has all 50 items of key 50 in order
+   adt_u16MapElem_t *it = adt_u16Map_iter_init(map2, NULL);
+   for (uint32_t i = 0; i < count; i++) {
+      CuAssertPtrNotNull(tc, it);
+      CuAssertIntEquals(tc, 50, it->key);
+      CuAssertPtrEquals(tc, (void*)(uintptr_t)(i + 100), it->val);
+      it = adt_u16Map_iter_next(map2);
+   }
+   CuAssertPtrEquals(tc, NULL, it);
+
+   adt_u16Map_delete(map1);
+   adt_u16Map_delete(map2);
+}
+
 CuSuite* testsuite_adt_u16Map(void)
 {
    CuSuite* suite = CuSuiteNew();
@@ -300,6 +395,9 @@ CuSuite* testsuite_adt_u16Map(void)
    SUITE_ADD_TEST(suite, test_adt_u16Map_find_exact);
    SUITE_ADD_TEST(suite, test_adt_u16Map_move);
    SUITE_ADD_TEST(suite, test_adt_u16Map_find_rand_set);
+   SUITE_ADD_TEST(suite, test_adt_u16Map_largeCapacity);
+   SUITE_ADD_TEST(suite, test_adt_u16Map_remove_val);
+   SUITE_ADD_TEST(suite, test_adt_u16Map_move_large);
 
    return suite;
 }

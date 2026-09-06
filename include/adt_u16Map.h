@@ -35,8 +35,8 @@ typedef struct u16Map_tag {
    adt_u16MapElem_t *pBegin;       /**< Pointer to start of element array */
    adt_u16MapElem_t *pEnd;         /**< Pointer to one past last active element */
    adt_u16MapElem_t *pIter;        /**< Internal iterator cursor */
-   uint16_t max_num_elem;          /**< Maximum number of elements array can hold */
-   uint16_t num_elem;              /**< Current number of elements stored */
+   uint32_t max_num_elem;          /**< Maximum number of elements array can hold */
+   uint32_t num_elem;              /**< Current number of elements stored */
    void (*pDestructor)(void*);     /**< Optional virtual destructor callback for values */
    uint8_t destructor_enable;      /**< Non-zero if destructor invocation is enabled */
 } adt_u16Map_t;
@@ -49,10 +49,10 @@ typedef struct u16Map_tag {
  *
  * @param self Pointer to the adt_u16Map_t structure.
  * @param pArray Pointer to caller-allocated array of adt_u16MapElem_t elements.
- * @param max_num_elem Maximum number of elements that can fit in pArray (must be < 65535).
+ * @param max_num_elem Maximum number of elements that can fit in pArray.
  * @param pDestructor Optional element value destructor callback (or NULL).
  */
-void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint16_t max_num_elem, void (*pDestructor)(void*));
+void adt_u16Map_create(adt_u16Map_t *self, adt_u16MapElem_t *pArray, uint32_t max_num_elem, void (*pDestructor)(void*));
 
 /**
  * Cleans up the map and invokes the destructor on remaining values if enabled.
@@ -70,7 +70,7 @@ void adt_u16Map_destroy(adt_u16Map_t *self);
  * @param pDestructor Optional element value destructor callback (or NULL).
  * @return Pointer to newly allocated adt_u16Map_t, or NULL on allocation failure.
  */
-adt_u16Map_t *adt_u16Map_new(uint16_t max_num_elem, void (*pDestructor)(void*));
+adt_u16Map_t *adt_u16Map_new(uint32_t max_num_elem, void (*pDestructor)(void*));
 
 /**
  * Cleans up map entries, invokes the destructor on remaining values, and frees heap memory.
@@ -146,7 +146,7 @@ adt_u16MapElem_t* adt_u16Map_find_exact(adt_u16Map_t *self, uint16_t key, const 
  * @param self Pointer to the map.
  * @return Number of elements.
  */
-uint16_t adt_u16Map_size(const adt_u16Map_t *self);
+uint32_t adt_u16Map_size(const adt_u16Map_t *self);
 
 /**
  * Initializes the internal iterator at the specified element (or the first element if NULL/out of bounds).
@@ -173,7 +173,7 @@ adt_u16MapElem_t* adt_u16Map_iter_next(adt_u16Map_t *self);
  * @param key 16-bit unsigned key of elements to transfer.
  * @return Total number of elements moved.
  */
-uint16_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key);
+uint32_t adt_u16Map_move_elem(adt_u16Map_t *dest, adt_u16Map_t *src, uint16_t key);
 
 /**
  * Searches the entire map and removes all entries matching the given value pointer.

@@ -174,7 +174,11 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         )
 
         ### Benchmark / Performance Test
-        add_executable(adt_perf test/adt_perf_main.c test/perf_adt_hash.c test/perf_adt_ary.c test/perf_adt_set.c ${ADT_LIB_EXTRA})
+        set(ADT_PERF_SRCS test/adt_perf_main.c test/perf_adt_hash.c test/perf_adt_ary.c test/perf_adt_set.c)
+        if(ADT_U16MAP_ENABLE)
+            list(APPEND ADT_PERF_SRCS test/perf_adt_u16map.c)
+        endif()
+        add_executable(adt_perf ${ADT_PERF_SRCS} ${ADT_LIB_EXTRA})
         target_link_libraries(adt_perf PRIVATE adt)
         target_include_directories(adt_perf PRIVATE
                                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
