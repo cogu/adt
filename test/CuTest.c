@@ -1,7 +1,6 @@
 /**
-* cogu 2017-02-19: This is a slighty modified version of CuTest.c v1.5 (http://cutest.sourceforge.net)
-* I have fixed a memory leak in the framework as well as adding test macro for unsigned integer equality (CuAssertUIntEquals).
-* cogu 2026-09-05: Resolve Clang-tidy issues.
+* See CuTest.h for manual changelog
+*
 */
 
 #include <assert.h>
@@ -11,6 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "CuTest.h"
 
 /*-------------------------------------------------------------------------*
@@ -225,6 +225,15 @@ void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
     CuFail_Line(tc, file, line, message, buf);
 }
 
+void CuAssertLIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+    long long int expected, long long int actual)
+{
+    char buf[STRING_MAX];
+    if (expected == actual) return;
+    sprintf(buf, "expected <%lld> but was <%lld>", expected, actual);
+    CuFail_Line(tc, file, line, message, buf);
+}
+
 void CuAssertUIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
    unsigned int expected, unsigned int actual)
 {
@@ -239,7 +248,7 @@ void CuAssertULIntEquals_LineMsg(CuTest* tc, const char* file, int line, const c
 {
    char buf[STRING_MAX];
    if (expected == actual) return;
-   sprintf(buf, "expected <%lu> but was <%lu>", (unsigned long) expected, (unsigned long) actual);
+   sprintf(buf, "expected <%llu> but was <%llu>", expected, actual);
    CuFail_Line(tc, file, line, message, buf);
 }
 
@@ -263,7 +272,7 @@ void CuAssertPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
     CuFail_Line(tc, file, line, message, buf);
 }
 
-/* CG 2018-08-08: Added function */
+
 void CuAssertConstPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
    const void* expected, const void* actual)
 {
@@ -283,6 +292,17 @@ void CuAssertFnPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const c
    memcpy(&p_expected, &expected, sizeof(p_expected));
    memcpy(&p_actual, &actual, sizeof(p_actual));
    sprintf(buf, "expected pointer <0x%p> but was <0x%p>", p_expected, p_actual);
+   CuFail_Line(tc, file, line, message, buf);
+}
+
+void CuAssertBoolEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
+   bool expected, bool actual)
+{
+   char buf[STRING_MAX];
+   const char *expected_str = expected ? "true" : "false";
+   const char *actual_str = actual ? "true" : "false";
+   if (expected == actual) return;
+   sprintf(buf, "expected <%s> but was <%s>", expected_str, actual_str);
    CuFail_Line(tc, file, line, message, buf);
 }
 
