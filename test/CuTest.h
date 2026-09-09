@@ -9,6 +9,7 @@
 * cogu 2026-09-05: Resolve Clang-tidy issues.
 * cogu 2026-09-05: Added function pointer helper functions to solve a compiler warning
 * cogu 2026-09-09: Replaced unsafe string calls with bounded copies
+* cogu 2026-09-09: Added fail-fast handling for CuString allocation failures
 */
 
 #ifndef CU_TEST_H
@@ -21,7 +22,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CUTEST_VERSION  "CuTest 1.5_COGU_PATCH_6"
+#define CUTEST_VERSION  "CuTest 1.5_COGU_PATCH_7"
 
 /* CuString */
 

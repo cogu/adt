@@ -35,21 +35,42 @@ char* CuStrCopy(const char* old)
  * CuString
  *-------------------------------------------------------------------------*/
 
+static CU_NORETURN void CuOutOfMemory(void)
+{
+    fputs("CuTest: out of memory\n", stderr);
+    abort();
+}
+
 void CuStringInit(CuString* str)
 {
+    char* buffer;
+
+    if (str == NULL)
+    {
+        abort();
+    }
+
+    buffer = (char*) malloc(STRING_MAX);
+    if (buffer == NULL)
+    {
+        CuOutOfMemory();
+    }
+
     str->length = 0;
     str->size = STRING_MAX;
-    str->buffer = (char*) malloc(sizeof(char) * ((unsigned int)str->size));
+    str->buffer = buffer;
     str->buffer[0] = '\0';
 }
 
 CuString* CuStringNew(void)
 {
     CuString* str = (CuString*) malloc(sizeof(CuString));
-    str->length = 0;
-    str->size = STRING_MAX;
-    str->buffer = (char*) malloc(sizeof(char) * ((unsigned int)str->size));
-    str->buffer[0] = '\0';
+    if (str == NULL)
+    {
+        CuOutOfMemory();
+    }
+
+    CuStringInit(str);
     return str;
 }
 
@@ -62,7 +83,20 @@ void CuStringDelete(CuString *str)
 
 void CuStringResize(CuString* str, int newSize)
 {
-    str->buffer = (char*) realloc(str->buffer, sizeof(char) * ((unsigned int)newSize));
+    char* buffer;
+
+    if (str == NULL || newSize <= 0)
+    {
+        abort();
+    }
+
+    buffer = (char*) realloc(str->buffer, (size_t) newSize);
+    if (buffer == NULL)
+    {
+        CuOutOfMemory();
+    }
+
+    str->buffer = buffer;
     str->size = newSize;
 }
 
