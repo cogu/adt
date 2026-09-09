@@ -14,6 +14,10 @@
 */
 
 #include "CMemLeak.h"
+
+/*******************************************************************************
+* Helper functions (added by Conny Gustafsson 2019-01-04)
+*******************************************************************************/
 #undef malloc
 #undef realloc
 #undef free
@@ -122,6 +126,7 @@ static void XWBMemInsert (
     const unsigned int iSize,
     const char* iFile,
     const unsigned int iLine);
+
 /*******************************************************************************
 * New node
 *******************************************************************************/
@@ -300,15 +305,17 @@ void* XWBRealloc (void* iPtr, unsigned int iSize, const char* iFile, const unsig
     const char* name;
 
     usize = ((iSize + xwbProtSize) / sizeof (unsigned int) + 1) * sizeof (unsigned int);
-    result = realloc (iPtr, usize);
-    /* memset (result, xwbUninit, usize); */
-    memcpy (&result[iSize], xwbProtect, xwbProtSize);
-    iPtr = result;
 
-    /* Update the allocation details */
+    /* Find existing allocation details before realloc */
     name = iFile;
     line = iLine;
     node = XWBMemFind (iPtr, &size, &name, &line);
+
+    result = realloc (iPtr, usize);
+    /* memset (result, xwbUninit, usize); */
+    memcpy (&result[iSize], xwbProtect, xwbProtSize);
+
+    /* Update the allocation details */
     if (node == NULL)
     {
        XWBMemInsert (result, iSize, iFile, iLine);
