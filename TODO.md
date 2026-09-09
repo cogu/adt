@@ -81,3 +81,12 @@ Add snake_case function definitions and retain camelCase aliases for backward co
   - Change signature from `(adt_u16Map_t *self, uint8_t enable)` to `(adt_u16Map_t *self, bool enable)` to match `adt_ary_destructor_enable` and `adt_list_destructor_enable` (include `<stdbool.h>`).
 - [ ] **Destructor status inspection**:
   - `adt_ary` provides `adt_ary_has_destructor` and `adt_ary_destructor_is_enabled`. Consider adding matching query functions for `adt_list_t` and `adt_u16Map_t`.
+
+---
+
+## 6. String Robustness
+
+- [ ] **Add unit tests for `adt_str_append(self, self)`**:
+  - Cover self-append both when the existing allocation is sufficient and when appending forces the buffer to grow.
+- [ ] **Handle length overflow in `adt_str_append`**:
+  - Check `self->s32Cur + other->s32Cur` before performing the addition and return `ADT_ARRAY_TOO_LARGE_ERROR` when the combined length exceeds `INT32_MAX`.
