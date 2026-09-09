@@ -213,12 +213,16 @@ static void test_adt_ary_unshift(CuTest *tc) {
 static void test_adt_ary_shift(CuTest *tc) {
   adt_ary_t *pArray = adt_ary_new(vfree);
   int *n1, *n2, *n3, *pVal;
-  n1 = (int *)malloc(sizeof(int));
-  n2 = (int *)malloc(sizeof(int));
-  n3 = (int *)malloc(sizeof(int));
+  n1 = malloc(sizeof(*n1));
+  CuAssertPtrNotNull(tc, n1);
+  n2 = malloc(sizeof(*n2));
+  CuAssertPtrNotNull(tc, n2);
+  n3 = malloc(sizeof(*n3));
+  CuAssertPtrNotNull(tc, n3);
+
   *n1 = 1;
-  *n1 = 2;
-  *n1 = 3;
+  *n2 = 2;
+  *n3 = 3;
   CuAssertPtrNotNull(tc, pArray);
   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, n1));
@@ -390,12 +394,16 @@ static void test_adt_ary_splice_at_end(CuTest *tc) {
 static void test_adt_ary_splice_at_middle(CuTest *tc) {
   int *n1, *n2, *n3;
   adt_ary_t *pArray = adt_ary_new(vfree);
-  n1 = (int *)malloc(sizeof(int));
-  n2 = (int *)malloc(sizeof(int));
-  n3 = (int *)malloc(sizeof(int));
+  n1 = malloc(sizeof(*n1));
+  CuAssertPtrNotNull(tc, n1);
+  n2 = malloc(sizeof(*n2));
+  CuAssertPtrNotNull(tc, n2);
+  n3 = malloc(sizeof(*n3));
+  CuAssertPtrNotNull(tc, n3);
+
   *n1 = 1;
-  *n1 = 2;
-  *n1 = 3;
+  *n2 = 2;
+  *n3 = 3;
   CuAssertPtrNotNull(tc, pArray);
   CuAssertIntEquals(tc, 0, adt_ary_length(pArray));
   CuAssertIntEquals(tc, ADT_NO_ERROR, adt_ary_push(pArray, n1));
@@ -407,7 +415,7 @@ static void test_adt_ary_splice_at_middle(CuTest *tc) {
   CuAssertIntEquals(tc, 2, adt_ary_length(pArray));
   CuAssertPtrEquals(tc, n1, adt_ary_value(pArray, 0));
   CuAssertPtrEquals(tc, n3, adt_ary_value(pArray, 1));
-
+    
   adt_ary_delete(pArray);
 }
 
