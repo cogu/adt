@@ -27,7 +27,7 @@ char* CuStrCopy(const char* old)
 {
     int len = (int) strlen(old);
     char* newStr = CuStrAlloc(len + 1);
-    STRLCPY(newStr, old, (size_t) (len + 1)); //cogu 2026-09-05: Replaced strcpy with STRLCPY to resolve clang-tidy warning
+    memcpy(newStr, old, (size_t) len + 1U);
     return newStr;
 }
 
@@ -77,8 +77,8 @@ void CuStringAppend(CuString* str, const char* text)
     length = (int) strlen(text);
     if (str->length + length + 1 >= str->size)
         CuStringResize(str, str->length + length + 1 + STRING_INC);
+    memcpy(str->buffer + str->length, text, (size_t) length + 1U);
     str->length += length;
-    STRLCAT(str->buffer, text, (size_t) str->size); //cogu 2026-09-05: Replaced strcat with STRLCAT to resolve clang-tidy warning
 }
 
 void CuStringAppendChar(CuString* str, char ch)

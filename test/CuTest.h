@@ -8,7 +8,7 @@
 * cogu 2020-12-01: Added the AssertFalse test macro
 * cogu 2026-09-05: Resolve Clang-tidy issues.
 * cogu 2026-09-05: Added function pointer helper functions to solve a compiler warning
-* cogu 2026-09-05: Added cross-platform string functions
+* cogu 2026-09-09: Replaced unsafe string calls with bounded copies
 */
 
 #ifndef CU_TEST_H
@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CUTEST_VERSION  "CuTest 1.5_COGU_PATCH_5"
+#define CUTEST_VERSION  "CuTest 1.5_COGU_PATCH_6"
 
 /* CuString */
 
@@ -33,14 +33,6 @@ char* CuStrCopy(const char* old);
 #define HUGE_STRING_LEN	8192
 #define STRING_MAX		256
 #define STRING_INC		256
-
-#ifdef _MSC_VER
-#define STRLCPY(dest, src, size) strcpy_s((dest), (size), (src))
-#define STRLCAT(dest, src, size) strcat_s((dest), (size), (src))
-#else
-#define STRLCPY(dest, src, size) strlcpy((dest), (src), (size))
-#define STRLCAT(dest, src, size) strlcat((dest), (src), (size))
-#endif
 
 /* cogu 2026-09-05: Added noreturn macro for MSVC and GCC/Clang */
 #if defined(_MSC_VER)
