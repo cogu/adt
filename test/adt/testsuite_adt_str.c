@@ -242,6 +242,7 @@ static void test_adt_str_set(CuTest *tc)
 {
    char buf[20];
    const char *a, *b;
+   adt_str_t invalidSource;
    adt_str_t *str1 = adt_str_new();
    adt_str_t *str2 = adt_str_new();
    CuAssertPtrNotNull(tc, str1);
@@ -257,6 +258,13 @@ static void test_adt_str_set(CuTest *tc)
    CuAssertIntEquals(tc, 0, memcmp(str1->pAlloc, &buf[0], str1->s32Cur));
    CuAssertIntEquals(tc, 0, memcmp(str2->pAlloc, &buf[0], str2->s32Cur));
    CuAssertTrue(tc, str1->pAlloc != str2->pAlloc);
+
+   adt_str_create(&invalidSource);
+   invalidSource.s32Cur = 1;
+   CuAssertIntEquals(tc, ADT_INVALID_ARGUMENT_ERROR, adt_str_set(str2, &invalidSource));
+   CuAssertIntEquals(tc, 12, str2->s32Cur);
+   CuAssertIntEquals(tc, 0, memcmp(str2->pAlloc, &buf[0], str2->s32Cur));
+
    adt_str_delete(str1);
    adt_str_delete(str2);
 }

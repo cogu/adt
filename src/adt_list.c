@@ -243,8 +243,7 @@ bool adt_list_is_empty(const adt_list_t *self)
    if (self != NULL)
    {
 #ifdef UNIT_TEST
-      if (self->pFirst == NULL) { assert (self->pLast == NULL); }
-      if (self->pLast == NULL) { assert (self->pFirst == NULL); }
+      assert((self->pFirst == NULL) == (self->pLast == NULL));
 #endif
       return (bool) (self->pFirst == NULL);
    }

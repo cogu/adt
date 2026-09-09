@@ -160,10 +160,10 @@ adt_error_t adt_bytearray_append(adt_bytearray_t *self, const uint8_t *pData, ui
    if(self && pData && (u32DataLen > 0)){
       adt_error_t errorCode = adt_bytearray_reserve(self, self->u32CurLen + u32DataLen);
       if(errorCode == ADT_NO_ERROR){
-         uint8_t *pNext, *pEnd;
+         uint8_t *pNext;
          pNext = self->pData + self->u32CurLen;
-         pEnd = self->pData + self->u32AllocLen;
-         assert(pNext + u32DataLen <= pEnd);
+         assert(self->u32CurLen <= self->u32AllocLen);
+         assert(u32DataLen <= self->u32AllocLen - self->u32CurLen);
          memcpy(pNext,pData,u32DataLen);
          self->u32CurLen+=u32DataLen;
       }
@@ -271,10 +271,9 @@ adt_error_t adt_bytearray_push(adt_bytearray_t *self, uint8_t value)
       adt_error_t errorCode = adt_bytearray_reserve(self, self->u32CurLen + 1);
       if(errorCode == ADT_NO_ERROR)
       {
-         uint8_t *pNext, *pEnd;
+         uint8_t *pNext;
          pNext = self->pData + self->u32CurLen;
-         pEnd = self->pData + self->u32AllocLen;
-         assert(pNext + 1 <= pEnd);
+         assert(self->u32CurLen < self->u32AllocLen);
          *pNext = value;
          self->u32CurLen++;
       }

@@ -504,15 +504,15 @@ static void adt_rbfh_swapBuffers(adt_rbfh_t* self, uint8_t *newAllocBuf, uint16_
       assert(self->u8AllocBuf != NULL);
       assert(allocSize > 0);
       u8EndPtr = self->u8AllocBuf + allocSize;
+      assert(self->u8ReadPtr >= self->u8AllocBuf);
+      assert(self->u8ReadPtr < u8EndPtr);
       //Step 1.
       copyLen = (uint32_t) (u8EndPtr-self->u8ReadPtr);
-      assert(copyLen <= allocSize);
       memcpy(newAllocBuf, self->u8ReadPtr, copyLen);
       mark = newAllocBuf+copyLen;
 
       //Step 2.
       copyLen =  (uint32_t) (self->u8ReadPtr - self->u8AllocBuf);
-      assert(copyLen <= allocSize);
       if (copyLen > 0)
       {
          memcpy(mark, self->u8AllocBuf, copyLen);
