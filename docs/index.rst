@@ -12,6 +12,7 @@ It offers a comprehensive suite of container data structures ranging from generi
 
    adt_bytearray
    adt_bytes
+   adt_streambuffer
    adt_ary
    adt_str
    adt_hash
@@ -52,6 +53,11 @@ Below is a summary of all data structures provided by the ADT library:
      - Bytes (``uint8_t``)
      - Yes
      - Immutable byte array buffer.
+   * - :c:type:`adt_streambuffer_t`
+     - ``adt_streambuffer.h``
+     - Bytes (``uint8_t``)
+     - Yes
+     - Multi-slab rolling byte stream buffer for zero-copy I/O and framing.
    * - :c:type:`adt_str_t`
      - ``adt_str.h``
      - Characters (``char*``)
