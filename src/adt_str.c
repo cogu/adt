@@ -571,18 +571,21 @@ const char* adt_str_cstr(adt_str_t *self)
       {
          result = adt_str_reserve(self, 0);
       }
-      if (result == ADT_NO_ERROR)
+      if ((result == ADT_NO_ERROR) && (self->pAlloc != NULL))
       {
          assert(self->s32Cur >= 0);
          assert(self->s32Cur < self->s32Size);
-         assert(self->pAlloc != NULL);
          self->pAlloc[self->s32Cur] = 0u;
          retval = (const char*) self->pAlloc;
          self->last_error = ADT_NO_ERROR;
       }
-      else
+      else if (result != ADT_NO_ERROR)
       {
          self->last_error = result;
+      }
+      else
+      {
+         self->last_error = ADT_MEM_ERROR;
       }
    }
    return retval;

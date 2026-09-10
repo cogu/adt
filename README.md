@@ -133,7 +133,7 @@ for f in src/*.c; do gcov -o build-cov/CMakeFiles/adt.dir/src/$(basename $f).o $
 Configure:
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -GNinja -DCMAKE_BUILD_TYPE=Release
 ```
 
 Build:
@@ -148,12 +148,13 @@ CMake options can be set from command line or using a CMake GUI tool (such as cc
 
 #### Generic Options
 
-| CMake Option      | Usage                                  | Description                                      |
-|-------------------|----------------------------------------|--------------------------------------------------|
-| LEAK_CHECK        | -DLEAK_CHECK=ON                        | Enables memory leak check detection              |
-| UNIT_TEST         | -DUNIT_TEST=ON                         | Activates UNIT_TEST preprocessor define          |
-| ADT_NO_HEAP_MEM   | -DADT_NO_HEAP_MEM=ON                   | Disable heap memory allocation (zero-heap mode)  |
-| ADT_SANITIZERS    | -DADT_SANITIZERS="address,undefined"   | Enables sanitizers for GCC or Clang              |
+| CMake Option         | Usage                                  | Description                                      |
+|----------------------|----------------------------------------|--------------------------------------------------|
+| LEAK_CHECK           | -DLEAK_CHECK=ON                        | Enables memory leak check detection              |
+| UNIT_TEST            | -DUNIT_TEST=ON                         | Activates UNIT_TEST preprocessor define          |
+| ADT_NO_HEAP_MEM      | -DADT_NO_HEAP_MEM=ON                   | Disable heap memory allocation (zero-heap mode)  |
+| ADT_SANITIZERS       | -DADT_SANITIZERS="address,undefined"   | Enables sanitizers for GCC or Clang              |
+| ENABLE_MSVC_ANALYZE  | -DENABLE_MSVC_ANALYZE=ON               | Enables MSVC static code analysis (/analyze)     |
 
 #### Embedded & Zero-Heap Support (`ADT_NO_HEAP_MEM`)
 
