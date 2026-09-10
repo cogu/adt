@@ -66,6 +66,7 @@ set (ADT_HEADER_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_ringbuf.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_set.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_stack.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_streambuffer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_str.h
 )
 
@@ -81,6 +82,7 @@ set (ADT_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_ringbuf.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_set.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_stack.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_streambuffer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_str.c
 )
 
@@ -117,6 +119,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                 test/adt/testsuite_adt_list.c
                 test/adt/testsuite_adt_ringbuf.c
                 test/adt/testsuite_adt_stack.c
+                test/adt/testsuite_adt_streambuffer.c
                 test/adt/testsuite_adt_str.c
                 test/adt/testsuite_adt_u32List.c
                 test/adt/testsuite_adt_u32Set.c

@@ -520,9 +520,15 @@ static bool adt_hnode_set(adt_hnode_t *node, const char *key, void *val, uint32_
                 }
                 // Hash matched, but key string is different (collision)
                 hkey = adt_hkey_new(key, val);
-                assert(hkey != NULL);
-                assert(hprev != NULL);
-                hprev->next = hkey;
+                if(hkey == NULL){
+                    return false;
+                }
+                if(hprev != NULL){
+                    hprev->next = hkey;
+                }
+                else{
+                    node->child.match[i].key = hkey;
+                }
                 return true; // inserted new
             }
         }
