@@ -15,6 +15,17 @@ Architecture & Mechanics
 * **Guaranteed Contiguous View**: When a slab boundary rollover occurs, any unconsumed remainder is copied to offset 0 of the subsequent slab before new bytes are ingested, ensuring downstream parsers always receive a single contiguous buffer.
 * **Shrink-on-Drain**: Slabs expanding beyond ``max_retained_size`` automatically downsize back to ``default_slab_size`` once drained, eliminating permanent heap bloat.
 
+Thread Safety
+-------------
+
+.. warning::
+
+   ``adt_streambuffer_t`` is **not thread-safe**. It does not support concurrent or parallel reading and writing from multiple threads.
+
+   If one thread acts as a producer (calling ingestion functions such as :c:func:`adt_streambuffer_append`, :c:func:`adt_streambuffer_write_begin`, or :c:func:`adt_streambuffer_write_commit`)
+   and another thread acts as a consumer (calling extraction functions such as :c:func:`adt_streambuffer_read_begin` or :c:func:`adt_streambuffer_read_commit`),
+   callers must use an external thread synchronization mechanism (such as a mutex) to serialize access.
+
 Memory Management
 -----------------
 

@@ -30,6 +30,15 @@ extern "C" {
 #define ADT_STREAMBUFFER_DEFAULT_SLAB_SIZE 4096u
 #define ADT_STREAMBUFFER_DEFAULT_MAX_RETAINED_SIZE (16u * 1024u)
 
+/**
+ * \brief Rolling multi-slab stream buffer instance.
+ *
+ * \warning Thread Safety: adt_streambuffer_t is NOT thread-safe. It does not support
+ *          concurrent or parallel reading and writing from multiple threads.
+ *          If one thread acts as a producer and another acts as a consumer, callers
+ *          must use an external synchronization mechanism (such as a mutex) to
+ *          serialize access.
+ */
 typedef struct adt_streambuffer_tag
 {
    adt_bytearray_t slabs[ADT_STREAMBUFFER_NUM_SLABS];
