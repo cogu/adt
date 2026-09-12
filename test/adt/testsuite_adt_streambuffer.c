@@ -68,14 +68,14 @@ static void test_streambuffer_create_destroy(CuTest* tc)
    adt_streambuffer_t sb;
    adt_streambuffer_create(&sb, 0u, 0u);
 
-   CuAssertUIntEquals(tc, adt_streambuffer_DEFAULT_SLAB_SIZE, sb.default_slab_size);
-   CuAssertUIntEquals(tc, adt_streambuffer_DEFAULT_MAX_RETAINED_SIZE, sb.max_retained_size);
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_DEFAULT_SLAB_SIZE, sb.default_slab_size);
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_DEFAULT_MAX_RETAINED_SIZE, sb.max_retained_size);
    CuAssertIntEquals(tc, 0, sb.write_slab_idx);
    CuAssertIntEquals(tc, 0, sb.read_slab_idx);
    CuAssertUIntEquals(tc, 0u, sb.read_pos);
    CuAssertUIntEquals(tc, 0u, adt_streambuffer_length(&sb));
    CuAssertTrue(tc, adt_streambuffer_is_empty(&sb));
-   CuAssertUIntEquals(tc, 3u * adt_streambuffer_DEFAULT_SLAB_SIZE, adt_streambuffer_allocated_bytes(&sb));
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_NUM_SLABS * ADT_STREAMBUFFER_DEFAULT_SLAB_SIZE, adt_streambuffer_allocated_bytes(&sb));
 
    adt_streambuffer_destroy(&sb);
 
@@ -84,7 +84,7 @@ static void test_streambuffer_create_destroy(CuTest* tc)
    CuAssertPtrNotNull(tc, pHeap);
    CuAssertUIntEquals(tc, 1024u, pHeap->default_slab_size);
    CuAssertUIntEquals(tc, 4096u, pHeap->max_retained_size);
-   CuAssertUIntEquals(tc, 3u * 1024u, adt_streambuffer_allocated_bytes(pHeap));
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_NUM_SLABS * 1024u, adt_streambuffer_allocated_bytes(pHeap));
    adt_streambuffer_delete(pHeap);
 
    // Test vdelete
@@ -247,7 +247,7 @@ static void test_streambuffer_jumbo_and_shrink(CuTest* tc)
    const uint32_t threshold = 4096u;
    adt_streambuffer_create(&sb, baseline, threshold);
 
-   CuAssertUIntEquals(tc, 3u * baseline, adt_streambuffer_allocated_bytes(&sb));
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_NUM_SLABS * baseline, adt_streambuffer_allocated_bytes(&sb));
 
    // Write 256 kB payload
    const uint32_t jumboSize = 256u * 1024u;
@@ -279,7 +279,7 @@ static void test_streambuffer_jumbo_and_shrink(CuTest* tc)
 
    // Shrink-on-drain verification: slab must have downsized back to baseline
    CuAssertUIntEquals(tc, baseline, sb.slabs[sb.read_slab_idx].u32AllocLen);
-   CuAssertUIntEquals(tc, 3u * baseline, adt_streambuffer_allocated_bytes(&sb));
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_NUM_SLABS * baseline, adt_streambuffer_allocated_bytes(&sb));
 
    // Also test shrink on rollover
    err = adt_streambuffer_append(&sb, jumboData, jumboSize);
@@ -296,7 +296,7 @@ static void test_streambuffer_jumbo_and_shrink(CuTest* tc)
    CuAssertIntEquals(tc, ADT_NO_ERROR, err);
 
    // The retired jumbo slab must have shrunk back to baseline!
-   uint8_t oldSlabIdx = (sb.write_slab_idx + adt_streambuffer_NUM_SLABS - 1u) % adt_streambuffer_NUM_SLABS;
+   uint8_t oldSlabIdx = (sb.write_slab_idx + ADT_STREAMBUFFER_NUM_SLABS - 1u) % ADT_STREAMBUFFER_NUM_SLABS;
    CuAssertUIntEquals(tc, baseline, sb.slabs[oldSlabIdx].u32AllocLen);
 
    free(jumboData);
@@ -444,7 +444,7 @@ static void test_streambuffer_clear(CuTest* tc)
    CuAssertTrue(tc, adt_streambuffer_allocated_bytes(&sb) >= bigSize);
 
    adt_streambuffer_clear(&sb);
-   CuAssertUIntEquals(tc, 3u * 1024u, adt_streambuffer_allocated_bytes(&sb));
+   CuAssertUIntEquals(tc, ADT_STREAMBUFFER_NUM_SLABS * 1024u, adt_streambuffer_allocated_bytes(&sb));
 
    free(bigBuf);
    adt_streambuffer_destroy(&sb);

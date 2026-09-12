@@ -10,7 +10,7 @@ Stream Buffer (adt_streambuffer)
 Architecture & Mechanics
 ------------------------
 
-* **3-Slab Rolling Model**: Uses an internal ring of 3 slabs (instances of :c:type:`adt_bytearray_t`).
+* **2-Slab Rolling Model**: Uses an internal ring of 2 slabs (instances of :c:type:`adt_bytearray_t`).
 * **Zero-Copy Consumption**: Advancing the read position (:c:func:`adt_streambuffer_read_commit`) is an :math:`O(1)` pointer advance with zero copying or shifting.
 * **Guaranteed Contiguous View**: When a slab boundary rollover occurs, any unconsumed remainder is copied to offset 0 of the subsequent slab before new bytes are ingested, ensuring downstream parsers always receive a single contiguous buffer.
 * **Shrink-on-Drain**: Slabs expanding beyond ``max_retained_size`` automatically downsize back to ``default_slab_size`` once drained, eliminating permanent heap bloat.

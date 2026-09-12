@@ -26,21 +26,17 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////////
 // PUBLIC CONSTANTS AND DATA TYPES
 //////////////////////////////////////////////////////////////////////////////
-#define adt_streambuffer_NUM_SLABS 3u
-#define adt_streambuffer_DEFAULT_SLAB_SIZE 4096u
-#define adt_streambuffer_DEFAULT_MAX_RETAINED_SIZE (16u * 1024u)
-
-#define ADT_STREAMBUFFER_NUM_SLABS adt_streambuffer_NUM_SLABS
-#define ADT_STREAMBUFFER_DEFAULT_SLAB_SIZE adt_streambuffer_DEFAULT_SLAB_SIZE
-#define ADT_STREAMBUFFER_DEFAULT_MAX_RETAINED_SIZE adt_streambuffer_DEFAULT_MAX_RETAINED_SIZE
+#define ADT_STREAMBUFFER_NUM_SLABS 2u
+#define ADT_STREAMBUFFER_DEFAULT_SLAB_SIZE 4096u
+#define ADT_STREAMBUFFER_DEFAULT_MAX_RETAINED_SIZE (16u * 1024u)
 
 typedef struct adt_streambuffer_tag
 {
-   adt_bytearray_t slabs[adt_streambuffer_NUM_SLABS];
+   adt_bytearray_t slabs[ADT_STREAMBUFFER_NUM_SLABS];
    uint32_t default_slab_size;  /**< Baseline allocation size for each slab */
    uint32_t max_retained_size;  /**< Hysteresis threshold: slabs exceeding this shrink upon drain */
-   uint8_t  write_slab_idx;     /**< Index of slab currently accepting writes (0..2) */
-   uint8_t  read_slab_idx;      /**< Index of slab currently being read (0..2) */
+   uint8_t  write_slab_idx;     /**< Index of slab currently accepting writes (0..1) */
+   uint8_t  read_slab_idx;      /**< Index of slab currently being read (0..1) */
    uint32_t read_pos;           /**< Number of bytes already consumed from slabs[read_slab_idx] */
 } adt_streambuffer_t;
 

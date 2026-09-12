@@ -41,8 +41,8 @@ void adt_streambuffer_create(adt_streambuffer_t *self, uint32_t default_slab_siz
 {
    if (self != NULL)
    {
-      self->default_slab_size = (default_slab_size == 0u) ? adt_streambuffer_DEFAULT_SLAB_SIZE : default_slab_size;
-      self->max_retained_size = (max_retained_size == 0u) ? adt_streambuffer_DEFAULT_MAX_RETAINED_SIZE : max_retained_size;
+      self->default_slab_size = (default_slab_size == 0u) ? ADT_STREAMBUFFER_DEFAULT_SLAB_SIZE : default_slab_size;
+      self->max_retained_size = (max_retained_size == 0u) ? ADT_STREAMBUFFER_DEFAULT_MAX_RETAINED_SIZE : max_retained_size;
       if (self->max_retained_size < self->default_slab_size)
       {
          self->max_retained_size = self->default_slab_size;
@@ -51,7 +51,7 @@ void adt_streambuffer_create(adt_streambuffer_t *self, uint32_t default_slab_siz
       self->read_slab_idx = 0u;
       self->read_pos = 0u;
 
-      for (uint8_t i = 0u; i < adt_streambuffer_NUM_SLABS; i++)
+      for (uint8_t i = 0u; i < ADT_STREAMBUFFER_NUM_SLABS; i++)
       {
          adt_bytearray_create(&self->slabs[i]);
          (void) adt_bytearray_reserve(&self->slabs[i], self->default_slab_size);
@@ -63,7 +63,7 @@ void adt_streambuffer_destroy(adt_streambuffer_t *self)
 {
    if (self != NULL)
    {
-      for (uint8_t i = 0u; i < adt_streambuffer_NUM_SLABS; i++)
+      for (uint8_t i = 0u; i < ADT_STREAMBUFFER_NUM_SLABS; i++)
       {
          adt_bytearray_destroy(&self->slabs[i]);
       }
@@ -106,7 +106,7 @@ void adt_streambuffer_clear(adt_streambuffer_t *self)
       self->write_slab_idx = 0u;
       self->read_slab_idx = 0u;
       self->read_pos = 0u;
-      for (uint8_t i = 0u; i < adt_streambuffer_NUM_SLABS; i++)
+      for (uint8_t i = 0u; i < ADT_STREAMBUFFER_NUM_SLABS; i++)
       {
          self->slabs[i].u32CurLen = 0u;
          adt_streambuffer_slab_shrink_if_needed(self, i);
@@ -209,7 +209,7 @@ uint8_t* adt_streambuffer_write_begin(adt_streambuffer_t *self, uint32_t u32MinS
       total_needed = self->default_slab_size;
    }
 
-   uint8_t next_idx = (self->write_slab_idx + 1u) % adt_streambuffer_NUM_SLABS;
+   uint8_t next_idx = (self->write_slab_idx + 1u) % ADT_STREAMBUFFER_NUM_SLABS;
    adt_bytearray_t *next_slab = &self->slabs[next_idx];
 
    next_slab->u32CurLen = 0u;
@@ -356,7 +356,7 @@ uint32_t adt_streambuffer_length(const adt_streambuffer_t *self)
    }
 
    uint32_t total = 0u;
-   for (uint8_t i = 0u; i < adt_streambuffer_NUM_SLABS; i++)
+   for (uint8_t i = 0u; i < ADT_STREAMBUFFER_NUM_SLABS; i++)
    {
       if (i == self->read_slab_idx)
       {
@@ -381,7 +381,7 @@ uint32_t adt_streambuffer_allocated_bytes(const adt_streambuffer_t *self)
    }
 
    uint32_t total = 0u;
-   for (uint8_t i = 0u; i < adt_streambuffer_NUM_SLABS; i++)
+   for (uint8_t i = 0u; i < ADT_STREAMBUFFER_NUM_SLABS; i++)
    {
       total += self->slabs[i].u32AllocLen;
    }
@@ -400,7 +400,7 @@ bool adt_streambuffer_is_empty(const adt_streambuffer_t *self)
 static void adt_streambuffer_slab_shrink_if_needed(adt_streambuffer_t *self, uint8_t slab_idx)
 {
    assert(self != NULL);
-   assert(slab_idx < adt_streambuffer_NUM_SLABS);
+   assert(slab_idx < ADT_STREAMBUFFER_NUM_SLABS);
 
    adt_bytearray_t *slab = &self->slabs[slab_idx];
    if (slab->u32AllocLen > self->max_retained_size)
