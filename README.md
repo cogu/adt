@@ -12,7 +12,7 @@ Online documentation and API reference: **[c-adt.readthedocs.io](https://c-adt.r
 **ADT** provides platform-independent and compiler-independent abstract data types for the C programming language (C99 and later). It offers a rich suite of containers designed for both standard application development and resource-constrained embedded systems:
 
 * **Generic Object Containers (`void*`)**: Dynamic pointer array (`adt_ary_t`), hash table with string keys (`adt_hash_t`), doubly-linked list (`adt_list_t`), LIFO stack (`adt_stack_t`), and binary heap priority queue (`adt_heap_t`).
-* **Byte & String Buffers**: Mutable resizable byte array (`adt_bytearray_t`), immutable byte buffer (`adt_bytes_t`), and UTF-8/ASCII string container (`adt_str_t`).
+* **Byte & String Buffers**: Mutable resizable byte array (`adt_bytearray_t`), immutable byte buffer (`adt_bytes_t`), rolling byte stream buffer (`adt_streambuffer_t`), and UTF-8/ASCII string container (`adt_str_t`).
 * **Embedded & Zero-Heap Containers**: Static element ring buffer (`adt_rbfs_t`), embedded 16-bit ring buffer (`adt_rbfu16_t`), and sorted-array key-value map (`adt_u16Map_t`).
 * **Specialized Value Containers**: 32-bit integer linked list (`adt_u32List_t`), unique 32-bit integer set (`adt_u32Set_t`), and dynamically resizing heap ring buffer (`adt_rbfh_t`).
 
@@ -23,6 +23,7 @@ Online documentation and API reference: **[c-adt.readthedocs.io](https://c-adt.r
 | `adt_ary_t` | `adt_ary.h` | Objects (`void*`) | Yes | Contiguous pointer array with O(1) random access |
 | `adt_bytearray_t` | `adt_bytearray.h` | Bytes (`uint8_t`) | Yes | Mutable byte array with geometric growth |
 | `adt_bytes_t` | `adt_bytes.h` | Bytes (`uint8_t`) | Yes | Immutable byte array |
+| `adt_streambuffer_t` | `adt_streambuffer.h` | Bytes (`uint8_t`) | Yes | Multi-slab rolling byte stream buffer for zero-copy I/O and framing |
 | `adt_str_t` | `adt_str.h` | Characters (`char*`) | Yes | Dynamic UTF-8 / ASCII string container |
 | `adt_hash_t` | `adt_hash.h` | Objects (`void*`) | Yes | Hash table with string keys |
 | `adt_u16Map_t` | `adt_map.h` | Objects (`void*`) | No | Sorted-array map for `uint16_t` keys |
