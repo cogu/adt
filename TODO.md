@@ -90,3 +90,60 @@ Add snake_case function definitions and retain camelCase aliases for backward co
   - Cover self-append both when the existing allocation is sufficient and when appending forces the buffer to grow.
 - [ ] **Handle length overflow in `adt_str_append`**:
   - Check `self->s32Cur + other->s32Cur` before performing the addition and return `ADT_ARRAY_TOO_LARGE_ERROR` when the combined length exceeds `INT32_MAX`.
+
+---
+
+## 7. Const Correctness & Code Hardening
+
+Follow the pattern established in `adt_streambuffer` to explicitly qualify parameters and local variables as `const` unless they are mutated during execution.
+
+- [ ] **Audit all public function prototypes across `include/*.h`**:
+  - Pass-by-value scalar parameters that are read-only should be declared `const` (e.g., `const uint32_t size`, `const int c`, `const uint8_t index`).
+  - Read-only container inspection functions should take `const T *self`.
+  - Pointers to input buffers should be pointer-to-const (e.g., `const uint8_t *data`).
+- [ ] **Audit implementations and local variables across `src/*.c`**:
+  - Declare local variables as `const` where their values do not change after initialization.
+  - Const-qualify local pointers where the pointer itself is not reassigned (`T * const ptr` or `const T * const ptr`).
+  - Containers to audit:
+    - [ ] `adt_ary.h` / `adt_ary.c`
+    - [ ] `adt_bytearray.h` / `adt_bytearray.c`
+    - [ ] `adt_bytes.h` / `adt_bytes.c`
+    - [ ] `adt_error.h` / `adt_error.c`
+    - [ ] `adt_hash.h` / `adt_hash.c`
+    - [ ] `adt_heap.h` / `adt_heap.c`
+    - [ ] `adt_list.h` / `adt_list.c`
+    - [ ] `adt_map.h` / `adt_map.c`
+    - [ ] `adt_ringbuf.h` / `adt_ringbuf.c`
+    - [ ] `adt_set.h` / `adt_set.c`
+    - [ ] `adt_stack.h` / `adt_stack.c`
+    - [ ] `adt_str.h` / `adt_str.c`
+
+---
+
+## 8. Parameter Naming Normalization (snake_case without Hungarian Notation)
+
+Normalize parameter names across all headers and source files to modern, idiomatic `snake_case`, eliminating legacy Hungarian notation prefixes (`u8`, `u16`, `u32`, `s32`, `p`, `pp`).
+
+- [ ] **Remove Hungarian notation prefixes from parameters**:
+  - `pItem` / `pVal` -> `item` / `val` / `value`
+  - `pData` / `pBuffer` -> `data` / `buffer`
+  - `pBegin` / `pEnd` -> `begin` / `end`
+  - `pKey` / `u32Hash` -> `key` / `hash`
+  - `u32Size` / `u32Length` / `dataLen` / `newLen` -> `size` / `length` / `num_bytes`
+  - `u32Index` / `s32Index` -> `index`
+  - `pDestructor` / `pComparator` -> `destructor` / `comparator`
+- [ ] **Normalize camelCase parameter names to snake_case**:
+  - Examples: `defaultSlabSize` -> `default_slab_size`, `growthFactor` -> `growth_factor`, `maxBufLen` -> `max_buf_len`.
+- [ ] **Containers to audit**:
+  - [ ] `adt_ary.h` / `adt_ary.c`
+  - [ ] `adt_bytearray.h` / `adt_bytearray.c`
+  - [ ] `adt_bytes.h` / `adt_bytes.c`
+  - [ ] `adt_hash.h` / `adt_hash.c`
+  - [ ] `adt_heap.h` / `adt_heap.c`
+  - [ ] `adt_list.h` / `adt_list.c`
+  - [ ] `adt_map.h` / `adt_map.c`
+  - [ ] `adt_ringbuf.h` / `adt_ringbuf.c`
+  - [ ] `adt_set.h` / `adt_set.c`
+  - [ ] `adt_stack.h` / `adt_stack.c`
+  - [ ] `adt_str.h` / `adt_str.c`
+
