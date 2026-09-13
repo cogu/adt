@@ -259,6 +259,7 @@ static void test_streambuffer_jumbo_and_shrink(CuTest* tc)
    const uint32_t jumboSize = 256u * 1024u;
    uint8_t *jumboData = (uint8_t*) malloc(jumboSize);
    CuAssertPtrNotNull(tc, jumboData);
+   assert(jumboData != NULL);
    for (uint32_t i = 0; i < jumboSize; i++)
    {
       jumboData[i] = (uint8_t) (i & 0xFFu);
@@ -374,7 +375,7 @@ static void test_streambuffer_stress(CuTest* tc)
             chunkSize = totalBytes - writeSeq;
          }
 
-         uint8_t writeBuf[300];
+         uint8_t writeBuf[300] = {0};
          for (uint32_t i = 0; i < chunkSize; i++)
          {
             writeBuf[i] = (uint8_t) ((writeSeq + i) & 0xFFu);
@@ -444,6 +445,7 @@ static void test_streambuffer_clear(CuTest* tc)
    const uint32_t bigSize = 32u * 1024u;
    uint8_t *bigBuf = (uint8_t*) malloc(bigSize);
    CuAssertPtrNotNull(tc, bigBuf);
+   assert(bigBuf != NULL);
    memset(bigBuf, 0x33, bigSize);
    err = adt_streambuffer_append(&sb, bigBuf, bigSize);
    CuAssertIntEquals(tc, ADT_NO_ERROR, err);
