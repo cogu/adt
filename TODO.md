@@ -147,3 +147,28 @@ Normalize parameter names across all headers and source files to modern, idiomat
   - [ ] `adt_stack.h` / `adt_stack.c`
   - [ ] `adt_str.h` / `adt_str.c`
 
+---
+
+## 9. UTF-8 Code-Point Append Support
+
+`adt_str` can detect and decode UTF-8, and its set/append functions accept already encoded UTF-8 byte sequences. However, it has no API for encoding a Unicode scalar value as UTF-8. `adt_str_push()` appends only one byte and must not be used for code points above U+00FF.
+
+- [ ] **Add `adt_str_push_code_point(adt_str_t *self, uint32_t code_point)`** to `include/adt_str.h` and `src/adt_str.c`:
+  - Encode valid Unicode scalar values as one to four UTF-8 bytes.
+  - Accept code points in the ranges U+0000 through U+D7FF and U+E000 through U+10FFFF.
+  - Reject UTF-16 surrogate code points U+D800 through U+DFFF with `ADT_INVALID_ARGUMENT_ERROR`.
+  - Reject values above U+10FFFF with `ADT_INVALID_ARGUMENT_ERROR`.
+  - Return `ADT_INVALID_ARGUMENT_ERROR` when `self` is `NULL`.
+  - Reserve space for the complete encoded sequence before modifying the string so the append is atomic on allocation failure.
+  - Return `ADT_MEM_ERROR` or the applicable reserve error without partially appending a code point.
+  - Preserve ASCII encoding for code points through U+007F; set the string encoding to `ADT_STR_ENCODING_UTF8` after appending a multibyte sequence.
+  - Keep `adt_str_push()` as the single-byte append API and clarify this distinction in its documentation.
+- [ ] **Add unit tests for `adt_str_push_code_point()`**:
+  - Cover UTF-8 boundaries U+0000, U+007F, U+0080, U+07FF, U+0800, U+D7FF, U+E000, U+FFFF, U+10000, and U+10FFFF.
+  - Verify the exact encoded bytes and null-terminated C-string representation.
+  - Verify `adt_str_size()` reports encoded byte length while `adt_str_length()` reports Unicode code-point count.
+  - Reject U+D800, U+DFFF, U+110000, and a `NULL` string.
+  - Verify allocation failure leaves the original string unchanged.
+
+This API is needed by JSON decoders such as `bstr_parse_json_string_literal()`, which must convert `\uXXXX` escapes and UTF-16 surrogate pairs into UTF-8 output without truncating code points to a single byte.
+
