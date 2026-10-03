@@ -10,7 +10,7 @@ import os
 project = 'ADT'
 copyright = '2026, Conny Gustafsson'
 author = 'Conny Gustafsson'
-release = '0.3.7'
+release = '0.3.8'
 
 # -- General configuration ---------------------------------------------------
 
