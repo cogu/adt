@@ -79,21 +79,9 @@ by default chooses the appropriate compiler version.
 
 #### Running unit tests
 
-Configure:
-
-```sh
+```bash
 cmake -S . -B build-test -GNinja -DUNIT_TEST=ON
-```
-
-Build:
-
-```sh
 cmake --build build-test
-```
-
-Run test cases:
-
-```sh
 ctest --test-dir build-test --output-on-failure
 ```
 
@@ -110,8 +98,7 @@ cmake -S . -B build-cov -DUNIT_TEST=ON \
 Build and run tests:
 
 ```sh
-cmake --build build-cov
-ctest --test-dir build-cov --output-on-failure
+cmake --build build-cov && ctest --test-dir build-cov --output-on-failure
 ```
 
 Analyze coverage with `gcov`:
