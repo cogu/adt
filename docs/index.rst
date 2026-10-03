@@ -22,6 +22,7 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_ringbuf
    adt_map
    adt_set
+   adt_partition
 
 
 Data Structures Catalog
@@ -113,6 +114,16 @@ Below is a summary of all data structures provided by the ADT library:
      - Values (``uint32_t``)
      - Yes
      - Set container for unique 32-bit unsigned integers.
+   * - :doc:`adt_u16_partition_t <adt_partition>`
+     - ``adt_partition.h``
+     - Boundaries (``uint16_t``)
+     - Yes
+     - Contiguous partition index for 16-bit offset intervals.
+   * - :doc:`adt_u32_partition_t <adt_partition>`
+     - ``adt_partition.h``
+     - Boundaries (``uint32_t``)
+     - Yes
+     - Contiguous partition index for 32-bit offset intervals.
 
 
 Embedded & Zero-Heap Support
