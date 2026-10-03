@@ -35,6 +35,8 @@ Online documentation and API reference: **[c-adt.readthedocs.io](https://c-adt.r
 | `adt_rbfu16_t` | `adt_ringbuf.h` | Values (`uint16_t`) | No | Embedded circular buffer for `uint16_t` (zero heap) |
 | `adt_rbfh_t` | `adt_ringbuf.h` | Elements (`uint8_t*`) | Yes | Heap-allocated circular FIFO buffer |
 | `adt_u32Set_t` | `adt_set.h` | Values (`uint32_t`) | Yes | Unique set of 32-bit integers |
+| `adt_u16_partition_t` | `adt_partition.h` | Boundaries (`uint16_t`) | Yes | Contiguous partition index for 16-bit offset intervals |
+| `adt_u32_partition_t` | `adt_partition.h` | Boundaries (`uint32_t`) | Yes | Contiguous partition index for 32-bit offset intervals |
 
 > **Embedded Development Note**: Data structures with **Requires Heap: No** (such as `adt_rbfs_t`, `adt_rbfu16_t`, and `adt_u16Map_t`) or those initialized via in-place `*_create` / `*_destroy` functions operate completely without dynamic heap allocation (`malloc` / `free`), making them safe for microcontrollers, safety-critical code, and real-time systems.
 
