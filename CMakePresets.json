@@ -2,7 +2,7 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 20,
+    "minor": 28,
     "patch": 0
   },
   "configurePresets": [
@@ -12,7 +12,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang-18",
+        "CMAKE_C_COMPILER": "clang-21",
         "CMAKE_EXPORT_COMPILE_COMMANDS": true
       }
     },
@@ -54,8 +54,8 @@
       "displayName": "Clang 18 Static Analysis",
       "inherits": "clang-test",
       "cacheVariables": {
-        "CMAKE_C_CLANG_TIDY": "clang-tidy-18",
-        "CMAKE_CXX_CLANG_TIDY": "clang-tidy-18"
+        "CMAKE_C_CLANG_TIDY": "clang-tidy-21",
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy-21"
       }
     }
   ],

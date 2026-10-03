@@ -63,18 +63,13 @@ If you are looking for higher level data types in C you can check out the [cogu/
 
 ```bash
 # Run unit tests
-cmake --preset clang-test
-cmake --build --preset clang-test
-ctest --preset clang-test
+cmake --preset clang-test && cmake --build --preset clang-test && ctest --preset clang-test
 
 # Address and Undefined Behavior Sanitizers (ASan + UBSan)
-cmake --preset clang-asan
-cmake --build --preset clang-asan
-ctest --preset clang-asan
+cmake --preset clang-asan && cmake --build --preset clang-asan && ctest --preset clang-asan
 
 # Static Analysis
-cmake --preset clang-tidy
-cmake --build --preset clang-tidy
+cmake --preset clang-tidy && cmake --build --preset clang-tidy
 ```
 
 ### Manual CMake Workflows (Linux and Windows)
@@ -174,11 +169,11 @@ When `-DUNIT_TEST=ON` is set, a dedicated benchmark executable `adt_perf` is bui
 Run directly:
 
 ```sh
-./build-test/adt_perf
+./build/clang-test/adt_perf
 ```
 
 Or run via CTest:
 
 ```sh
-ctest --test-dir build-test -L benchmark --output-on-failure --verbose
+ctest --test-dir build/clang-test -L benchmark --output-on-failure --verbose
 ```
