@@ -64,6 +64,7 @@ set (ADT_HEADER_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_list.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_map.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_partition.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_range_list.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_ringbuf.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_set.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/adt_stack.h
@@ -81,6 +82,7 @@ set (ADT_SOURCE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_list.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_map.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_partition.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_range_list.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_ringbuf.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_set.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adt_stack.c
@@ -120,6 +122,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                 test/adt/testsuite_adt_heap.c
                 test/adt/testsuite_adt_list.c
                 test/adt/testsuite_adt_partition.c
+                test/adt/testsuite_adt_range_list.c
                 test/adt/testsuite_adt_ringbuf.c
                 test/adt/testsuite_adt_stack.c
                 test/adt/testsuite_adt_streambuffer.c

@@ -34,6 +34,7 @@ CuSuite* testsuite_adt_streambuffer(void);
 CuSuite* testsuite_adt_bytes(void);
 CuSuite* testsuite_adt_error(void);
 CuSuite* testsuite_adt_partition(void);
+CuSuite* testsuite_adt_range_list(void);
 
 void RunAllTests(void)
 {
@@ -55,6 +56,7 @@ void RunAllTests(void)
    CuSuiteAddSuite(suite, testsuite_adt_bytes());
    CuSuiteAddSuite(suite, testsuite_adt_error());
    CuSuiteAddSuite(suite, testsuite_adt_partition());
+   CuSuiteAddSuite(suite, testsuite_adt_range_list());
 
 
 
