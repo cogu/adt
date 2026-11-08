@@ -23,6 +23,7 @@ It offers a comprehensive suite of container data structures ranging from generi
    adt_map
    adt_set
    adt_partition
+   adt_range_list
 
 
 Data Structures Catalog
@@ -124,6 +125,16 @@ Below is a summary of all data structures provided by the ADT library:
      - Boundaries (``uint32_t``)
      - Yes
      - Contiguous partition index for 32-bit offset intervals.
+   * - :doc:`adt_u16_range_list_t <adt_range_list>`
+     - ``adt_range_list.h``
+     - Ranges (``adt_u16_range_t``)
+     - Yes
+     - Sorted disjoint range list with coalescing for 16-bit offsets.
+   * - :doc:`adt_u32_range_list_t <adt_range_list>`
+     - ``adt_range_list.h``
+     - Ranges (``adt_u32_range_t``)
+     - Yes
+     - Sorted disjoint range list with coalescing for 32-bit offsets.
 
 
 Embedded & Zero-Heap Support
